@@ -20,6 +20,8 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - Validate=false
   ignoreDifferences:
     - group: constraints.gatekeeper.sh
       kind: "*"
