@@ -14,7 +14,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
 rules:
 - apiGroups: ["longhorn.io"]
-  resources: ["settings"]
+  resources: ["*"]
   verbs: ["get", "list", "watch"]
 - apiGroups: [""]
   resources: ["events"]
