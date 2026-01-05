@@ -17,6 +17,7 @@ spec:
       values: |
         defaultSettings:
           defaultDataPath: /mnt/data/longhorn
+          disablePreUpgradeChecker: true
         ingress:
           enabled: true
           host: longhorn.k3s.gillouche.homelab

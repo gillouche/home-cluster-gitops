@@ -1,0 +1,2 @@
+# Add other longhorn prerequisites here (e.g. ConfigMaps, specialized RBAC)
+# Note: The ServiceAccount is managed by the Helm chart to avoid conflicts.
