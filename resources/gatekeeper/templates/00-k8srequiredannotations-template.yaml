@@ -1,6 +1,8 @@
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
   name: k8srequiredannotations
 spec:
   crd:
@@ -9,21 +11,15 @@ spec:
         kind: K8sRequiredAnnotations
       validation:
         openAPIV3Schema:
-          type: object
           properties:
             annotations:
-              type: array
               items:
                 type: string
+              type: array
+          type: object
   targets:
-    - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8srequiredannotations
-
-        violation[{"msg": msg}] {
-          required := input.parameters.annotations
-          provided := input.review.object.metadata.annotations
-          missing := required[_]
-          not provided[missing]
-          msg := sprintf("Missing required annotation: %s", [missing])
-        }
+  - rego: "package k8srequiredannotations\n\nviolation[{\"msg\": msg}] {\n  required\
+      \ := input.parameters.annotations\n  provided := input.review.object.metadata.annotations\n\
+      \  missing := required[_]\n  not provided[missing]\n  msg := sprintf(\"Missing\
+      \ required annotation: %s\", [missing])\n}\n"
+    target: admission.k8s.gatekeeper.sh

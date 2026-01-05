@@ -1,22 +1,27 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sResourceLimits
 metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: '2'
   name: require-resource-limits
 spec:
   enforcementAction: dryrun
   match:
+    excludedNamespaces:
+    - kube-system
+    - gatekeeper-system
+    - kube-public
+    - longhorn-system
+    - kubernetes-dashboard
+    - sealed-secrets
     kinds:
-      - apiGroups: ["apps"]
-        kinds: ["Deployment"]
+    - apiGroups:
+      - apps
+      kinds:
+      - Deployment
     namespaceSelector:
       matchExpressions:
-        - key: policy-tier
-          operator: In
-          values: ["playground"]
-    excludedNamespaces:
-      - kube-system
-      - gatekeeper-system
-      - kube-public
-      - longhorn-system
-      - kubernetes-dashboard
-      - sealed-secrets
+      - key: policy-tier
+        operator: In
+        values:
+        - playground

@@ -1,6 +1,8 @@
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
   name: k8srunasnonroot
 spec:
   crd:
@@ -8,11 +10,6 @@ spec:
       names:
         kind: K8sRunAsNonRoot
   targets:
-    - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8srunasnonroot
-
-        violation[{"msg": msg}] {
-          not input.review.object.spec.securityContext.runAsNonRoot
-          msg := "Pods must set securityContext.runAsNonRoot=true"
-        }
+  - rego: "package k8srunasnonroot\n\nviolation[{\"msg\": msg}] {\n  not input.review.object.spec.securityContext.runAsNonRoot\n\
+      \  msg := \"Pods must set securityContext.runAsNonRoot=true\"\n}\n"
+    target: admission.k8s.gatekeeper.sh

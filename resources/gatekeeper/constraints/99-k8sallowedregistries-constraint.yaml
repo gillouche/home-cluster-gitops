@@ -1,27 +1,32 @@
 apiVersion: constraints.gatekeeper.sh/v1beta1
 kind: K8sAllowedRegistries
 metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: '2'
   name: allow-approved-registries
 spec:
   enforcementAction: dryrun
-  parameters:
-    registries:
-      - "docker.io/library/"
-      - "ghcr.io/"
-      - "quay.io/"
   match:
+    excludedNamespaces:
+    - kube-system
+    - gatekeeper-system
+    - kube-public
+    - longhorn-system
+    - kubernetes-dashboard
+    - sealed-secrets
     kinds:
-      - apiGroups: [""]
-        kinds: ["Pod"]
+    - apiGroups:
+      - ''
+      kinds:
+      - Pod
     namespaceSelector:
       matchExpressions:
-        - key: policy-tier
-          operator: In
-          values: ["playground"]
-    excludedNamespaces:
-      - kube-system
-      - gatekeeper-system
-      - kube-public
-      - longhorn-system
-      - kubernetes-dashboard
-      - sealed-secrets
+      - key: policy-tier
+        operator: In
+        values:
+        - playground
+  parameters:
+    registries:
+    - docker.io/library/
+    - ghcr.io/
+    - quay.io/

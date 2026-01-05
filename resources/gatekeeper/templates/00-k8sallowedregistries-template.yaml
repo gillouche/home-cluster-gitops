@@ -1,6 +1,8 @@
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
   name: k8sallowedregistries
 spec:
   crd:
@@ -9,25 +11,17 @@ spec:
         kind: K8sAllowedRegistries
       validation:
         openAPIV3Schema:
-          type: object
           properties:
             registries:
-              type: array
               items:
                 type: string
+              type: array
+          type: object
   targets:
-    - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8sallowedregistries
-
-        violation[{"msg": msg}] {
-          container := input.review.object.spec.containers[_]
-          image := container.image
-          not matches_any_registry(image, input.parameters.registries)
-          msg := sprintf("Image '%s' is not from an allowed registry", [image])
-        }
-
-        matches_any_registry(image, registries) {
-          registry := registries[_]
-          startswith(image, registry)
-        }
+  - rego: "package k8sallowedregistries\n\nviolation[{\"msg\": msg}] {\n  container\
+      \ := input.review.object.spec.containers[_]\n  image := container.image\n  not\
+      \ matches_any_registry(image, input.parameters.registries)\n  msg := sprintf(\"\
+      Image '%s' is not from an allowed registry\", [image])\n}\n\nmatches_any_registry(image,\
+      \ registries) {\n  registry := registries[_]\n  startswith(image, registry)\n\
+      }\n"
+    target: admission.k8s.gatekeeper.sh

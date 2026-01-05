@@ -1,6 +1,8 @@
 apiVersion: templates.gatekeeper.sh/v1
 kind: ConstraintTemplate
 metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'
   name: k8snoprivileged
 spec:
   crd:
@@ -8,12 +10,7 @@ spec:
       names:
         kind: K8sNoPrivileged
   targets:
-    - target: admission.k8s.gatekeeper.sh
-      rego: |
-        package k8snoprivileged
-
-        violation[{"msg": msg}] {
-          container := input.review.object.spec.containers[_]
-          container.securityContext.privileged == true
-          msg := "Privileged containers are not allowed"
-        }
+  - rego: "package k8snoprivileged\n\nviolation[{\"msg\": msg}] {\n  container :=\
+      \ input.review.object.spec.containers[_]\n  container.securityContext.privileged\
+      \ == true\n  msg := \"Privileged containers are not allowed\"\n}\n"
+    target: admission.k8s.gatekeeper.sh
