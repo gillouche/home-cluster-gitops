@@ -1,8 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: longhorn-prereqs
+  name: gatekeeper-templates
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
@@ -10,15 +12,13 @@ spec:
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
-    path: resources/longhorn
-    directory:
-      recurse: true
+    path: resources/gatekeeper/templates
   destination:
     server: https://kubernetes.default.svc
-    namespace: longhorn-system
+    namespace: gatekeeper-system
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
+      - Validate=false
