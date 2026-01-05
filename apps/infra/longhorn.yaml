@@ -1,0 +1,33 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    chart: longhorn
+    repoURL: https://charts.longhorn.io
+    targetRevision: 1.10.1
+    helm:
+      values: |
+        defaultSettings:
+          defaultDataPath: /mnt/data/longhorn
+        ingress:
+          enabled: true
+          host: longhorn.k3s.gillouche.homelab
+          tls: true
+          tlsSecret: longhorn-tls
+          annotations:
+             cert-manager.io/cluster-issuer: vault-issuer
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: longhorn-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

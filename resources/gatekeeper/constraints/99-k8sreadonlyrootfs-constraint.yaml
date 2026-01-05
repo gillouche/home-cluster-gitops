@@ -1,0 +1,22 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sReadOnlyRootFS
+metadata:
+  name: require-readonly-rootfs
+spec:
+  enforcementAction: dryrun
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: policy-tier
+          operator: In
+          values: ["playground"]
+    excludedNamespaces:
+      - kube-system
+      - gatekeeper-system
+      - kube-public
+      - longhorn-system
+      - kubernetes-dashboard
+      - sealed-secrets

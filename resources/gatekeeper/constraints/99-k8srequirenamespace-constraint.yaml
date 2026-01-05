@@ -1,0 +1,24 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequireNamespace
+metadata:
+  name: require-namespace
+spec:
+  enforcementAction: dryrun
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod", "Service", "ConfigMap", "Secret"]
+      - apiGroups: ["apps"]
+        kinds: ["Deployment", "StatefulSet", "DaemonSet"]
+    namespaceSelector:
+      matchExpressions:
+        - key: policy-tier
+          operator: In
+          values: ["playground"]
+    excludedNamespaces:
+      - kube-system
+      - gatekeeper-system
+      - kube-public
+      - longhorn-system
+      - kubernetes-dashboard
+      - sealed-secrets

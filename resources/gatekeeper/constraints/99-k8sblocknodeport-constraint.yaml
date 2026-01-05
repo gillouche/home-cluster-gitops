@@ -1,0 +1,22 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sBlockNodePort
+metadata:
+  name: block-nodeport-services
+spec:
+  enforcementAction: dryrun
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Service"]
+    namespaceSelector:
+      matchExpressions:
+        - key: policy-tier
+          operator: In
+          values: ["playground"]
+    excludedNamespaces:
+      - kube-system
+      - gatekeeper-system
+      - kube-public
+      - longhorn-system
+      - kubernetes-dashboard
+      - sealed-secrets

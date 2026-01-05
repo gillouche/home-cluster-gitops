@@ -1,0 +1,65 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubernetes-dashboard
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    chart: kubernetes-dashboard
+    repoURL: https://kubernetes.github.io/dashboard/
+    targetRevision: 7.0.0
+    helm:
+      values: |
+        nginx:
+          enabled: false
+        cert-manager:
+          enabled: false
+        metrics-scraper:
+          enabled: true
+        api:
+          ingress:
+            enabled: true
+            annotations:
+              cert-manager.io/cluster-issuer: vault-issuer
+              traefik.ingress.kubernetes.io/router.entrypoints: websecure
+            hosts:
+              - dashboard.k3s.gillouche.homelab
+            tls:
+              - secretName: kubernetes-dashboard-tls
+                hosts:
+                  - dashboard.k3s.gillouche.homelab
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubernetes-dashboard
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubernetes-dashboard-config
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/gillouche/home-cluster-gitops.git
+    targetRevision: HEAD
+    path: resources/kubernetes-dashboard
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kubernetes-dashboard
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

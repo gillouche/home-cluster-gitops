@@ -1,0 +1,22 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sIngressTLS
+metadata:
+  name: enforce-ingress-tls
+spec:
+  enforcementAction: dryrun
+  match:
+    kinds:
+      - apiGroups: ["networking.k8s.io"]
+        kinds: ["Ingress"]
+    namespaceSelector:
+      matchExpressions:
+        - key: policy-tier
+          operator: In
+          values: ["playground"]
+    excludedNamespaces:
+      - kube-system
+      - gatekeeper-system
+      - kube-public
+      - longhorn-system
+      - kubernetes-dashboard
+      - sealed-secrets

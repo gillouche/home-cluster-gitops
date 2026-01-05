@@ -1,0 +1,36 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: traefik
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    chart: traefik
+    repoURL: https://traefik.github.io/charts
+    targetRevision: 26.0.0
+    helm:
+      values: |
+        ports:
+          web:
+            port: 9000
+            expose: true
+            exposedPort: 9000
+            protocol: TCP
+          websecure:
+            port: 9443
+            expose: true
+            exposedPort: 9443
+            protocol: TCP
+        service:
+          enabled: true
+          type: LoadBalancer
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
