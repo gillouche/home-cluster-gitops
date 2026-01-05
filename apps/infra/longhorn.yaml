@@ -17,7 +17,24 @@ spec:
       values: |
         defaultSettings:
           defaultDataPath: /mnt/data/longhorn
+          replicaSoftAntiAffinity: true
+          createDefaultDiskLabeledNodes: true
           disablePreUpgradeChecker: true
+        longhornManager:
+          nodeSelector:
+            storage: "ssd"
+        longhornDriver:
+          nodeSelector:
+            storage: "ssd"
+        longhornUI:
+          nodeSelector:
+            storage: "ssd"
+        instanceManager:
+          nodeSelector:
+            storage: "ssd"
+        persistence:
+          defaultClass: true
+          defaultClassReplicaCount: 3
         ingress:
           enabled: true
           host: longhorn.k3s.gillouche.homelab
