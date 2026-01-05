@@ -19,7 +19,6 @@ spec:
           defaultDataPath: /mnt/data/longhorn
           replicaSoftAntiAffinity: true
           createDefaultDiskLabeledNodes: true
-          disablePreUpgradeChecker: true
         longhornManager:
           nodeSelector:
             storage: "ssd"
@@ -35,13 +34,9 @@ spec:
         persistence:
           defaultClass: true
           defaultClassReplicaCount: 3
-        ingress:
-          enabled: true
-          host: longhorn.k3s.gillouche.homelab
-          tls: true
-          tlsSecret: longhorn-tls
-          annotations:
-             cert-manager.io/cluster-issuer: vault-issuer
+        service:
+          ui:
+            type: ClusterIP
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
