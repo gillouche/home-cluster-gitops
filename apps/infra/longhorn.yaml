@@ -37,6 +37,8 @@ spec:
         service:
           ui:
             type: ClusterIP
+        ingress:
+          enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system

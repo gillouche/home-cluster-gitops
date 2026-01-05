@@ -6,7 +6,13 @@ metadata:
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
+    cert-manager.io/cluster-issuer: vault-issuer
+    cert-manager.io/common-name: longhorn.k3s.gillouche.homelab
 spec:
+  tls:
+  - hosts:
+    - longhorn.k3s.gillouche.homelab
+    secretName: longhorn-tls
   rules:
   - host: longhorn.k3s.gillouche.homelab
     http:
