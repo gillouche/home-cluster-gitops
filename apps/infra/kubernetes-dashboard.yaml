@@ -20,13 +20,17 @@ spec:
         metrics-scraper:
           enabled: true
         kong:
-          env:
-            proxy_listen: "0.0.0.0:8000, 0.0.0.0:8443 http2 ssl"
           proxy:
+            type: ClusterIP
             http:
+              enabled: false
+            tls:
               enabled: true
-              servicePort: 8000
-              containerPort: 8000
+              servicePort: 443
+              containerPort: 8443
+            annotations:
+              traefik.ingress.kubernetes.io/service.serversscheme: https
+              traefik.ingress.kubernetes.io/service.serverstransport: kubernetes-dashboard-dashboard-transport@kubernetescrd
         web:
           enabled: true
           ingress:
