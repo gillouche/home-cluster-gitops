@@ -10,24 +10,9 @@ metadata:
 spec:
   project: default
   source:
-    chart: homepage
-    repoURL: https://m0nsterrr.github.io/homepage
-    targetRevision: 4.5.0
-    helm:
-      values: |
-        config:
-          existingConfigMap: homepage-config
-        ingress:
-          main:
-            enabled: true
-            ingressClassName: traefik
-            hosts:
-              - host: homepage.k3s.gillouche.homelab
-                paths:
-                  - path: /
-                    pathType: Prefix
-            annotations:
-              traefik.ingress.kubernetes.io/router.entrypoints: web
+    repoURL: https://github.com/gillouche/home-cluster-gitops.git
+    targetRevision: HEAD
+    path: resources/homepage
   destination:
     server: https://kubernetes.default.svc
     namespace: homepage
