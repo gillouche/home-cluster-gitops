@@ -20,6 +20,8 @@ spec:
         metrics-scraper:
           enabled: true
         kong:
+          env:
+            proxy_listen: "0.0.0.0:8000, 0.0.0.0:8443 http2 ssl"
           proxy:
             http:
               enabled: true
