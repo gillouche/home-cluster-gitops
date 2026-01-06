@@ -21,20 +21,6 @@ spec:
           enabled: true
         web:
           enabled: true
-          ingress:
-            enabled: true
-            annotations:
-              traefik.ingress.kubernetes.io/router.entrypoints: web
-            hosts:
-              - host: dashboard.k3s.gillouche.homelab
-                paths:
-                  - path: /
-                    pathType: Prefix
-                    backend:
-                      service:
-                        name: kubernetes-dashboard-web
-                        port:
-                          name: web
   destination:
     server: https://kubernetes.default.svc
     namespace: kubernetes-dashboard
