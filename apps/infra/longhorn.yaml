@@ -19,21 +19,6 @@ spec:
           defaultDataPath: /mnt/data/longhorn
           replicaSoftAntiAffinity: true
           createDefaultDiskLabeledNodes: true
-        longhornManager:
-          nodeSelector:
-            storage: "ssd"
-        longhornDriver:
-          nodeSelector:
-            storage: "ssd"
-        longhornUI:
-          nodeSelector:
-            storage: "ssd"
-        instanceManager:
-          nodeSelector:
-            storage: "ssd"
-        csi:
-          nodeSelector:
-            storage: "ssd"
         persistence:
           defaultClass: true
           defaultClassReplicaCount: 3
