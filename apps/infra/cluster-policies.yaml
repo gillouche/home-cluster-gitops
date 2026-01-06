@@ -1,23 +1,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: kube-state-metrics
+  name: cluster-policies
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
   project: default
   source:
-    chart: kube-state-metrics
-    repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 5.16.0
-    helm:
-      values: |
-        {}
+    repoURL: https://github.com/gillouche/home-cluster-gitops.git
+    targetRevision: HEAD
+    path: resources/cluster-policies
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-system
+    namespace: default
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=false

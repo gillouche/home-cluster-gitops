@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: restrict-default-namespace
+  namespace: default
+  labels:
+    app.kubernetes.io/managed-by: argocd
+spec:
+  hard:
+    pods: "0"
+    services: "0"
+    configmaps: "0"
+    secrets: "0"
+    persistentvolumeclaims: "0"

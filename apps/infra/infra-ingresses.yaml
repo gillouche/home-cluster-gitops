@@ -4,7 +4,7 @@ metadata:
   name: infra-ingresses
   namespace: argocd
   finalizers:
-    - resources-finalizer.argocd.argoproj.io
+    - argoproj.io/resources-finalizer
 spec:
   project: default
   source:
