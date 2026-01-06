@@ -45,7 +45,7 @@ spec:
             enabled: true
             className: traefik
             hosts:
-              - host: filer.seaweedfs.k3s.gillouche.homelab
+              - host: seaweedfs-filer.k3s.gillouche.homelab
                 paths:
                   - path: /
                     pathType: Prefix
@@ -59,7 +59,7 @@ spec:
             enabled: true
             className: traefik
             hosts:
-              - host: s3.seaweedfs.k3s.gillouche.homelab
+              - host: seaweedfs-s3.k3s.gillouche.homelab
                 paths:
                   - path: /
                     pathType: Prefix
