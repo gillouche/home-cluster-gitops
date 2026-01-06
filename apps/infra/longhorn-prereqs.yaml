@@ -22,11 +22,20 @@ spec:
     - group: scheduling.k8s.io
       kind: PriorityClass
       name: longhorn-critical
-      jsonPointers: [ "*" ]
+      jsonPointers:
+        - /metadata/annotations
+        - /metadata/labels
     - group: ""
       kind: ServiceAccount
       name: longhorn-service-account
-      jsonPointers: [ "*" ]
+      jsonPointers:
+        - /metadata/annotations
+        - /metadata/labels
+    - group: networking.k8s.io
+      kind: Ingress
+      name: longhorn-ui
+      jsonPointers:
+        - /status
   syncPolicy:
     automated:
       prune: true
