@@ -18,7 +18,15 @@ spec:
           annotations:
             traefik.ingress.kubernetes.io/router.entrypoints: web
           hosts:
-            - ksm.k3s.gillouche.homelab
+            - host: ksm.k3s.gillouche.homelab
+              paths:
+                - path: /
+                  pathType: Prefix
+                  backend:
+                    service:
+                      name: kube-state-metrics
+                      port:
+                        name: http
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
