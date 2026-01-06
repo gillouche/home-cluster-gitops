@@ -17,15 +17,7 @@ spec:
       values: |
         dashboard:
           ingress:
-            enabled: true
-            ingressClassName: traefik
-            hosts:
-              - host: goldilocks.k3s.gillouche.homelab
-                paths:
-                  - path: /
-                    pathType: Prefix
-            annotations:
-              traefik.ingress.kubernetes.io/router.entrypoints: web
+            enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: goldilocks
