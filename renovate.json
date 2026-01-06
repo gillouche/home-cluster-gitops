@@ -1,0 +1,26 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":prHourlyLimitNone",
+    ":prConcurrentLimitNone"
+  ],
+  "labels": ["renovate"],
+  "kubernetes": {
+    "fileMatch": ["\.yaml$"]
+  },
+  "argocd": {
+    "fileMatch": ["apps/.*\.yaml$"]
+  },
+  "packageRules": [
+    {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["ghcr.io/gethomepage/homepage"],
+      "versioning": "docker"
+    }
+  ]
+}
