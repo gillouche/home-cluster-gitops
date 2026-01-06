@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: goldilocks
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: default
+  source:
+    chart: goldilocks
+    repoURL: https://charts.fairwinds.com/stable
+    targetRevision: 5.3.0
+    helm:
+      values: |
+        dashboard:
+          ingress:
+            enabled: true
+            ingressClassName: traefik
+            hosts:
+              - host: goldilocks.k3s.gillouche.homelab
+                paths:
+                  - path: /
+                    pathType: ImplementationSpecific
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: web
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: goldilocks
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

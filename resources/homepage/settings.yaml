@@ -1,0 +1,13 @@
+title: Gillouche Homelab
+layout:
+  Infrastructure:
+    style: bunches
+    columns: 2
+  Monitoring:
+    style: bunches
+    columns: 2
+  Network:
+    style: bunches
+    columns: 2
+headerStyle: clean
+showStats: true

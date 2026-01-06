@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homepage-config
+  namespace: homepage
+data:
+  services.yaml: |
+    - Infrastructure:
+        - Kubernetes Dashboard:
+            icon: kubernetes
+            href: https://dashboard.k3s.gillouche.homelab
+            description: Cluster Management
+        - ArgoCD:
+            icon: argocd
+            href: https://argocd.k3s.gillouche.homelab
+            description: GitOps Continuous Delivery
+        - Longhorn:
+            icon: longhorn
+            href: https://longhorn.k3s.gillouche.homelab
+            description: Distributed Block Storage
+        - Goldilocks:
+            icon: goldilocks
+            href: https://goldilocks.k3s.gillouche.homelab
+            description: Resource Recommendation
+
+    - Monitoring:
+        - Grafana:
+            icon: grafana
+            href: https://grafana.gillouche.homelab
+            description: Metrics & Dashboards
+        - Prometheus:
+            icon: prometheus
+            href: https://prometheus.gillouche.homelab
+            description: Time-series Database
+
+    - Network:
+        - Pi-hole:
+            icon: pi-hole
+            href: https://pihole.gillouche.homelab
+            description: DNS Sinkhole
+
+  widgets.yaml: |
+    - datetime:
+        text_size: xl
+        format:
+          dateStyle: long
+          timeStyle: short
+
+    - kubernetes:
+        cluster:
+          show: true
+          cpu: true
+          memory: true
+          show_node_stats: true
+        nodes:
+          show: true
+
+  settings.yaml: |
+    title: Gillouche Homelab
+    layout:
+      Infrastructure:
+        style: bunches
+        columns: 2
+      Monitoring:
+        style: bunches
+        columns: 2
+      Network:
+        style: bunches
+        columns: 2
+    headerStyle: clean
+    showStats: true
+
+  bookmarks.yaml: |
+    - Documentation:
+        - GitHub:
+            - icon: github
+              href: https://github.com/gillouche
+        - K3s Docs:
+            - icon: kubernetes
+              href: https://docs.k3s.io
+        - ArgoCD Docs:
+            - icon: argocd
+              href: https://argo-cd.readthedocs.io
