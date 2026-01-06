@@ -19,12 +19,12 @@ spec:
           enabled: false
         metrics-scraper:
           enabled: true
-        api:
+        web:
+          enabled: true
           ingress:
             enabled: true
             annotations:
-              cert-manager.io/cluster-issuer: vault-issuer
-              traefik.ingress.kubernetes.io/router.entrypoints: websecure
+              traefik.ingress.kubernetes.io/router.entrypoints: web
             hosts:
               - dashboard.k3s.gillouche.homelab
             tls:

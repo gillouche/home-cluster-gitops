@@ -24,6 +24,7 @@ spec:
       kind: CustomResourceDefinition
       jsonPointers:
         - /status
+        - /spec/preserveUnknownFields
   syncPolicy:
     automated:
       prune: true

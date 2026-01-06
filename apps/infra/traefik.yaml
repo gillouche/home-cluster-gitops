@@ -30,6 +30,10 @@ spec:
         service:
           enabled: true
           type: LoadBalancer
+        providers:
+          kubernetesIngress:
+            publishedService:
+              enabled: true
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
