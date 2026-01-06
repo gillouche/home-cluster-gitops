@@ -31,6 +31,9 @@ spec:
         instanceManager:
           nodeSelector:
             storage: "ssd"
+        csi:
+          nodeSelector:
+            storage: "ssd"
         persistence:
           defaultClass: true
           defaultClassReplicaCount: 3
