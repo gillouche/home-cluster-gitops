@@ -19,8 +19,19 @@ spec:
           enabled: false
         metrics-scraper:
           enabled: true
+        kong:
+          proxy:
+            http:
+              enabled: true
+              servicePort: 8000
+              containerPort: 8000
         web:
           enabled: true
+          ingress:
+            enabled: false
+        api:
+          ingress:
+            enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: kubernetes-dashboard
