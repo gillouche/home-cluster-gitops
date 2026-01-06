@@ -1,0 +1,76 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: seaweedfs
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: default
+  source:
+    chart: seaweedfs
+    repoURL: https://seaweedfs.github.io/seaweedfs/helm
+    targetRevision: 4.0.405
+    helm:
+      values: |
+        global:
+          nodeSelector:
+            storage: ssd
+        
+        master:
+          replicas: 3
+          persistence:
+            enabled: true
+            size: 1Gi
+            storageClass: longhorn
+
+        volume:
+          replicas: 3
+          dir: "/data"
+          dataDir: "/data"
+          persistence:
+            enabled: true
+            size: 50Gi
+            storageClass: longhorn
+
+        filer:
+          replicas: 3
+          persistence:
+            enabled: true
+            size: 10Gi
+            storageClass: longhorn
+          ingress:
+            enabled: true
+            className: traefik
+            hosts:
+              - host: filer.seaweedfs.k3s.gillouche.homelab
+                paths:
+                  - path: /
+                    pathType: Prefix
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: web
+
+        s3:
+          enabled: true
+          replicas: 2
+          ingress:
+            enabled: true
+            className: traefik
+            hosts:
+              - host: s3.seaweedfs.k3s.gillouche.homelab
+                paths:
+                  - path: /
+                    pathType: Prefix
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: web
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: seaweedfs
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
