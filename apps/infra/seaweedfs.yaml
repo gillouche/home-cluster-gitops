@@ -9,61 +9,66 @@ metadata:
     - argoproj.io/resources-finalizer
 spec:
   project: default
-  source:
-    chart: seaweedfs
-    repoURL: https://seaweedfs.github.io/seaweedfs/helm
-    targetRevision: 4.0.405
-    helm:
-      values: |
-        master:
-          replicas: 3
-          nodeSelector: |
-            storage: ssd
-          data:
-            type: "persistentVolumeClaim"
-            size: "1Gi"
-            storageClass: "longhorn"
-
-        volume:
-          replicas: 3
-          nodeSelector: |
-            storage: ssd
-          dataDirs:
-            - name: data1
+  sources:
+    - chart: seaweedfs
+      repoURL: https://seaweedfs.github.io/seaweedfs/helm
+      targetRevision: 4.0.405
+      helm:
+        values: |
+          master:
+            replicas: 3
+            nodeSelector: |
+              storage: ssd
+            data:
               type: "persistentVolumeClaim"
-              size: "50Gi"
+              size: "1Gi"
               storageClass: "longhorn"
 
-        filer:
-          replicas: 3
-          nodeSelector: |
-            storage: ssd
-          data:
-            type: "persistentVolumeClaim"
-            size: "10Gi"
-            storageClass: "longhorn"
-          ingress:
-            enabled: true
-            className: "traefik"
-            host: "seaweedfs-filer.k3s.gillouche.homelab"
-            path: "/"
-            pathType: "Prefix"
-            annotations:
-              traefik.ingress.kubernetes.io/router.entrypoints: web
+          volume:
+            replicas: 3
+            nodeSelector: |
+              storage: ssd
+            dataDirs:
+              - name: data1
+                type: "persistentVolumeClaim"
+                size: "50Gi"
+                storageClass: "longhorn"
 
-        s3:
-          enabled: true
-          replicas: 2
-          nodeSelector: |
-            storage: ssd
-          ingress:
+          filer:
+            replicas: 3
+            nodeSelector: |
+              storage: ssd
+            data:
+              type: "persistentVolumeClaim"
+              size: "10Gi"
+              storageClass: "longhorn"
+            ingress:
+              enabled: true
+              className: "traefik"
+              host: "seaweedfs-filer.k3s.gillouche.homelab"
+              path: "/"
+              pathType: "Prefix"
+              annotations:
+                traefik.ingress.kubernetes.io/router.entrypoints: web
+
+          s3:
             enabled: true
-            className: "traefik"
-            host: "seaweedfs-s3.k3s.gillouche.homelab"
-            path: "/"
-            pathType: "Prefix"
-            annotations:
-              traefik.ingress.kubernetes.io/router.entrypoints: web
+            replicas: 2
+            nodeSelector: |
+              storage: ssd
+            # Use the sealed secret we just created
+            existingSecret: "seaweedfs-s3-secret"
+            ingress:
+              enabled: true
+              className: "traefik"
+              host: "seaweedfs-s3.k3s.gillouche.homelab"
+              path: "/"
+              pathType: "Prefix"
+              annotations:
+                traefik.ingress.kubernetes.io/router.entrypoints: web
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      path: resources/seaweedfs
   destination:
     server: https://kubernetes.default.svc
     namespace: seaweedfs
