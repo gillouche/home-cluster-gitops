@@ -65,7 +65,6 @@ spec:
         grafana:
           deploymentStrategy:
             type: Recreate
-            rollingUpdate: null
           admin:
             existingSecret: "monitoring-grafana"
             userKey: "admin-user"
