@@ -30,6 +30,9 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /app/config
+          env:
+            - name: HOMEPAGE_ALLOWED_HOSTS
+              value: "*"
           resources:
             requests:
               cpu: 10m
