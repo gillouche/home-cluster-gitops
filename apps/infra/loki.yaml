@@ -27,6 +27,17 @@ spec:
             table_manager:
               retention_deletes_enabled: true
               retention_period: 7d
+            ruler:
+              storage:
+                type: local
+                local:
+                  directory: /data/loki/rules
+              rule_path: /data/loki/rules
+              alertmanager_url: http://alertmanager-operated.monitoring.svc:9093
+              ring:
+                kvstore:
+                  store: inmemory
+              enable_api: true
           ingress:
             enabled: true
             ingressClassName: traefik
