@@ -10,7 +10,7 @@ spec:
   source:
     chart: traefik
     repoURL: https://traefik.github.io/charts
-    targetRevision: 26.0.0
+    targetRevision: 38.0.1
     helm:
       values: |
         ports:
