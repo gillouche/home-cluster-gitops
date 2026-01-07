@@ -13,6 +13,15 @@ spec:
       labels:
         app: homepage
     spec:
+      initContainers:
+        - name: init-config
+          image: busybox:latest
+          command: ['sh', '-c', 'cp -L /app/config-ro/* /app/config/']
+          volumeMounts:
+            - name: config-ro
+              mountPath: /app/config-ro
+            - name: config
+              mountPath: /app/config
       containers:
         - name: homepage
           image: ghcr.io/gethomepage/homepage:v1.8.0
@@ -21,8 +30,6 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /app/config
-            - name: logs
-              mountPath: /app/config/logs
           resources:
             requests:
               cpu: 10m
@@ -31,8 +38,8 @@ spec:
               cpu: 100m
               memory: 256Mi
       volumes:
-        - name: config
+        - name: config-ro
           configMap:
             name: homepage-config
-        - name: logs
+        - name: config
           emptyDir: {}

@@ -62,6 +62,10 @@ spec:
               traefik.ingress.kubernetes.io/router.entrypoints: web
 
         grafana:
+          admin:
+            existingSecret: "monitoring-grafana"
+            userKey: "admin-user"
+            passwordKey: "admin-password"
           persistence:
             enabled: true
             storageClassName: longhorn
