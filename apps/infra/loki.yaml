@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: loki
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "11"
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: default
+  source:
+    chart: loki-stack
+    repoURL: https://grafana.github.io/helm-charts
+    targetRevision: 2.10.2
+    helm:
+      values: |
+        loki:
+          enabled: true
+          persistence:
+            enabled: true
+            storageClassName: longhorn
+            size: 10Gi
+          nodeSelector:
+            storage: ssd
+          config:
+            table_manager:
+              retention_deletes_enabled: true
+              retention_period: 7d
+
+        promtail:
+          enabled: true
+          # Collects logs from all nodes automatically
+          config:
+            clients:
+              - url: http://{{ .Release.Name }}:3100/loki/api/v1/push
+
+        grafana:
+          enabled: false # We use the one from kube-prometheus-stack
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
