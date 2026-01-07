@@ -26,9 +26,13 @@ spec:
                   accessModes: ["ReadWriteOnce"]
                   resources:
                     requests:
-                      storage: 20Gi
+                      storage: 10Gi
             nodeSelector:
               storage: ssd
+            tolerations:
+              - key: "node-role.kubernetes.io/control-plane"
+                operator: "Exists"
+                effect: "NoSchedule"
             
         alertmanager:
           alertmanagerSpec:
