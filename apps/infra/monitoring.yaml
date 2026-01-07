@@ -27,8 +27,20 @@ spec:
                   resources:
                     requests:
                       storage: 10Gi
-            nodeSelector:
-              storage: ssd
+            affinity:
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                    - matchExpressions:
+                        - key: node-class
+                          operator: In
+                          values: ["rpi5"]
+                        - key: storage
+                          operator: In
+                          values: ["ssd", "ephemeral"]
+                        - key: reliability
+                          operator: In
+                          values: ["preferred", "stable"]
             tolerations:
               - key: "node-role.kubernetes.io/control-plane"
                 operator: "Exists"
@@ -52,8 +64,20 @@ spec:
                   resources:
                     requests:
                       storage: 1Gi
-            nodeSelector:
-              storage: ssd
+            affinity:
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                    - matchExpressions:
+                        - key: node-class
+                          operator: In
+                          values: ["rpi5"]
+                        - key: storage
+                          operator: In
+                          values: ["ssd", "ephemeral"]
+                        - key: reliability
+                          operator: In
+                          values: ["preferred", "stable"]
           ingress:
             enabled: true
             ingressClassName: traefik
@@ -73,8 +97,20 @@ spec:
             enabled: true
             storageClassName: longhorn
             size: 5Gi
-          nodeSelector:
-            storage: ssd
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: node-class
+                        operator: In
+                        values: ["rpi5"]
+                      - key: storage
+                        operator: In
+                        values: ["ssd", "ephemeral"]
+                      - key: reliability
+                        operator: In
+                        values: ["preferred", "stable"]
           ingress:
             enabled: true
             ingressClassName: traefik
