@@ -21,6 +21,8 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /app/config
+            - name: logs
+              mountPath: /app/config/logs
           resources:
             requests:
               cpu: 10m
@@ -32,3 +34,5 @@ spec:
         - name: config
           configMap:
             name: homepage-config
+        - name: logs
+          emptyDir: {}
