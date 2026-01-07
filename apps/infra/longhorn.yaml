@@ -19,8 +19,8 @@ spec:
             defaultDataPath: /mnt/data/longhorn
             replicaSoftAntiAffinity: true
             createDefaultDiskLabeledNodes: true
-            storageReservedPercentageForDefaultDisk: 5
-            storageOverProvisioningPercentage: 200
+            storageReservedPercentageForDefaultDisk: 20
+            storageOverProvisioningPercentage: 100
           longhornManager:
             nodeSelector:
               storage: "ssd"
