@@ -27,6 +27,15 @@ spec:
             table_manager:
               retention_deletes_enabled: true
               retention_period: 7d
+          ingress:
+            enabled: true
+            ingressClassName: traefik
+            hosts:
+              - host: loki.k3s.gillouche.homelab
+                paths:
+                  - /
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: web
 
         promtail:
           enabled: true

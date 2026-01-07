@@ -33,6 +33,13 @@ spec:
               - key: "node-role.kubernetes.io/control-plane"
                 operator: "Exists"
                 effect: "NoSchedule"
+          ingress:
+            enabled: true
+            ingressClassName: traefik
+            hosts:
+              - prometheus.k3s.gillouche.homelab
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: web
             
         alertmanager:
           alertmanagerSpec:
@@ -46,6 +53,13 @@ spec:
                       storage: 1Gi
             nodeSelector:
               storage: ssd
+          ingress:
+            enabled: true
+            ingressClassName: traefik
+            hosts:
+              - alertmanager.k3s.gillouche.homelab
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: web
 
         grafana:
           persistence:
