@@ -75,6 +75,14 @@ spec:
               - grafana.k3s.gillouche.homelab
             annotations:
               traefik.ingress.kubernetes.io/router.entrypoints: web
+          
+          additionalDataSources:
+            - name: Loki
+              type: loki
+              url: http://loki.monitoring.svc:3100
+              access: proxy
+              isDefault: false
+
           # Use default dashboards
           dashboardProviders:
             dashboardproviders.yaml:
