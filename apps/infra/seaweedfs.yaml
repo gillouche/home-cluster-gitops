@@ -15,54 +15,53 @@ spec:
     targetRevision: 4.0.405
     helm:
       values: |
-        global:
-          nodeSelector:
-            storage: ssd
-        
         master:
           replicas: 3
-          persistence:
-            enabled: true
-            size: 1Gi
-            storageClass: longhorn
+          nodeSelector: |
+            storage: ssd
+          data:
+            type: "persistentVolumeClaim"
+            size: "1Gi"
+            storageClass: "longhorn"
 
         volume:
           replicas: 3
-          dir: "/data"
-          dataDir: "/data"
-          persistence:
-            enabled: true
-            size: 50Gi
-            storageClass: longhorn
+          nodeSelector: |
+            storage: ssd
+          dataDirs:
+            - name: data1
+              type: "persistentVolumeClaim"
+              size: "50Gi"
+              storageClass: "longhorn"
 
         filer:
           replicas: 3
-          persistence:
-            enabled: true
-            size: 10Gi
-            storageClass: longhorn
+          nodeSelector: |
+            storage: ssd
+          data:
+            type: "persistentVolumeClaim"
+            size: "10Gi"
+            storageClass: "longhorn"
           ingress:
             enabled: true
-            className: traefik
-            hosts:
-              - host: seaweedfs-filer.k3s.gillouche.homelab
-                paths:
-                  - path: /
-                    pathType: Prefix
+            className: "traefik"
+            host: "seaweedfs-filer.k3s.gillouche.homelab"
+            path: "/"
+            pathType: "Prefix"
             annotations:
               traefik.ingress.kubernetes.io/router.entrypoints: web
 
         s3:
           enabled: true
           replicas: 2
+          nodeSelector: |
+            storage: ssd
           ingress:
             enabled: true
-            className: traefik
-            hosts:
-              - host: seaweedfs-s3.k3s.gillouche.homelab
-                paths:
-                  - path: /
-                    pathType: Prefix
+            className: "traefik"
+            host: "seaweedfs-s3.k3s.gillouche.homelab"
+            path: "/"
+            pathType: "Prefix"
             annotations:
               traefik.ingress.kubernetes.io/router.entrypoints: web
   destination:
