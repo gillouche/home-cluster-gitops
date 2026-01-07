@@ -14,6 +14,20 @@ spec:
         app: homepage
     spec:
       serviceAccountName: homepage
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-class
+                    operator: In
+                    values: ["rpi5"]
+                  - key: storage
+                    operator: In
+                    values: ["ssd", "ephemeral"]
+                  - key: reliability
+                    operator: In
+                    values: ["preferred", "stable"]
       initContainers:
         - name: init-config
           image: busybox:latest
