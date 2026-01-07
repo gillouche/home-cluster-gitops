@@ -87,6 +87,7 @@ data:
           timeStyle: short
 
     - kubernetes:
+        mode: cluster
         cluster:
           show: true
           cpu: true
