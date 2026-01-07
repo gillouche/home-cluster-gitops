@@ -18,26 +18,66 @@ data:
             icon: longhorn
             href: https://longhorn.k3s.gillouche.homelab
             description: Distributed Block Storage
+        - Vault:
+            icon: hashicorp-vault
+            href: https://vault.gillouche.homelab
+            description: Secrets Management
+        - Nexus:
+            icon: nexus
+            href: https://nexus.gillouche.homelab
+            description: Artifact Repository
+        - SeaweedFS Filer:
+            icon: seaweedfs
+            href: https://seaweedfs-filer.k3s.gillouche.homelab
+            description: Distributed File System
+        - SeaweedFS S3:
+            icon: seaweedfs
+            href: https://seaweedfs-s3.k3s.gillouche.homelab
+            description: Object Storage
         - Goldilocks:
             icon: goldilocks
             href: https://goldilocks.k3s.gillouche.homelab
             description: Resource Recommendation
+        - Firefly III:
+            icon: firefly
+            href: https://firefly.gillouche.homelab
+            description: Finance Manager
 
     - Monitoring:
         - Grafana:
             icon: grafana
-            href: https://grafana.gillouche.homelab
+            href: https://grafana.k3s.gillouche.homelab
             description: Metrics & Dashboards
         - Prometheus:
             icon: prometheus
-            href: https://prometheus.gillouche.homelab
+            href: https://prometheus.k3s.gillouche.homelab
             description: Time-series Database
+        - Alertmanager:
+            icon: alertmanager
+            href: https://alertmanager.k3s.gillouche.homelab
+            description: Alerting System
+        - Loki:
+            icon: grafana-loki
+            href: https://loki.k3s.gillouche.homelab/ready
+            description: Log Aggregation
 
     - Network:
-        - Pi-hole:
+        - Pi-hole Cluster:
             icon: pi-hole
             href: https://pihole.gillouche.homelab
-            description: DNS Sinkhole
+            description: Cluster Load Balancer
+        - Pi-hole Primary:
+            icon: pi-hole
+            href: https://primary.pihole.gillouche.homelab
+            description: rpi5b16g4
+        - Pi-hole Replica 1:
+            icon: pi-hole
+            href: https://replica1.pihole.gillouche.homelab
+            description: rpi5b16g5
+        - Pi-hole Replica 2:
+            icon: pi-hole
+            href: https://replica2.pihole.gillouche.homelab
+            description: rpi5b16g6
 
   widgets.yaml: |
     - datetime:
@@ -60,13 +100,13 @@ data:
     layout:
       Infrastructure:
         style: bunches
-        columns: 2
+        columns: 3
       Monitoring:
         style: bunches
         columns: 2
       Network:
         style: bunches
-        columns: 2
+        columns: 1
     headerStyle: clean
     showStats: true
 
