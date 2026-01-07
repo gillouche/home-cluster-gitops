@@ -43,6 +43,7 @@ spec:
             
         alertmanager:
           alertmanagerSpec:
+            replicas: 3
             storage:
               volumeClaimTemplate:
                 spec:
