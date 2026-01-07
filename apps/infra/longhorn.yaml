@@ -9,32 +9,35 @@ metadata:
     - argoproj.io/resources-finalizer
 spec:
   project: default
-  source:
-    chart: longhorn
-    repoURL: https://charts.longhorn.io
-    targetRevision: 1.10.1
-    helm:
-      values: |
-        defaultSettings:
-          defaultDataPath: /mnt/data/longhorn
-          replicaSoftAntiAffinity: true
-          createDefaultDiskLabeledNodes: true
-          storageReservedPercentageForDefaultDisk: 5
-          storageOverProvisioningPercentage: 200
-        longhornManager:
-          nodeSelector:
-            storage: "ssd"
-        longhornUI:
-          nodeSelector:
-            storage: "ssd"
-        persistence:
-          defaultClass: true
-          defaultClassReplicaCount: 3
-        service:
-          ui:
-            type: ClusterIP
-        ingress:
-          enabled: false
+  sources:
+    - chart: longhorn
+      repoURL: https://charts.longhorn.io
+      targetRevision: 1.10.1
+      helm:
+        values: |
+          defaultSettings:
+            defaultDataPath: /mnt/data/longhorn
+            replicaSoftAntiAffinity: true
+            createDefaultDiskLabeledNodes: true
+            storageReservedPercentageForDefaultDisk: 5
+            storageOverProvisioningPercentage: 200
+          longhornManager:
+            nodeSelector:
+              storage: "ssd"
+          longhornUI:
+            nodeSelector:
+              storage: "ssd"
+          persistence:
+            defaultClass: true
+            defaultClassReplicaCount: 3
+          service:
+            ui:
+              type: ClusterIP
+          ingress:
+            enabled: false
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      path: resources/longhorn
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
