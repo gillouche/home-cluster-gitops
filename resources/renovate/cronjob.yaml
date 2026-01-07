@@ -4,7 +4,7 @@ metadata:
   name: renovate
   namespace: argocd
 spec:
-  schedule: "0 * * * *" # Run every hour
+  schedule: "0 0 * * 1,4" # Run twice per week (Monday and Thursday)
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
