@@ -48,10 +48,10 @@ spec:
                     values: ["rpi5"]
                   - key: storage
                     operator: In
-                    values: ["ssd", "ephemeral"]
+                    values: ["ssd", "sdcard"]                  
                   - key: reliability
                     operator: In
-                    values: ["preferred", "stable"]
+                    values: ["best-effort", "stable"]
   destination:
     server: https://kubernetes.default.svc
     namespace: kubernetes-dashboard

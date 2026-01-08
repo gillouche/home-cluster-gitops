@@ -37,10 +37,10 @@ spec:
                           values: ["rpi5"]
                         - key: storage
                           operator: In
-                          values: ["ssd", "ephemeral"]
+                          values: ["ssd", "sdcard"]
                         - key: reliability
                           operator: In
-                          values: ["preferred", "stable"]
+                          values: ["best-effort", "stable"]
             tolerations:
               - key: "node-role.kubernetes.io/control-plane"
                 operator: "Exists"
@@ -74,10 +74,10 @@ spec:
                           values: ["rpi5"]
                         - key: storage
                           operator: In
-                          values: ["ssd", "ephemeral"]
+                          values: ["ssd", "sdcard"]
                         - key: reliability
                           operator: In
-                          values: ["preferred", "stable"]
+                          values: ["best-effort", "stable"]
           ingress:
             enabled: true
             ingressClassName: traefik
@@ -107,10 +107,10 @@ spec:
                         values: ["rpi5"]
                       - key: storage
                         operator: In
-                        values: ["ssd", "ephemeral"]
+                        values: ["ssd", "sdcard"]
                       - key: reliability
                         operator: In
-                        values: ["preferred", "stable"]
+                        values: ["best-effort", "stable"]
           ingress:
             enabled: true
             ingressClassName: traefik

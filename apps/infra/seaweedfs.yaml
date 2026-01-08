@@ -27,10 +27,10 @@ spec:
                           values: ["rpi5"]
                         - key: storage
                           operator: In
-                          values: ["ssd", "ephemeral"]
+                          values: ["ssd", "sdcard"]
                         - key: reliability
                           operator: In
-                          values: ["preferred", "stable"]
+                          values: ["best-effort", "stable"]
             data:
               type: "persistentVolumeClaim"
               size: "1Gi"
@@ -48,10 +48,10 @@ spec:
                           values: ["rpi5"]
                         - key: storage
                           operator: In
-                          values: ["ssd", "ephemeral"]
+                          values: ["ssd", "sdcard"]
                         - key: reliability
                           operator: In
-                          values: ["preferred", "stable"]
+                          values: ["best-effort", "stable"]
             dataDirs:
               - name: data1
                 type: "persistentVolumeClaim"
@@ -70,10 +70,10 @@ spec:
                           values: ["rpi5"]
                         - key: storage
                           operator: In
-                          values: ["ssd", "ephemeral"]
+                          values: ["ssd", "sdcard"]
                         - key: reliability
                           operator: In
-                          values: ["preferred", "stable"]
+                          values: ["best-effort", "stable"]
             data:
               type: "persistentVolumeClaim"
               size: "10Gi"
@@ -100,10 +100,10 @@ spec:
                           values: ["rpi5"]
                         - key: storage
                           operator: In
-                          values: ["ssd", "ephemeral"]
+                          values: ["ssd", "sdcard"]
                         - key: reliability
                           operator: In
-                          values: ["preferred", "stable"]
+                          values: ["best-effort", "stable"]
             # Use the sealed secret we just created
             existingSecret: "seaweedfs-s3-secret"
             ingress:

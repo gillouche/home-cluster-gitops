@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: amdgpu-device-plugin
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      name: amdgpu-device-plugin
+  template:
+    metadata:
+      labels:
+        name: amdgpu-device-plugin
+    spec:
+      containers:
+      - name: amdgpu-device-plugin
+        image: rocm/k8s-device-plugin:0.21.0
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - name: dev
+          mountPath: /dev
+      volumes:
+      - name: dev
+        hostPath:
+          path: /dev
