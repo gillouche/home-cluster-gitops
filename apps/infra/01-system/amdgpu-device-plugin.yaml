@@ -20,6 +20,7 @@ spec:
           gpu: "True"
         securityContext:
           privileged: true
+          allowPrivilegeEscalation: true
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
