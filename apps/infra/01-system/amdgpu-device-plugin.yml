@@ -19,7 +19,7 @@ spec:
       nodeSelector:
         gpu: "True"
       containers:
-      - image: rocm/k8s-device-plugin:1.32.0.1
+      - image: rocm/k8s-device-plugin:1.31.0.9
         name: amdgpu-device-plugin
         workingDir: /root
         command: ["/usr/bin/k8s-device-plugin"]

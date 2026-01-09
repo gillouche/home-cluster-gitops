@@ -16,6 +16,9 @@ kubectl get application <app-name> -n argocd -o yaml
 argocd app sync <app-name>
 # OR via kubectl (if argocd CLI is not available)
 kubectl patch application <app-name> -n argocd --type merge -p '{"spec":{"syncPolicy":{"automated":{"prune":true,"selfHeal":true}}}}'
+
+# Force refresh of root
+kubectl patch application root -n argocd --type merge -p '{"metadata": {"annotations": {"argocd.argoproj.io/refresh": "hard"}}}'
 ```
 
 ### Troubleshooting Sync Errors
