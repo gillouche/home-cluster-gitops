@@ -18,15 +18,18 @@ spec:
         ports:
           traefik:
             port: 9999
-            expose: false
+            expose:
+              default: false
           web:
             port: 9000
-            expose: true
+            expose:
+              default: true
             exposedPort: 9000
             protocol: TCP
           websecure:
             port: 9443
-            expose: true
+            expose:
+              default: true
             exposedPort: 9443
             protocol: TCP
         service:
