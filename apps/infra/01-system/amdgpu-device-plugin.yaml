@@ -1,0 +1,31 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: amdgpu-device-plugin
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ROCm/k8s-device-plugin
+    targetRevision: amd-gpu-helm-0.21.0
+    path: helm/amd-gpu
+    helm:
+      values: |
+        node_selector_enabled: true
+        nodeSelector:
+          gpu: "True"
+        securityContext:
+          privileged: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
