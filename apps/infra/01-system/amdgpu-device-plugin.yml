@@ -5,6 +5,8 @@ metadata:
   namespace: kube-system
   labels:
     name: amdgpu-device-plugin
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   selector:
     matchLabels:
@@ -17,7 +19,7 @@ spec:
       nodeSelector:
         gpu: "True"
       containers:
-      - image: rocm/k8s-device-plugin:0.21.0
+      - image: rocm/k8s-device-plugin:1.32.0.1
         name: amdgpu-device-plugin
         workingDir: /root
         command: ["/usr/bin/k8s-device-plugin"]
