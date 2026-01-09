@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cluster-policies
+  name: gatekeeper-constraints
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "4"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
@@ -12,13 +12,18 @@ spec:
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
-    path: resources/cluster-policies
+    path: resources/gatekeeper/constraints
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: gatekeeper-system
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=false
+      - Validate=false
+  ignoreDifferences:
+    - group: constraints.gatekeeper.sh
+      kind: "*"
+      jsonPointers:
+        - /status

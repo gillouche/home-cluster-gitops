@@ -4,7 +4,7 @@ metadata:
   name: monitoring
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/sync-wave: "5"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:

@@ -1,19 +1,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: infra-ingresses
+  name: kube-state-metrics
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
   project: default
   source:
-    repoURL: https://github.com/gillouche/home-cluster-gitops.git
-    targetRevision: HEAD
-    path: resources/infra-ingresses
+    chart: kube-state-metrics
+    repoURL: https://prometheus-community.github.io/helm-charts
+    targetRevision: 7.0.0
+    helm:
+      values: |
+        {}
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: kube-system
   syncPolicy:
     automated:
       prune: true

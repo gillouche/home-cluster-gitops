@@ -1,8 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argocd-ingress
+  name: gatekeeper-templates
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
@@ -10,11 +12,13 @@ spec:
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
-    path: resources/argocd
+    path: resources/gatekeeper/templates
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: gatekeeper-system
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - Validate=false

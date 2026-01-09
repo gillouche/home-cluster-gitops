@@ -1,22 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: sealed-secrets
+  name: argocd-ingress
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "4"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
   project: default
   source:
-    chart: sealed-secrets
-    repoURL: https://bitnami-labs.github.io/sealed-secrets
-    targetRevision: 2.18.0
-    helm:
-      values: |
-        fullnameOverride: sealed-secrets-controller
+    repoURL: https://github.com/gillouche/home-cluster-gitops.git
+    targetRevision: HEAD
+    path: resources/argocd
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-system
+    namespace: argocd
   syncPolicy:
     automated:
       prune: true

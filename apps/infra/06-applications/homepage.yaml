@@ -1,26 +1,21 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: goldilocks
+  name: homepage
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "3"
+    argocd.argoproj.io/sync-wave: "6"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
   project: default
   source:
-    chart: goldilocks
-    repoURL: https://charts.fairwinds.com/stable
-    targetRevision: 10.2.0
-    helm:
-      values: |
-        dashboard:
-          ingress:
-            enabled: false
+    repoURL: https://github.com/gillouche/home-cluster-gitops.git
+    targetRevision: HEAD
+    path: resources/homepage
   destination:
     server: https://kubernetes.default.svc
-    namespace: goldilocks
+    namespace: homepage
   syncPolicy:
     automated:
       prune: true

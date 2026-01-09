@@ -3,6 +3,8 @@ kind: Application
 metadata:
   name: cert-manager
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
@@ -49,6 +51,8 @@ kind: Application
 metadata:
   name: cert-manager-config
   namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:

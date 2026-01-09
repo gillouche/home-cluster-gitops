@@ -3,6 +3,8 @@ kind: DaemonSet
 metadata:
   name: amdgpu-device-plugin
   namespace: kube-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
 spec:
   selector:
     matchLabels:

@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: longhorn-prereqs
+  name: cluster-policies
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "1"
+    argocd.argoproj.io/sync-wave: "4"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
@@ -12,21 +12,13 @@ spec:
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
-    path: resources/longhorn
-    directory:
-      recurse: true
+    path: resources/cluster-policies
   destination:
     server: https://kubernetes.default.svc
-    namespace: longhorn-system
-  ignoreDifferences:
-    - group: networking.k8s.io
-      kind: Ingress
-      name: longhorn-ui
-      jsonPointers:
-        - /status
+    namespace: default
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
+      - CreateNamespace=false

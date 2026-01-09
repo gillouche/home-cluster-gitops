@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: gatekeeper
+  name: goldilocks
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "5"
@@ -10,21 +10,17 @@ metadata:
 spec:
   project: default
   source:
-    chart: gatekeeper
-    repoURL: https://open-policy-agent.github.io/gatekeeper/charts
-    targetRevision: 3.21.0
+    chart: goldilocks
+    repoURL: https://charts.fairwinds.com/stable
+    targetRevision: 10.2.0
     helm:
       values: |
-        auditInterval: 60
+        dashboard:
+          ingress:
+            enabled: false
   destination:
     server: https://kubernetes.default.svc
-    namespace: gatekeeper-system
-  ignoreDifferences:
-    - group: apiextensions.k8s.io
-      kind: CustomResourceDefinition
-      jsonPointers:
-        - /status
-        - /spec/preserveUnknownFields
+    namespace: goldilocks
   syncPolicy:
     automated:
       prune: true
