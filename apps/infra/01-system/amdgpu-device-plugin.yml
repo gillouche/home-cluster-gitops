@@ -3,8 +3,8 @@ kind: DaemonSet
 metadata:
   name: amdgpu-device-plugin
   namespace: kube-system
-  annotations:
-    argocd.argoproj.io/sync-wave: "1"
+  labels:
+    name: amdgpu-device-plugin
 spec:
   selector:
     matchLabels:
@@ -14,15 +14,25 @@ spec:
       labels:
         name: amdgpu-device-plugin
     spec:
+      nodeSelector:
+        gpu: "True"
       containers:
-      - name: amdgpu-device-plugin
-        image: rocm/k8s-device-plugin:0.21.0
+      - image: rocm/k8s-device-plugin:0.21.0
+        name: amdgpu-device-plugin
+        workingDir: /root
+        command: ["/usr/bin/k8s-device-plugin"]
+        args: ["-logtostderr=true", "-stderrthreshold=INFO", "-v=5"]
         securityContext:
           privileged: true
         volumeMounts:
         - name: dev
           mountPath: /dev
+        - name: sys
+          mountPath: /sys
       volumes:
       - name: dev
         hostPath:
           path: /dev
+      - name: sys
+        hostPath:
+          path: /sys
