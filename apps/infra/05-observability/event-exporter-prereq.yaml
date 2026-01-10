@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: event-exporter
+  name: event-exporter-prereq
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "1"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: main
-    path: resources/event-exporter/app
+    path: resources/event-exporter/prereq
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
@@ -20,3 +20,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
