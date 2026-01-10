@@ -16,6 +16,7 @@ spec:
     helm:
       values: |
         loki:
+          isDefault: false
           enabled: true
           persistence:
             enabled: true
