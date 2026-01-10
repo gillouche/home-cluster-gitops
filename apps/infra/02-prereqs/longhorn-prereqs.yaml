@@ -12,9 +12,7 @@ spec:
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
-    path: resources/longhorn
-    directory:
-      recurse: true
+    path: resources/longhorn/prereqs
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
