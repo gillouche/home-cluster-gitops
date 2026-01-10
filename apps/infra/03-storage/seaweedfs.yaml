@@ -31,6 +31,17 @@ spec:
                         - key: reliability
                           operator: In
                           values: ["best-effort", "stable"]
+              podAntiAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values: ["seaweedfs"]
+                        - key: app.kubernetes.io/component
+                          operator: In
+                          values: ["master"]
+                    topologyKey: "kubernetes.io/hostname"
             data:
               type: "persistentVolumeClaim"
               size: "1Gi"
@@ -52,6 +63,17 @@ spec:
                         - key: reliability
                           operator: In
                           values: ["best-effort", "stable"]
+              podAntiAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values: ["seaweedfs"]
+                        - key: app.kubernetes.io/component
+                          operator: In
+                          values: ["volume"]
+                    topologyKey: "kubernetes.io/hostname"
             dataDirs:
               - name: data1
                 type: "persistentVolumeClaim"
@@ -74,6 +96,17 @@ spec:
                         - key: reliability
                           operator: In
                           values: ["best-effort", "stable"]
+              podAntiAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values: ["seaweedfs"]
+                        - key: app.kubernetes.io/component
+                          operator: In
+                          values: ["filer"]
+                    topologyKey: "kubernetes.io/hostname"
             data:
               type: "persistentVolumeClaim"
               size: "10Gi"
@@ -104,6 +137,17 @@ spec:
                         - key: reliability
                           operator: In
                           values: ["best-effort", "stable"]
+              podAntiAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  - labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values: ["seaweedfs"]
+                        - key: app.kubernetes.io/component
+                          operator: In
+                          values: ["s3"]
+                    topologyKey: "kubernetes.io/hostname"
             # Use the sealed secret we just created
             existingSecret: "seaweedfs-s3-secret"
             ingress:

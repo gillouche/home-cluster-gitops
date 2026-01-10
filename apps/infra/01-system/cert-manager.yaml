@@ -16,9 +16,10 @@ spec:
     helm:
       values: |
         installCRDs: true
+        replicaCount: 3
         global:
           priorityClassName: system-cluster-critical
-        affinity: &affinity
+        affinity:
           nodeAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
               nodeSelectorTerms:
@@ -32,10 +33,71 @@ spec:
                     - key: reliability
                       operator: In
                       values: ["best-effort", "stable"]
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/instance
+                      operator: In
+                      values: ["cert-manager"]
+                    - key: app.kubernetes.io/component
+                      operator: In
+                      values: ["controller"]
+                topologyKey: "kubernetes.io/hostname"
         webhook:
-          affinity: *affinity
+          replicaCount: 3
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: node-class
+                        operator: In
+                        values: ["rpi5"]
+                      - key: storage
+                        operator: In
+                        values: ["ssd", "sdcard"]
+                      - key: reliability
+                        operator: In
+                        values: ["best-effort", "stable"]
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/instance
+                        operator: In
+                        values: ["cert-manager"]
+                      - key: app.kubernetes.io/component
+                        operator: In
+                        values: ["webhook"]
+                  topologyKey: "kubernetes.io/hostname"
         cainjector:
-          affinity: *affinity
+          replicaCount: 3
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: node-class
+                        operator: In
+                        values: ["rpi5"]
+                      - key: storage
+                        operator: In
+                        values: ["ssd", "sdcard"]
+                      - key: reliability
+                        operator: In
+                        values: ["best-effort", "stable"]
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - labelSelector:
+                    matchExpressions:
+                      - key: app.kubernetes.io/instance
+                        operator: In
+                        values: ["cert-manager"]
+                      - key: app.kubernetes.io/component
+                        operator: In
+                        values: ["cainjector"]
+                  topologyKey: "kubernetes.io/hostname"
   destination:
     server: https://kubernetes.default.svc
     namespace: cert-manager
