@@ -1,0 +1,82 @@
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: node-reachability
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  jobName: node-reachability
+  prober:
+    url: blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc:9115
+  module: icmp
+  interval: 30s
+  scrapeTimeout: 10s
+  targets:
+    staticConfig:
+      static:
+        # RPi 4 Cluster
+        - 192.168.0.76  # rpi4b8g1
+        - 192.168.0.77  # rpi4b8g2
+        - 192.168.0.78  # rpi4b8g3
+        - 192.168.0.79  # rpi4b8g4
+        # RPi 5 Cluster
+        - 192.168.0.80  # rpi5b8g1
+        - 192.168.0.81  # rpi5b16g1ssd
+        - 192.168.0.82  # rpi5b16g2ssd
+        - 192.168.0.83  # rpi5b16g3ssd
+        - 192.168.0.84  # rpi5b16g4
+        - 192.168.0.85  # rpi5b16g5
+        - 192.168.0.86  # rpi5b16g6
+        - 192.168.0.87  # homeserver
+      relabeling:
+        - sourceLabels: [__param_target]
+          targetLabel: instance
+        - sourceLabels: [__param_target]
+          regex: "192.168.0.76"
+          replacement: "rpi4b8g1"
+          targetLabel: hostname
+        - sourceLabels: [__param_target]
+          regex: "192.168.0.77"
+          replacement: "rpi4b8g2"
+          targetLabel: hostname
+        - sourceLabels: [__param_target]
+          regex: "192.168.0.78"
+          replacement: "rpi4b8g3"
+          targetLabel: hostname
+        - sourceLabels: [__param_target]
+          regex: "192.168.0.79"
+          replacement: "rpi4b8g4"
+          targetLabel: hostname
+        - sourceLabels: [__param_target]
+          regex: "192.168.0.80"
+          replacement: "rpi5b8g1"
+          targetLabel: hostname
+        - sourceLabels: [__param_target]
+          regex: "192.168.0.81"
+          replacement: "rpi5b16g1ssd"
+          targetLabel: hostname
+        - sourceLabels: [__param_target]
+          regex: "192.168.0.82"
+          replacement: "rpi5b16g2ssd"
+          targetLabel: hostname
+        - sourceLabels: [__param_target]
+          regex: "192.168.0.83"
+          replacement: "rpi5b16g3ssd"
+          targetLabel: hostname
+        - sourceLabels: [__param_target]
+          regex: "192.168.0.84"
+          replacement: "rpi5b16g4"
+          targetLabel: hostname
+        - sourceLabels: [__param_target]
+          regex: "192.168.0.85"
+          replacement: "rpi5b16g5"
+          targetLabel: hostname
+        - sourceLabels: [__param_target]
+          regex: "192.168.0.86"
+          replacement: "rpi5b16g6"
+          targetLabel: hostname
+        - sourceLabels: [__param_target]
+          regex: "192.168.0.87"
+          replacement: "homeserver"
+          targetLabel: hostname

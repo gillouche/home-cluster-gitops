@@ -9,71 +9,29 @@ metadata:
     - argoproj.io/resources-finalizer
 spec:
   project: default
-  source:
-    chart: prometheus-blackbox-exporter
-    repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 11.6.1
-    helm:
-      values: |
-        config:
-          modules:
-            icmp:
-              prober: icmp
-              timeout: 5s
-            ssh_banner:
-              prober: tcp
-              tcp:
-                query_response:
-                  - expect: "^SSH-2.0-"
-        
-        # Enable ServiceMonitor for Prometheus Operator to scrape these targets
-        serviceMonitor:
-          enabled: true
-          defaults:
-            labels:
-              release: monitoring
-            interval: 30s
-            scrapeTimeout: 10s
+  sources:
+    - chart: prometheus-blackbox-exporter
+      repoURL: https://prometheus-community.github.io/helm-charts
+      targetRevision: 11.6.1
+      helm:
+        values: |
+          config:
+            modules:
+              icmp:
+                prober: icmp
+                timeout: 5s
+              ssh_banner:
+                prober: tcp
+                tcp:
+                  query_response:
+                    - expect: "^SSH-2.0-"
           
-          # Define targets to probe directly here
-          targets:
-            # RPi 4 Cluster
-            - name: rpi4b8g1
-              url: 192.168.0.76
-              module: icmp
-            - name: rpi4b8g2
-              url: 192.168.0.77
-              module: icmp
-            - name: rpi4b8g3
-              url: 192.168.0.78
-              module: icmp
-            - name: rpi4b8g4
-              url: 192.168.0.79
-              module: icmp
-            
-            # RPi 5 Cluster
-            - name: rpi5b8g1
-              url: 192.168.0.80
-              module: icmp
-            - name: rpi5b16g1ssd
-              url: 192.168.0.81
-              module: icmp
-            - name: rpi5b16g2ssd
-              url: 192.168.0.82
-              module: icmp
-            - name: rpi5b16g3ssd
-              url: 192.168.0.83
-              module: icmp
-            - name: rpi5b16g4
-              url: 192.168.0.84
-              module: icmp
-            - name: rpi5b16g5
-              url: 192.168.0.85
-              module: icmp
-            - name: rpi5b16g6
-              url: 192.168.0.86
-              module: icmp
-
+          # single Probe CR instead of multiple ServiceMonitors
+          serviceMonitor:
+            enabled: false
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      path: resources/blackbox-exporter
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
