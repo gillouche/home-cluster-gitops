@@ -11,21 +11,13 @@ spec:
   project: default
   source:
     chart: kubernetes-event-exporter
-    repoURL: https://charts.bitnami.com/bitnami
-    targetRevision: 2.11.0
+    repoURL: https://resmoio.github.io/kubernetes-event-exporter
+    targetRevision: 1.7.0
     helm:
       values: |
-        image:
-          registry: ghcr.io
-          repository: resmoio/kubernetes-event-exporter
-          tag: v1.7.0
-
-        deploy:
-          replicaCount: 1
-          strategy:
-            type: Recreate
+        replicaCount: 1
         
-        extraEnvVars:
+        extraEnv:
           - name: DISCORD_WEBHOOK_URL
             valueFrom:
               secretKeyRef:
