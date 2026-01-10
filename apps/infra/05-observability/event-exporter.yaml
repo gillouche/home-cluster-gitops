@@ -15,6 +15,11 @@ spec:
     targetRevision: 2.11.0
     helm:
       values: |
+        image:
+          registry: ghcr.io
+          repository: resmoio/kubernetes-event-exporter
+          tag: v1.7.0
+
         deploy:
           replicaCount: 1
           strategy:

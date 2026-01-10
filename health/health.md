@@ -22,6 +22,18 @@ kubectl patch application root -n argocd --type merge -p '{"metadata": {"annotat
 
 # Check the revision of the root application
 kubectl get application root -n argocd -o yaml | grep revision:
+
+# Check unhealthy applications
+kubectl get applications -n argocd -o json | \
+jq -r '
+  .items[]
+  | select(.status.sync.status != "Synced" or .status.health.status != "Healthy")
+  | [
+      .metadata.name,
+      .status.sync.status,
+      .status.health.status
+    ] | @tsv
+'
 ```
 
 ### Troubleshooting Sync Errors
