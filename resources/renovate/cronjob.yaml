@@ -22,9 +22,24 @@ spec:
                   value: "false"
                 - name: RENOVATE_REPOSITORIES
                   value: "['gillouche/home-cluster-gitops']"
+                - name: RENOVATE_CONFIG_FILE
+                  value: "/app/renovate-config/config.js"
                 - name: RENOVATE_TOKEN
                   valueFrom:
                     secretKeyRef:
                       name: renovate-config
                       key: token
+                - name: DISCORD_WEBHOOK
+                  valueFrom:
+                    secretKeyRef:
+                      name: discord-webhooks
+                      key: renovate-updates
+                      optional: true
+              volumeMounts:
+                - name: config-volume
+                  mountPath: /app/renovate-config
           restartPolicy: Never
+          volumes:
+            - name: config-volume
+              configMap:
+                name: renovate-config-map

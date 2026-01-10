@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: renovate-config-map
+  namespace: argocd
+data:
+  config.js: |
+    module.exports = {
+      platform: 'github',
+      autodiscover: false,
+      onboarding: false,
+      requireConfig: false,
+      notifications: [
+        {
+          channel: 'renovate-updates',
+          type: 'discord',
+          webhookUrl: process.env.DISCORD_WEBHOOK
+        }
+      ]
+    };

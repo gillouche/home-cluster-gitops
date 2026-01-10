@@ -1,0 +1,85 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: event-exporter
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: default
+  source:
+    chart: kubernetes-event-exporter
+    repoURL: https://charts.bitnami.com/bitnami
+    targetRevision: 2.11.0
+    helm:
+      values: |
+        deploy:
+          replicaCount: 1
+          strategy:
+            type: Recreate
+        
+        extraEnvVars:
+          - name: DISCORD_WEBHOOK_URL
+            valueFrom:
+              secretKeyRef:
+                name: discord-webhooks
+                key: warning-alerts
+
+        config:
+          logLevel: error
+          logFormat: json
+          route:
+            routes:
+              - match:
+                  type: "Warning"
+                receiver: "discord"
+          receivers:
+            - name: "discord"
+              webhook:
+                endpoint: "${DISCORD_WEBHOOK_URL}"
+                headers:
+                  Content-Type: "application/json"
+                layout:
+                  body: |
+                    {{- $colors := dict "Normal" 3066993 "Warning" 15158332 "Critical" 15105570 -}}
+                    {
+                      "embeds": [
+                        {
+                          "title": "{{ .Type }} Event in {{ .InvolvedObject.Namespace }}/{{ .InvolvedObject.Kind }}",
+                          "description": "{{ .Message }}",
+                          "color": {{ index $colors .Type | default 3066993 }},
+                          "fields": [
+                            {
+                              "name": "Reason",
+                              "value": "{{ .Reason }}",
+                              "inline": true
+                            },
+                            {
+                              "name": "Object",
+                              "value": "{{ .InvolvedObject.Name }}",
+                              "inline": true
+                            },
+                            {
+                              "name": "Count",
+                              "value": "{{ .Count }}",
+                              "inline": true
+                            }
+                          ],
+                          "footer": {
+                            "text": "{{ .LastTimestamp }}"
+                          }
+                        }
+                      ]
+                    }
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

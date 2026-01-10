@@ -56,6 +56,8 @@ spec:
         alertmanager:
           alertmanagerSpec:
             replicas: 3
+            secrets:
+              - discord-webhooks
             storage:
               volumeClaimTemplate:
                 spec:
@@ -78,6 +80,63 @@ spec:
                         - key: reliability
                           operator: In
                           values: ["best-effort", "stable"]
+          config:
+            global:
+              resolve_timeout: 5m
+            route:
+              group_by: ['alertname', 'job']
+              group_wait: 30s
+              group_interval: 5m
+              repeat_interval: 3h
+              receiver: 'discord-prometheus-firing'
+              routes:
+                - match:
+                    alertname: Watchdog
+                  receiver: 'null'
+                - match:
+                    severity: critical
+                  receiver: 'discord-critical'
+                  continue: true
+                - match:
+                    severity: warning
+                  receiver: 'discord-warning'
+                  continue: true
+                - match:
+                    job: blackbox
+                  receiver: 'discord-network'
+                  continue: true
+                - match:
+                    alertname: KubeStateMetricsDown
+                  receiver: 'discord-warning'
+                - match:
+                    alertname: LonghornVolumeStatusCritical
+                  receiver: 'discord-storage'
+                - match:
+                    alertname: LonghornVolumeStatusWarning
+                  receiver: 'discord-storage'
+            receivers:
+            - name: 'null'
+            - name: 'discord-prometheus-firing'
+              discord_configs:
+              - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/prometheus-firing
+                send_resolved: true
+            - name: 'discord-critical'
+              discord_configs:
+              - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/critical-alerts
+                send_resolved: true
+            - name: 'discord-warning'
+              discord_configs:
+              - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/warning-alerts
+                send_resolved: true
+            - name: 'discord-network'
+              discord_configs:
+              - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/network-issues
+                send_resolved: true
+            - name: 'discord-storage'
+              discord_configs:
+              - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/storage-issues
+                send_resolved: true
+
           ingress:
             enabled: true
             ingressClassName: traefik
