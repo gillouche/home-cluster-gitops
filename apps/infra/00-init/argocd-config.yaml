@@ -13,6 +13,8 @@ spec:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
     path: resources/argocd
+    directory:
+      exclude: "ingress.yaml"
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
