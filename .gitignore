@@ -1,1 +1,3 @@
 sealed-secrets/input/
+.venv
+__pycache__/
