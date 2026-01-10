@@ -4,7 +4,7 @@ metadata:
   name: kubernetes-dashboard
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "7"
+    argocd.argoproj.io/sync-wave: "14"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
@@ -70,7 +70,7 @@ metadata:
   name: kubernetes-dashboard-config
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "6"
+    argocd.argoproj.io/sync-wave: "13"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:

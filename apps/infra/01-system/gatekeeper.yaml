@@ -4,7 +4,7 @@ metadata:
   name: gatekeeper
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "3"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
