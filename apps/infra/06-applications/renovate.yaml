@@ -1,10 +1,10 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cluster-policies
+  name: renovate
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-wave: "7"
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
@@ -12,13 +12,13 @@ spec:
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
-    path: resources/cluster-policies
+    path: resources/renovate
   destination:
     server: https://kubernetes.default.svc
-    namespace: default
+    namespace: argocd
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=false
+      - CreateNamespace=true
