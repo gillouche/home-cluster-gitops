@@ -75,7 +75,7 @@ echo "   This requires an 'htpasswd' formatted string."
 echo "   Format: user:hashed_password"
 echo ""
 echo "   To generate this, run the following in another terminal:"
-echo "   ${BLUE}htpasswd -nb admin <your-password>${NC}"
+echo -e "   ${BLUE}htpasswd -nb admin <your-password>${NC}"
 echo ""
 read -p "Enter the full htpasswd output (e.g., admin:\$apr1\$...): " LONGHORN_USERS
 
@@ -91,11 +91,11 @@ fi
 echo -e "${YELLOW}----------------------------------------------------------------${NC}"
 echo -e "${GREEN}5. ArgoCD Secrets${NC}"
 echo "   a) admin.password: Requires a Bcrypt hash of your password."
-echo "      To generate, run: ${BLUE}htpasswd -nB -C 10 admin${NC}"
+echo -e "      To generate, run: ${BLUE}htpasswd -nB -C 10 admin${NC}"
 echo "      (Then copy ONLY the hash part, starting after 'admin:')"
 echo ""
 echo "   b) server.secretkey: Requires a random secure string."
-echo "      To generate, run: ${BLUE}openssl rand -base64 32${NC}"
+echo -e "      To generate, run: ${BLUE}openssl rand -base64 32${NC}"
 echo ""
 
 read -p "Enter admin.password (Bcrypt hash, starts with \$2y\$...): " ARGO_PWD
