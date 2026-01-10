@@ -5,8 +5,14 @@ metadata:
   namespace: argocd
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
+    cert-manager.io/cluster-issuer: vault-issuer
+    cert-manager.io/common-name: argocd.k3s.gillouche.homelab
 spec:
   ingressClassName: traefik
+  tls:
+    - hosts:
+        - argocd.k3s.gillouche.homelab
+      secretName: argocd-server-tls
   rules:
   - host: argocd.k3s.gillouche.homelab
     http:
