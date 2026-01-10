@@ -19,6 +19,9 @@ kubectl patch application <app-name> -n argocd --type merge -p '{"spec":{"syncPo
 
 # Force refresh of root
 kubectl patch application root -n argocd --type merge -p '{"metadata": {"annotations": {"argocd.argoproj.io/refresh": "hard"}}}'
+
+# Check the revision of the root application
+kubectl get application root -n argocd -o yaml | grep revision:
 ```
 
 ### Troubleshooting Sync Errors
