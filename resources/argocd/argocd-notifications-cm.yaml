@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/name: argocd-notifications-controller
     app.kubernetes.io/part-of: argocd
 data:
-  service.discord: |
+  service.webhook.discord: |
     url: $discord-webhooks:argocd-sync
 
   template.app-sync-succeeded: |
