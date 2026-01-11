@@ -12,12 +12,52 @@ data:
       routes:
         - match:
             - type: "Warning"
-          receiver: "discord"
+          receiver: "discord-warning"
+        - match:
+            - type: "Normal"
+          receiver: "discord-info"
 
     receivers:
-      - name: "discord"
+      - name: "discord-warning"
         webhook:
-          endpoint: "${DISCORD_WEBHOOK_URL}"
+          endpoint: "${DISCORD_WARNING_WEBHOOK_URL}"
+          headers:
+            Content-Type: "application/json"
+          layout:
+            body: |
+              {{- $colors := dict "Normal" 3066993 "Warning" 15158332 "Critical" 15105570 -}}
+              {
+                "embeds": [
+                  {
+                    "title": "{{ .Type }} Event in {{ .InvolvedObject.Namespace }}/{{ .InvolvedObject.Kind }}",
+                    "description": "{{ .Message }}",
+                    "color": {{ index $colors .Type | default 3066993 }},
+                    "fields": [
+                      {
+                        "name": "Reason",
+                        "value": "{{ .Reason }}",
+                        "inline": true
+                      },
+                      {
+                        "name": "Object",
+                        "value": "{{ .InvolvedObject.Name }}",
+                        "inline": true
+                      },
+                      {
+                        "name": "Count",
+                        "value": "{{ .Count }}",
+                        "inline": true
+                      }
+                    ],
+                    "footer": {
+                      "text": "{{ .LastTimestamp }}"
+                    }
+                  }
+                ]
+              }
+      - name: "discord-info"
+        webhook:
+          endpoint: "${DISCORD_INFO_WEBHOOK_URL}"
           headers:
             Content-Type: "application/json"
           layout:
@@ -73,7 +113,7 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "2112"
         prometheus.io/path: "/metrics"
-        rollout-restart: "2026-01-11T02:57:00Z"
+        rollout-restart: "2026-01-11T03:05:00Z"
     spec:
       serviceAccountName: event-exporter
       securityContext:
@@ -85,11 +125,16 @@ spec:
           image: ghcr.io/resmoio/kubernetes-event-exporter:v1.7
           imagePullPolicy: IfNotPresent
           env:
-            - name: DISCORD_WEBHOOK_URL
+            - name: DISCORD_WARNING_WEBHOOK_URL
               valueFrom:
                 secretKeyRef:
                   name: monitoring-discord-webhooks
                   key: pod-events
+            - name: DISCORD_INFO_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: monitoring-discord-webhooks
+                  key: info-alerts
           args:
             - -conf=/data/config.yaml
           ports:
