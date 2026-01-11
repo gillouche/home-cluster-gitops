@@ -7,57 +7,60 @@ metadata:
     app.kubernetes.io/name: argocd-notifications-controller
     app.kubernetes.io/part-of: argocd
 data:
-  service.webhook: |
+  service.webhook.discord: |
     url: $argocd-notifications-secret:argocd-sync
-    method: POST
     headers:
-      Content-Type: application/json
+      - name: Content-Type
+        value: application/json
 
   template.app-sync-succeeded: |
-    message: |
-      Application {{.app.metadata.name}} has been successfully synced.
     webhook:
-      title: "Application {{.app.metadata.name}} Synced"
-      description: "Application {{.app.metadata.name}} has been successfully synced at {{.app.status.operationState.finishedAt}}."
-      color: "#00ff00"
+      discord:
+        method: POST
+        body: |
+          {
+            "content": "Application {{ .app.metadata.name }} synced successfully at {{ .app.status.operationState.finishedAt }}."
+          }
 
   template.app-sync-failed: |
-    message: |
-      Application {{.app.metadata.name}} sync failed.
     webhook:
-      title: "Application {{.app.metadata.name}} Sync Failed"
-      description: "Application {{.app.metadata.name}} sync failed. Error: {{.app.status.operationState.message}}"
-      color: "#ff0000"
+      discord:
+        method: POST
+        body: |
+          {
+            "content": "Application {{ .app.metadata.name }} sync failed: {{ .app.status.operationState.message }}"
+          }
 
   template.app-health-degraded: |
-    message: |
-      Application {{.app.metadata.name}} is degraded.
     webhook:
-      title: "Application {{.app.metadata.name}} Degraded"
-      description: "Application {{.app.metadata.name}} health is degraded."
-      color: "#ff0000"
+      discord:
+        method: POST
+        body: |
+          {
+            "content": "Application {{ .app.metadata.name }} health degraded."
+          }
 
   template.app-deployed: |
-    message: |
-      Application {{.app.metadata.name}} has been deployed.
     webhook:
-      title: "Application {{.app.metadata.name}} Deployed"
-      description: |
-        Application {{.app.metadata.name}} was successfully deployed and is healthy.
-      color: "#00ff00"
-
-  trigger.on-sync-failed: |
-    - description: Application syncing has failed
-      send: [app-sync-failed]
-      when: app.status.operationState.phase in ['Failed', 'Error']
+      discord:
+        method: POST
+        body: |
+          {
+            "content": "Application {{ .app.metadata.name }} deployed and healthy."
+          }
 
   trigger.on-sync-succeeded: |
-    - description: Application syncing has succeeded
+    - description: Application sync succeeded
       send: [app-sync-succeeded]
       when: app.status.operationState.phase in ['Succeeded']
 
+  trigger.on-sync-failed: |
+    - description: Application sync failed
+      send: [app-sync-failed]
+      when: app.status.operationState.phase in ['Failed', 'Error']
+
   trigger.on-health-degraded: |
-    - description: Application has degraded
+    - description: Application health degraded
       send: [app-health-degraded]
       when: app.status.health.status == 'Degraded'
 
@@ -68,7 +71,7 @@ data:
 
   subscriptions: |
     - recipients:
-        - webhook
+        - discord
       triggers:
         - on-sync-succeeded
         - on-sync-failed
