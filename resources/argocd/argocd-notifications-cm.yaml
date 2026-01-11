@@ -19,7 +19,7 @@ data:
         method: POST
         body: |
           {
-            "content": "Application {{ .app.metadata.name }} synced successfully at {{ .app.status.operationState.finishedAt }}."
+            "content": ":white_check_mark: **Application {{ .app.metadata.name }} Synced**\n> Synced successfully at `{{ .app.status.operationState.finishedAt }}`."
           }
 
   template.app-sync-failed: |
@@ -28,7 +28,7 @@ data:
         method: POST
         body: |
           {
-            "content": "Application {{ .app.metadata.name }} sync failed: {{ .app.status.operationState.message }}"
+            "content": ":x: **Application {{ .app.metadata.name }} Sync Failed**\n> Error: `{{ .app.status.operationState.message }}`"
           }
 
   template.app-health-degraded: |
@@ -37,7 +37,7 @@ data:
         method: POST
         body: |
           {
-            "content": "Application {{ .app.metadata.name }} health degraded."
+            "content": ":warning: **Application {{ .app.metadata.name }} Health Degraded**\n> Current status: `{{ .app.status.health.status }}`"
           }
 
   template.app-deployed: |
@@ -46,7 +46,7 @@ data:
         method: POST
         body: |
           {
-            "content": "Application {{ .app.metadata.name }} deployed and healthy."
+            "content": ":tada: **Application {{ .app.metadata.name }} Deployed**\n> Deployed successfully and healthy at `{{ .app.status.operationState.finishedAt }}`."
           }
 
   trigger.on-sync-succeeded: |
