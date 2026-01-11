@@ -70,3 +70,32 @@ spec:
           annotations:
             summary: "High System Load on {{ $labels.instance }}"
             description: "Node {{ $labels.instance }} load average is > 120% of capacity."
+        # --- System Stability (Paranoid Debugging) ---
+        - alert: NodeOOMKillDetected
+          # Detect kmsg 'OOM kill' events via node-exporter (requires --collector.vmstat)
+          expr: increase(node_vmstat_oom_kill[5m]) > 0
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: "OOM Kill Detected on {{ $labels.instance }}"
+            description: "Kernel OOM killer has triggered on {{ $labels.instance }}! Check logs immediately."
+
+        - alert: NodeHighIOWait
+          # Critical for SD cards: if CPU is spending > 20% time waiting for IO
+          expr: avg by (instance) (rate(node_cpu_seconds_total{mode="iowait"}[5m])) * 100 > 20
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High IO Wait on {{ $labels.instance }}"
+            description: "Node {{ $labels.instance }} is suffering high IO wait ({{ $value }}%). SD Card may be saturated or failing."
+
+        - alert: NodeNetworkReceptionErrors
+          expr: rate(node_network_receive_errs_total[2m]) > 0
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Network Receive Errors on {{ $labels.instance }}"
+            description: "Node {{ $labels.instance }} interface {{ $labels.device }} is dropping packets."
