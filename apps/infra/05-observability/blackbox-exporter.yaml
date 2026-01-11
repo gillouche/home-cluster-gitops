@@ -43,6 +43,6 @@ spec:
       - CreateNamespace=true
   ignoreDifferences:
     - group: monitoring.coreos.com
-      kind: ServiceMonitor
+      kind: Probe
       jsonPointers:
         - /spec/targets/staticConfig/relabeling
