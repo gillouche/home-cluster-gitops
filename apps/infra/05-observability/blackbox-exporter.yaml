@@ -44,5 +44,6 @@ spec:
   ignoreDifferences:
     - group: monitoring.coreos.com
       kind: Probe
-      jsonPointers:
-        - /spec/targets/staticConfig/relabeling
+      jqPathExpressions:
+        - .spec.targets.staticConfig.relabeling
+        - .spec.prober.path
