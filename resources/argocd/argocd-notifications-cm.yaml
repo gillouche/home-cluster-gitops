@@ -34,6 +34,15 @@ data:
       description: "Application {{.app.metadata.name}} health is degraded."
       color: "#ff0000"
 
+  template.app-deployed: |
+    message: |
+      Application {{.app.metadata.name}} has been deployed.
+    discord:
+      title: "Application {{.app.metadata.name}} Deployed"
+      description: |
+        Application {{.app.metadata.name}} was successfully deployed and is healthy.
+      color: "#00ff00"
+
   trigger.on-sync-failed: |
     - description: Application syncing has failed
       send: [app-sync-failed]
@@ -49,6 +58,11 @@ data:
       send: [app-health-degraded]
       when: app.status.health.status == 'Degraded'
 
+  trigger.on-deployed: |
+    - description: Application deployed and healthy
+      send: [app-deployed]
+      when: app.status.operationState.phase == 'Succeeded' && app.status.health.status == 'Healthy'
+
   subscriptions: |
     - recipients:
         - discord
@@ -56,3 +70,4 @@ data:
         - on-sync-succeeded
         - on-sync-failed
         - on-health-degraded
+        - on-deployed
