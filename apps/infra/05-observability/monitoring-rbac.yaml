@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
-    path: resources/monitoring
+    path: resources/monitoring-rbac
     directory:
       recurse: true
   destination:
