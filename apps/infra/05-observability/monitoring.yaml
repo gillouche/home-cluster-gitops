@@ -58,6 +58,9 @@ spec:
             replicas: 3
             secrets:
               - discord-webhooks
+            podMetadata:
+              annotations:
+                rollout-restart: "2026-01-11T02:57:00Z"
             storage:
               volumeClaimTemplate:
                 spec:

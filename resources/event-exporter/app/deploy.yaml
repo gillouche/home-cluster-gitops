@@ -73,6 +73,7 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/port: "2112"
         prometheus.io/path: "/metrics"
+        rollout-restart: "2026-01-11T02:57:00Z"
     spec:
       serviceAccountName: event-exporter
       securityContext:
