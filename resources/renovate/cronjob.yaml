@@ -32,7 +32,7 @@ spec:
                 - name: DISCORD_WEBHOOK
                   valueFrom:
                     secretKeyRef:
-                      name: discord-webhooks
+                      name: argocd-notifications-secret
                       key: renovate-updates
                       optional: true
               volumeMounts:

@@ -5,9 +5,9 @@ metadata:
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "11"
-    notifications.argoproj.io/subscribe.on-sync-succeeded.discord: ""
-    notifications.argoproj.io/subscribe.on-sync-failed.discord: ""
-    notifications.argoproj.io/subscribe.on-health-degraded.discord: ""
+    https://github.com/gillouche/home-cluster-gitops.git: ""
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook: ""
   finalizers:
     - argoproj.io/resources-finalizer
 spec:

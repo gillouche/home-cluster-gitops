@@ -31,4 +31,4 @@ spec:
               name: daily-summary-script
           - name: secrets
             secret:
-              secretName: discord-webhooks
+              secretName: monitoring-discord-webhooks

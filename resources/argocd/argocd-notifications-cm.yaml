@@ -7,13 +7,13 @@ metadata:
     app.kubernetes.io/name: argocd-notifications-controller
     app.kubernetes.io/part-of: argocd
 data:
-  service.discord: |
+  service.webhook: |
     url: $argocd-notifications-secret:argocd-sync
 
   template.app-sync-succeeded: |
     message: |
       Application {{.app.metadata.name}} has been successfully synced.
-    discord:
+    webhook:
       title: "Application {{.app.metadata.name}} Synced"
       description: "Application {{.app.metadata.name}} has been successfully synced at {{.app.status.operationState.finishedAt}}."
       color: "#00ff00"
@@ -21,7 +21,7 @@ data:
   template.app-sync-failed: |
     message: |
       Application {{.app.metadata.name}} sync failed.
-    discord:
+    webhook:
       title: "Application {{.app.metadata.name}} Sync Failed"
       description: "Application {{.app.metadata.name}} sync failed. Error: {{.app.status.operationState.message}}"
       color: "#ff0000"
@@ -29,7 +29,7 @@ data:
   template.app-health-degraded: |
     message: |
       Application {{.app.metadata.name}} is degraded.
-    discord:
+    webhook:
       title: "Application {{.app.metadata.name}} Degraded"
       description: "Application {{.app.metadata.name}} health is degraded."
       color: "#ff0000"
@@ -37,7 +37,7 @@ data:
   template.app-deployed: |
     message: |
       Application {{.app.metadata.name}} has been deployed.
-    discord:
+    webhook:
       title: "Application {{.app.metadata.name}} Deployed"
       description: |
         Application {{.app.metadata.name}} was successfully deployed and is healthy.
@@ -65,7 +65,7 @@ data:
 
   subscriptions: |
     - recipients:
-        - discord
+        - webhook
       triggers:
         - on-sync-succeeded
         - on-sync-failed
