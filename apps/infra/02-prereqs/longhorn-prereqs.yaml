@@ -4,7 +4,7 @@ metadata:
   name: longhorn-prereqs
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-wave: "1"
     notifications.argoproj.io/subscribe.on-sync-succeeded.webhook.discord: ""
     notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord: ""
     notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord: ""
