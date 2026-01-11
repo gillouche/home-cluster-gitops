@@ -148,61 +148,61 @@ spec:
 
               receivers:
               - name: 'null'
-              - name: 'discord-firing'
-                discord_configs:
-                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/prometheus-firing
-                  send_resolved: true
-                  title: '🔔 ALERT: {{ .GroupLabels.alertname }}'
-                  message: '{{ template "discord.message" . }}'
-
-              - name: 'discord-critical'
-                discord_configs:
-                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/critical-alerts
-                  send_resolved: true
-                  title: '🔥 CRITICAL: {{ .GroupLabels.alertname }}'
-                  message: '{{ template "discord.message" . }}'
-
-              - name: 'discord-warning'
-                discord_configs:
-                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/warning-alerts
-                  send_resolved: true
-                  title: '⚠️ WARNING: {{ .GroupLabels.alertname }}'
-                  message: '{{ template "discord.message" . }}'
-
-              - name: 'discord-info'
-                discord_configs:
-                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/info-alerts
-                  send_resolved: true
-                  title: 'ℹ️ INFO: {{ .GroupLabels.alertname }}'
-                  message: '{{ template "discord.message" . }}'
-
-              - name: 'discord-network'
-                discord_configs:
-                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/network-issues
-                  send_resolved: true
-                  title: '🌐 NETWORK: {{ .GroupLabels.alertname }}'
-                  message: '{{ template "discord.message" . }}'
-
-              - name: 'discord-storage'
-                discord_configs:
-                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/storage-issues
-                  send_resolved: true
-                  title: '💾 STORAGE: {{ .GroupLabels.alertname }}'
-                  message: '{{ template "discord.message" . }}'
-
-              - name: 'discord-health'
-                discord_configs:
-                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/cluster-health
-                  send_resolved: true
-                  title: '🏥 HEALTH: {{ .GroupLabels.alertname }}'
-                  message: '{{ template "discord.message" . }}'
-
-              - name: 'discord-pods'
-                discord_configs:
-                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/pod-events
-                  send_resolved: true
-                  title: '📦 POD: {{ .GroupLabels.alertname }}'
-                  message: '{{ template "discord.message" . }}'
+#              - name: 'discord-firing'
+#                discord_configs:
+#                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/prometheus-firing
+#                  send_resolved: true
+#                  title: '🔔 ALERT: {{ .GroupLabels.alertname }}'
+#                  message: '{{ template "discord.message" . }}'
+#
+#              - name: 'discord-critical'
+#                discord_configs:
+#                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/critical-alerts
+#                  send_resolved: true
+#                  title: '🔥 CRITICAL: {{ .GroupLabels.alertname }}'
+#                  message: '{{ template "discord.message" . }}'
+#
+#              - name: 'discord-warning'
+#                discord_configs:
+#                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/warning-alerts
+#                  send_resolved: true
+#                  title: '⚠️ WARNING: {{ .GroupLabels.alertname }}'
+#                  message: '{{ template "discord.message" . }}'
+#
+#              - name: 'discord-info'
+#                discord_configs:
+#                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/info-alerts
+#                  send_resolved: true
+#                  title: 'ℹ️ INFO: {{ .GroupLabels.alertname }}'
+#                  message: '{{ template "discord.message" . }}'
+#
+#              - name: 'discord-network'
+#                discord_configs:
+#                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/network-issues
+#                  send_resolved: true
+#                  title: '🌐 NETWORK: {{ .GroupLabels.alertname }}'
+#                  message: '{{ template "discord.message" . }}'
+#
+#              - name: 'discord-storage'
+#                discord_configs:
+#                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/storage-issues
+#                  send_resolved: true
+#                  title: '💾 STORAGE: {{ .GroupLabels.alertname }}'
+#                  message: '{{ template "discord.message" . }}'
+#
+#              - name: 'discord-health'
+#                discord_configs:
+#                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/cluster-health
+#                  send_resolved: true
+#                  title: '🏥 HEALTH: {{ .GroupLabels.alertname }}'
+#                  message: '{{ template "discord.message" . }}'
+#
+#              - name: 'discord-pods'
+#                discord_configs:
+#                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/pod-events
+#                  send_resolved: true
+#                  title: '📦 POD: {{ .GroupLabels.alertname }}'
+#                  message: '{{ template "discord.message" . }}'
 
               templates:
               - '/etc/alertmanager/config/*.tmpl'
