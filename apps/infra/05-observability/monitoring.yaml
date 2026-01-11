@@ -9,66 +9,156 @@ metadata:
     - argoproj.io/resources-finalizer
 spec:
   project: default
-  source:
-    chart: kube-prometheus-stack
-    repoURL: https://prometheus-community.github.io/helm-charts
-    targetRevision: 80.13.2
-    helm:
-      values: |
-        # Use existing storage class and SSD nodes
-        prometheus:
-          prometheusSpec:
-            retention: 7d
-            storageSpec:
-              volumeClaimTemplate:
-                spec:
-                  storageClassName: longhorn
-                  accessModes: ["ReadWriteOnce"]
-                  resources:
-                    requests:
-                      storage: 10Gi
-            affinity:
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                        - key: node-class
-                          operator: In
-                          values: ["rpi5"]
-                        - key: storage
-                          operator: In
-                          values: ["ssd", "sdcard"]
-                        - key: reliability
-                          operator: In
-                          values: ["best-effort", "stable"]
-            tolerations:
-              - key: "node-role.kubernetes.io/control-plane"
-                operator: "Exists"
-                effect: "NoSchedule"
-          ingress:
-            enabled: true
-            ingressClassName: traefik
-            hosts:
-              - prometheus.k3s.gillouche.homelab
-            annotations:
-              traefik.ingress.kubernetes.io/router.entrypoints: web
-            
-        alertmanager:
-          alertmanagerSpec:
-            replicas: 3
-            secrets:
-              - discord-webhooks
-            podMetadata:
+  sources:
+    - chart: kube-prometheus-stack
+      repoURL: https://prometheus-community.github.io/helm-charts
+      targetRevision: 80.13.2
+      helm:
+        values: |
+          # Use existing storage class and SSD nodes
+          prometheus:
+            prometheusSpec:
+              retention: 7d
+              storageSpec:
+                volumeClaimTemplate:
+                  spec:
+                    storageClassName: longhorn
+                    accessModes: ["ReadWriteOnce"]
+                    resources:
+                      requests:
+                        storage: 10Gi
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                      - matchExpressions:
+                          - key: node-class
+                            operator: In
+                            values: ["rpi5"]
+                          - key: storage
+                            operator: In
+                            values: ["ssd", "sdcard"]
+                          - key: reliability
+                            operator: In
+                            values: ["best-effort", "stable"]
+              tolerations:
+                - key: "node-role.kubernetes.io/control-plane"
+                  operator: "Exists"
+                  effect: "NoSchedule"
+            ingress:
+              enabled: true
+              ingressClassName: traefik
+              hosts:
+                - prometheus.k3s.gillouche.homelab
               annotations:
-                rollout-restart: "2026-01-11T02:57:00Z"
-            storage:
-              volumeClaimTemplate:
-                spec:
-                  storageClassName: longhorn
-                  accessModes: ["ReadWriteOnce"]
-                  resources:
-                    requests:
-                      storage: 1Gi
+                traefik.ingress.kubernetes.io/router.entrypoints: web
+              
+          alertmanager:
+            alertmanagerSpec:
+              replicas: 3
+              secrets:
+                - discord-webhooks
+              podMetadata:
+                annotations:
+                  rollout-restart: "2026-01-11T02:57:00Z"
+              storage:
+                volumeClaimTemplate:
+                  spec:
+                    storageClassName: longhorn
+                    accessModes: ["ReadWriteOnce"]
+                    resources:
+                      requests:
+                        storage: 1Gi
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                      - matchExpressions:
+                          - key: node-class
+                            operator: In
+                            values: ["rpi5"]
+                          - key: storage
+                            operator: In
+                            values: ["ssd", "sdcard"]
+                          - key: reliability
+                            operator: In
+                            values: ["best-effort", "stable"]
+            config:
+              global:
+                resolve_timeout: 5m
+              route:
+                group_by: ['alertname', 'job']
+                group_wait: 30s
+                group_interval: 5m
+                repeat_interval: 3h
+                receiver: 'discord-prometheus-firing'
+                routes:
+                  - match:
+                      alertname: Watchdog
+                    receiver: 'null'
+                  - match:
+                      severity: critical
+                    receiver: 'discord-critical'
+                    continue: true
+                  - match:
+                      severity: warning
+                    receiver: 'discord-warning'
+                    continue: true
+                  - match:
+                      job: blackbox
+                    receiver: 'discord-network'
+                    continue: true
+                  - match:
+                      alertname: KubeStateMetricsDown
+                    receiver: 'discord-warning'
+                  - match:
+                      alertname: LonghornVolumeStatusCritical
+                    receiver: 'discord-storage'
+                  - match:
+                      alertname: LonghornVolumeStatusWarning
+                    receiver: 'discord-storage'
+              receivers:
+              - name: 'null'
+              - name: 'discord-prometheus-firing'
+                discord_configs:
+                - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/prometheus-firing
+                  send_resolved: true
+              - name: 'discord-critical'
+                discord_configs:
+                - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/critical-alerts
+                  send_resolved: true
+              - name: 'discord-warning'
+                discord_configs:
+                - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/warning-alerts
+                  send_resolved: true
+              - name: 'discord-network'
+                discord_configs:
+                - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/network-issues
+                  send_resolved: true
+              - name: 'discord-storage'
+                discord_configs:
+                - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/storage-issues
+                  send_resolved: true
+  
+            ingress:
+              enabled: true
+              ingressClassName: traefik
+              hosts:
+                - alertmanager.k3s.gillouche.homelab
+              annotations:
+                traefik.ingress.kubernetes.io/router.entrypoints: web
+  
+          grafana:
+            deploymentStrategy:
+              type: Recreate
+            admin:
+              existingSecret: "monitoring-grafana"
+              userKey: "admin-user"
+              passwordKey: "admin-password"
+            persistence:
+              enabled: true
+              storageClassName: longhorn
+              size: 5Gi
             affinity:
               nodeAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
@@ -83,131 +173,44 @@ spec:
                         - key: reliability
                           operator: In
                           values: ["best-effort", "stable"]
-          config:
-            global:
-              resolve_timeout: 5m
-            route:
-              group_by: ['alertname', 'job']
-              group_wait: 30s
-              group_interval: 5m
-              repeat_interval: 3h
-              receiver: 'discord-prometheus-firing'
-              routes:
-                - match:
-                    alertname: Watchdog
-                  receiver: 'null'
-                - match:
-                    severity: critical
-                  receiver: 'discord-critical'
-                  continue: true
-                - match:
-                    severity: warning
-                  receiver: 'discord-warning'
-                  continue: true
-                - match:
-                    job: blackbox
-                  receiver: 'discord-network'
-                  continue: true
-                - match:
-                    alertname: KubeStateMetricsDown
-                  receiver: 'discord-warning'
-                - match:
-                    alertname: LonghornVolumeStatusCritical
-                  receiver: 'discord-storage'
-                - match:
-                    alertname: LonghornVolumeStatusWarning
-                  receiver: 'discord-storage'
-            receivers:
-            - name: 'null'
-            - name: 'discord-prometheus-firing'
-              discord_configs:
-              - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/prometheus-firing
-                send_resolved: true
-            - name: 'discord-critical'
-              discord_configs:
-              - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/critical-alerts
-                send_resolved: true
-            - name: 'discord-warning'
-              discord_configs:
-              - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/warning-alerts
-                send_resolved: true
-            - name: 'discord-network'
-              discord_configs:
-              - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/network-issues
-                send_resolved: true
-            - name: 'discord-storage'
-              discord_configs:
-              - webhook_url_file: /etc/alertmanager/secrets/discord-webhooks/storage-issues
-                send_resolved: true
-
-          ingress:
+            ingress:
+              enabled: true
+              ingressClassName: traefik
+              hosts:
+                - grafana.k3s.gillouche.homelab
+              annotations:
+                traefik.ingress.kubernetes.io/router.entrypoints: web
+            
+            # Use default dashboards
+            dashboardProviders:
+              dashboardproviders.yaml:
+                apiVersion: 1
+                providers:
+                  - name: 'default'
+                    orgId: 1
+                    folder: ''
+                    type: file
+                    disableDeletion: false
+                    editable: true
+                    options:
+                      path: /var/lib/grafana/dashboards/default
+  
+          # Replace standalone exporters
+          nodeExporter:
             enabled: true
-            ingressClassName: traefik
-            hosts:
-              - alertmanager.k3s.gillouche.homelab
-            annotations:
-              traefik.ingress.kubernetes.io/router.entrypoints: web
-
-        grafana:
-          deploymentStrategy:
-            type: Recreate
-          admin:
-            existingSecret: "monitoring-grafana"
-            userKey: "admin-user"
-            passwordKey: "admin-password"
-          persistence:
+          kubeStateMetrics:
             enabled: true
-            storageClassName: longhorn
-            size: 5Gi
-          affinity:
-            nodeAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                nodeSelectorTerms:
-                  - matchExpressions:
-                      - key: node-class
-                        operator: In
-                        values: ["rpi5"]
-                      - key: storage
-                        operator: In
-                        values: ["ssd", "sdcard"]
-                      - key: reliability
-                        operator: In
-                        values: ["best-effort", "stable"]
-          ingress:
-            enabled: true
-            ingressClassName: traefik
-            hosts:
-              - grafana.k3s.gillouche.homelab
-            annotations:
-              traefik.ingress.kubernetes.io/router.entrypoints: web
-          
-          # Use default dashboards
-          dashboardProviders:
-            dashboardproviders.yaml:
-              apiVersion: 1
-              providers:
-                - name: 'default'
-                  orgId: 1
-                  folder: ''
-                  type: file
-                  disableDeletion: false
-                  editable: true
-                  options:
-                    path: /var/lib/grafana/dashboards/default
-
-        # Replace standalone exporters
-        nodeExporter:
-          enabled: true
-        kubeStateMetrics:
-          enabled: true
-
-        # Disable some defaults that might be too heavy for RPIs or not needed yet
-        kubeProxy:
-          enabled: false
-        kubeScheduler:
-          enabled: false
-        kubeControllerManager:
-          enabled: false
+  
+          # Disable some defaults that might be too heavy for RPIs or not needed yet
+          kubeProxy:
+            enabled: false
+          kubeScheduler:
+            enabled: false
+          kubeControllerManager:
+            enabled: false
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      path: resources/monitoring
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

@@ -1,0 +1,57 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: rpi-health-rules
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: rpi-health
+      rules:
+        - alert: RPiHighTemperature
+          expr: node_hwmon_temp_celsius > 80
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "RPi High Temperature (instance {{ $labels.instance }})"
+            description: "Node {{ $labels.instance }} temperature is {{ $value }}°C. Potential for throttling or damage."
+
+        - alert: RPiCriticalTemperature
+          expr: node_hwmon_temp_celsius > 85
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "RPi Critical Temperature (instance {{ $labels.instance }})"
+            description: "Node {{ $labels.instance }} temperature is {{ $value }}°C. Shutdown imminent."
+
+        - alert: RPiLowVoltageThrottled
+          # This metric is only available if the rpi collector is enabled in node-exporter
+          # and running on a Raspberry Pi. It might not be available but worth having if it is.
+          expr: node_raspberrypi_throttled_flags > 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "RPi Throttled/Low Voltage (instance {{ $labels.instance }})"
+            description: "Node {{ $labels.instance }} is reporting throttling flags ({{ $value }}). This often indicates an inadequate power supply."
+
+        - alert: NodeMemoryPressure
+          expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.95
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Node Memory Pressure (instance {{ $labels.instance }})"
+            description: "Node {{ $labels.instance }} is using more than 95% of its memory for 10 minutes."
+
+        - alert: NodeClockDrift
+          expr: abs(node_timex_offset_seconds) > 0.05
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Node Clock Drift (instance {{ $labels.instance }})"
+            description: "Node {{ $labels.instance }} clock is drifting by {{ $value }} seconds. This can cause issues with cluster synchronization."

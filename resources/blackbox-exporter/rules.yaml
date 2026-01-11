@@ -1,0 +1,28 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: node-reachability-rules
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: node-reachability
+      rules:
+        - alert: NodeUnreachable
+          expr: probe_success{job="probe/monitoring/node-reachability"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Node Unreachable (instance {{ $labels.instance }})"
+            description: "Node {{ $labels.instance }} is not responding to ICMP probes from blackbox-exporter."
+
+        - alert: NodeHighLatency
+          expr: probe_duration_seconds{job="probe/monitoring/node-reachability"} > 0.5
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Node High Latency (instance {{ $labels.instance }})"
+            description: "Node {{ $labels.instance }} has high ICMP latency (> 500ms) for more than 5 minutes."
