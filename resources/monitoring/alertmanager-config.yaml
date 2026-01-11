@@ -78,72 +78,72 @@ spec:
   - name: 'null'
   - name: 'discord-firing'
     discordConfigs:
-    - webhookURL:
+    - apiURL:
         key: prometheus-firing
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '🔔 ALERT: {{ .GroupLabels.alertname }}'
-      message: '{{ template "discord.message" . }}'
+      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
 
   - name: 'discord-critical'
     discordConfigs:
-    - webhookURL:
+    - apiURL:
         key: critical-alerts
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '🔥 CRITICAL: {{ .GroupLabels.alertname }}'
-      message: '{{ template "discord.message" . }}'
+      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
 
   - name: 'discord-warning'
     discordConfigs:
-    - webhookURL:
+    - apiURL:
         key: warning-alerts
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '⚠️ WARNING: {{ .GroupLabels.alertname }}'
-      message: '{{ template "discord.message" . }}'
+      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
 
   - name: 'discord-info'
     discordConfigs:
-    - webhookURL:
+    - apiURL:
         key: info-alerts
         name: monitoring-discord-webhooks
       sendResolved: true
       title: 'ℹ️ INFO: {{ .GroupLabels.alertname }}'
-      message: '{{ template "discord.message" . }}'
+      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
 
   - name: 'discord-network'
     discordConfigs:
-    - webhookURL:
+    - apiURL:
         key: network-issues
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '🌐 NETWORK: {{ .GroupLabels.alertname }}'
-      message: '{{ template "discord.message" . }}'
+      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
 
   - name: 'discord-storage'
     discordConfigs:
-    - webhookURL:
+    - apiURL:
         key: storage-issues
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '💾 STORAGE: {{ .GroupLabels.alertname }}'
-      message: '{{ template "discord.message" . }}'
+      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
 
   - name: 'discord-health'
     discordConfigs:
-    - webhookURL:
+    - apiURL:
         key: cluster-health
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '🏥 HEALTH: {{ .GroupLabels.alertname }}'
-      message: '{{ template "discord.message" . }}'
+      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
 
   - name: 'discord-pods'
     discordConfigs:
-    - webhookURL:
+    - apiURL:
         key: pod-events
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '📦 POD: {{ .GroupLabels.alertname }}'
-      message: '{{ template "discord.message" . }}'
+      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
