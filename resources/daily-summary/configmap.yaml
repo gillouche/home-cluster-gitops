@@ -12,7 +12,7 @@ data:
     from datetime import datetime
 
     WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL")
-    PROMETHEUS_URL = "http://prometheus-operated.monitoring.svc:9090"
+    PROMETHEUS_URL = "http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090"
 
     def query_prometheus(query):
         params = urllib.parse.urlencode({'query': query})

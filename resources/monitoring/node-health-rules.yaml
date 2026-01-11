@@ -1,0 +1,72 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: node-health-rules
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: node-health
+      rules:
+        # --- Kubelet & Node Availability ---
+        - alert: InstanceDown
+          expr: up{job="node-exporter"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Instance {{ $labels.instance }} down"
+            description: "Node {{ $labels.instance }} has been unreachable for >1 minute."
+
+        - alert: KubeNodeNotReady
+          expr: kube_node_status_condition{condition="Ready",status="true"} == 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Node {{ $labels.node }} NotReady"
+            description: "Kubernetes node {{ $labels.node }} is reporting NotReady status."
+
+        # --- Disk Space (Critical for preventing corruption on SD cards) ---
+        - alert: NodeDiskSpaceRunningOut
+          # Warn if < 15% free
+          expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint=""} * 100) < 15
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Low Disk Space on {{ $labels.instance }}"
+            description: "Node {{ $labels.instance }} has less than 15% disk space remaining."
+
+        - alert: NodeDiskSpaceCritical
+          # Critical if < 5% free
+          expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint=""} * 100) < 5
+          for: 2m
+          labels:
+            severity: critical
+          annotations:
+            summary: "CRITICAL Disk Space on {{ $labels.instance }}"
+            description: "Node {{ $labels.instance }} has less than 5% disk space remaining. IO failures imminent."
+
+        # --- Memory Saturation (Common cause of RPi freezes) ---
+        - alert: NodeMemoryPressureCritical
+          # Alert if available memory < 5%
+          expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100) < 5
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Memory Critical on {{ $labels.instance }}"
+            description: "Node {{ $labels.instance }} has less than 5% memory available. OOM Killer imminent."
+
+        # --- CPU Saturation ---
+        - alert: NodeHighCPU
+          # 15m load average normalized by core count
+          expr: node_load15 / count without (cpu, mode) (node_cpu_seconds_total{mode="idle"}) > 1.2
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High System Load on {{ $labels.instance }}"
+            description: "Node {{ $labels.instance }} load average is > 120% of capacity."
