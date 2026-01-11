@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/part-of: argocd
 data:
   service.discord: |
-    url: $discord-webhook-url
+    url: $discord-webhooks:argocd-sync
 
   template.app-sync-succeeded: |
     message: |
