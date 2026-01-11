@@ -9,11 +9,15 @@ metadata:
 data:
   service.webhook: |
     url: $argocd-notifications-secret:argocd-sync
+    method: POST
+    headers:
+      Content-Type: application/json
 
   template.app-sync-succeeded: |
     message: |
       Application {{.app.metadata.name}} has been successfully synced.
     webhook:
+      url: $argocd-notifications-secret:argocd-sync
       title: "Application {{.app.metadata.name}} Synced"
       description: "Application {{.app.metadata.name}} has been successfully synced at {{.app.status.operationState.finishedAt}}."
       color: "#00ff00"
@@ -22,6 +26,7 @@ data:
     message: |
       Application {{.app.metadata.name}} sync failed.
     webhook:
+      url: $argocd-notifications-secret:argocd-sync
       title: "Application {{.app.metadata.name}} Sync Failed"
       description: "Application {{.app.metadata.name}} sync failed. Error: {{.app.status.operationState.message}}"
       color: "#ff0000"
@@ -30,6 +35,7 @@ data:
     message: |
       Application {{.app.metadata.name}} is degraded.
     webhook:
+      url: $argocd-notifications-secret:argocd-sync
       title: "Application {{.app.metadata.name}} Degraded"
       description: "Application {{.app.metadata.name}} health is degraded."
       color: "#ff0000"
@@ -38,6 +44,7 @@ data:
     message: |
       Application {{.app.metadata.name}} has been deployed.
     webhook:
+      url: $argocd-notifications-secret:argocd-sync
       title: "Application {{.app.metadata.name}} Deployed"
       description: |
         Application {{.app.metadata.name}} was successfully deployed and is healthy.
