@@ -43,6 +43,9 @@ kubectl get application <app-name> -n argocd -o jsonpath='{.status.conditions}' 
 
 # Check ArgoCD Repo Server logs (useful if manifest generation fails)
 kubectl logs -n argocd -l app.kubernetes.io/name=argocd-repo-server
+
+# Delete finalizers
+kubectl patch app sealed-discord-webhooks -n argocd -p '{"metadata":{"finalizers":null}}' --type=merge
 ```
 
 ---
