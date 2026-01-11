@@ -57,7 +57,7 @@ spec:
                           values: ["best-effort", "stable"]
           persistence:
             defaultClass: true
-            defaultClassReplicaCount: 3
+            defaultClassReplicaCount: 2
           service:
             ui:
               type: ClusterIP
