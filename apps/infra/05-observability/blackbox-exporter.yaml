@@ -41,3 +41,8 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+  ignoreDifferences:
+    - group: monitoring.coreos.com
+      kind: ServiceMonitor
+      jsonPointers:
+        - /spec/targets/staticConfig/relabeling
