@@ -19,7 +19,20 @@ data:
         method: POST
         body: |
           {
-            "content": ":white_check_mark: **Application {{ .app.metadata.name }} Synced**\n> Synced successfully at `{{ .app.status.operationState.finishedAt }}`."
+            "embeds": [
+              {
+                "title": "✅ Application {{ .app.metadata.name }} Synced",
+                "description": "Synced successfully at `{{ .app.status.operationState.finishedAt }}`",
+                "color": 3066993,
+                "fields": [
+                  {"name": "Namespace", "value": "{{ .app.metadata.namespace }}", "inline": true},
+                  {"name": "Revision", "value": "{{ .app.status.sync.revision }}", "inline": true},
+                  {"name": "Health", "value": "{{ .app.status.health.status }}", "inline": true},
+                  {"name": "Status", "value": "{{ .app.status.operationState.phase }}", "inline": true}
+                ],
+                "footer": {"text": "ArgoCD Notifications"}
+              }
+            ]
           }
 
   template.app-sync-failed: |
@@ -28,7 +41,20 @@ data:
         method: POST
         body: |
           {
-            "content": ":x: **Application {{ .app.metadata.name }} Sync Failed**\n> Error: `{{ .app.status.operationState.message }}`"
+            "embeds": [
+              {
+                "title": "❌ Application {{ .app.metadata.name }} Sync Failed",
+                "description": "Error: `{{ .app.status.operationState.message }}`",
+                "color": 15158332,
+                "fields": [
+                  {"name": "Namespace", "value": "{{ .app.metadata.namespace }}", "inline": true},
+                  {"name": "Revision", "value": "{{ .app.status.sync.revision }}", "inline": true},
+                  {"name": "Health", "value": "{{ .app.status.health.status }}", "inline": true},
+                  {"name": "Status", "value": "{{ .app.status.operationState.phase }}", "inline": true}
+                ],
+                "footer": {"text": "ArgoCD Notifications"}
+              }
+            ]
           }
 
   template.app-health-degraded: |
@@ -37,7 +63,20 @@ data:
         method: POST
         body: |
           {
-            "content": ":warning: **Application {{ .app.metadata.name }} Health Degraded**\n> Current status: `{{ .app.status.health.status }}`"
+            "embeds": [
+              {
+                "title": "⚠️ Application {{ .app.metadata.name }} Health Degraded",
+                "description": "Current status: `{{ .app.status.health.status }}`",
+                "color": 15105570,
+                "fields": [
+                  {"name": "Namespace", "value": "{{ .app.metadata.namespace }}", "inline": true},
+                  {"name": "Revision", "value": "{{ .app.status.sync.revision }}", "inline": true},
+                  {"name": "Last Sync", "value": "{{ .app.status.operationState.finishedAt }}", "inline": true},
+                  {"name": "Status", "value": "{{ .app.status.operationState.phase }}", "inline": true}
+                ],
+                "footer": {"text": "ArgoCD Notifications"}
+              }
+            ]
           }
 
   template.app-deployed: |
@@ -46,7 +85,20 @@ data:
         method: POST
         body: |
           {
-            "content": ":tada: **Application {{ .app.metadata.name }} Deployed**\n> Deployed successfully and healthy at `{{ .app.status.operationState.finishedAt }}`."
+            "embeds": [
+              {
+                "title": "🎉 Application {{ .app.metadata.name }} Deployed",
+                "description": "Deployed successfully and healthy at `{{ .app.status.operationState.finishedAt }}`",
+                "color": 3066993,
+                "fields": [
+                  {"name": "Namespace", "value": "{{ .app.metadata.namespace }}", "inline": true},
+                  {"name": "Revision", "value": "{{ .app.status.sync.revision }}", "inline": true},
+                  {"name": "Health", "value": "{{ .app.status.health.status }}", "inline": true},
+                  {"name": "Status", "value": "{{ .app.status.operationState.phase }}", "inline": true}
+                ],
+                "footer": {"text": "ArgoCD Notifications"}
+              }
+            ]
           }
 
   trigger.on-sync-succeeded: |
