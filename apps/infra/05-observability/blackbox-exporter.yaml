@@ -41,9 +41,3 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-  ignoreDifferences:
-    - group: monitoring.coreos.com
-      kind: Probe
-      jqPathExpressions:
-        - .spec.targets.staticConfig.relabeling
-        - .spec.prober.path
