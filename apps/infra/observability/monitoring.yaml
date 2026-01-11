@@ -91,12 +91,11 @@ spec:
                             operator: In
                             values: ["best-effort", "stable"]
             
-            # Configuration moved to AlertmanagerConfig CRD (resources/monitoring/alertmanager-config.yaml)
-            # config:
-            #   global:
-            #     resolve_timeout: 5m
-            #   templates:
-            #   - '/etc/alertmanager/config/*.tmpl'
+            config:
+              global:
+                resolve_timeout: 5m
+              templates:
+              - '/etc/alertmanager/config/*.tmpl'
   
             ingress:
               enabled: true
