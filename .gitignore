@@ -1,3 +1,5 @@
-sealed-secrets/input/
+tools/sealed-secrets/input/
 .venv
 __pycache__/
+.envrc
+.direnv
