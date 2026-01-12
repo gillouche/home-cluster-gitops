@@ -19,13 +19,11 @@ spec:
         receiver: 'null'
       
       # -- Critical Infrastructure (CPU, Targets, Nodes) --
-      # User requested these to be critical
       - matchers:
           - name: alertname
             regex: true
             value: ^(TargetDown|NodeSystemSaturation|NodeHighCPU|InstanceDown|KubeNodeNotReady|NodeOOMKillDetected)$
         receiver: 'discord-critical'
-        continue: true
 
       # -- Critical Severity (General) --
       - matchers:
