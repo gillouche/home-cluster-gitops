@@ -1,0 +1,63 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: longhorn-rules
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+  - name: longhorn.rules
+    rules:
+    # --- Volume Health ---
+    - alert: LonghornVolumeFaulted
+      # Robustness: 0=Unknown, 1=Healthy, 2=Degraded, 3=Faulted
+      expr: longhorn_volume_robustness == 3
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Volume {{ $labels.volume }} Faulted"
+        description: "Longhorn volume {{ $labels.volume }} on node {{ or $labels.node $labels.instance }} is FAULTED. Data may be inaccessible."
+
+    - alert: LonghornVolumeDegraded
+      expr: longhorn_volume_robustness == 2
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Volume {{ $labels.volume }} Degraded"
+        description: "Volume {{ $labels.volume }} is degraded. Replicas may be rebuilding or missing."
+
+    # --- Node Status ---
+    - alert: LonghornNodeDown
+      # condition="ready", status="false" (or check if metric is missing/0)
+      # Usually: longhorn_node_status{condition="ready"} == 0 means not ready
+      expr: longhorn_node_status{condition="ready"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Longhorn Node {{ $labels.node }} Down"
+        description: "Storage node {{ $labels.node }} is reporting as Not Ready."
+
+    # --- Storage Capacity ---
+    - alert: LonghornStorageFull
+      # Usage > 90%
+      expr: (longhorn_node_storage_usage_bytes / longhorn_node_storage_capacity_bytes) > 0.90
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Storage Critical on {{ $labels.node }}"
+        description: "Longhorn node {{ $labels.node }} is at {{ humanizePercentage $value }} capacity."
+
+    - alert: LonghornStorageWarning
+      # Usage > 80%
+      expr: (longhorn_node_storage_usage_bytes / longhorn_node_storage_capacity_bytes) > 0.80
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Storage Warning on {{ $labels.node }}"
+        description: "Longhorn node {{ $labels.node }} is at {{ humanizePercentage $value }} capacity."
