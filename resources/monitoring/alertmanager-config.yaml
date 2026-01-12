@@ -83,7 +83,11 @@ spec:
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '🔔 ALERT: {{ .GroupLabels.alertname }}'
-      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
+      message: |-
+        {{ range .Alerts }}
+        • **{{ .Annotations.summary }}**
+          {{ .Annotations.description }}
+        {{ end }}
 
   - name: 'discord-critical'
     discordConfigs:
@@ -92,7 +96,11 @@ spec:
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '🔥 CRITICAL: {{ .GroupLabels.alertname }}'
-      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
+      message: |-
+        {{ range .Alerts }}
+        • **{{ .Annotations.summary }}**
+          {{ .Annotations.description }}
+        {{ end }}
 
   - name: 'discord-warning'
     discordConfigs:
@@ -101,7 +109,11 @@ spec:
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '⚠️ WARNING: {{ .GroupLabels.alertname }}'
-      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
+      message: |-
+        {{ range .Alerts }}
+        • **{{ .Annotations.summary }}**
+          {{ .Annotations.description }}
+        {{ end }}
 
   - name: 'discord-info'
     discordConfigs:
@@ -110,7 +122,11 @@ spec:
         name: monitoring-discord-webhooks
       sendResolved: true
       title: 'ℹ️ INFO: {{ .GroupLabels.alertname }}'
-      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
+      message: |-
+        {{ range .Alerts }}
+        • **{{ .Annotations.summary }}**
+          {{ .Annotations.description }}
+        {{ end }}
 
   - name: 'discord-network'
     discordConfigs:
@@ -119,7 +135,11 @@ spec:
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '🌐 NETWORK: {{ .GroupLabels.alertname }}'
-      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
+      message: |-
+        {{ range .Alerts }}
+        • **{{ .Annotations.summary }}**
+          {{ .Annotations.description }}
+        {{ end }}
 
   - name: 'discord-storage'
     discordConfigs:
@@ -128,7 +148,11 @@ spec:
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '💾 STORAGE: {{ .GroupLabels.alertname }}'
-      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
+      message: |-
+        {{ range .Alerts }}
+        • **{{ .Annotations.summary }}**
+          {{ .Annotations.description }}
+        {{ end }}
 
   - name: 'discord-health'
     discordConfigs:
@@ -137,7 +161,11 @@ spec:
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '🏥 HEALTH: {{ .GroupLabels.alertname }}'
-      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
+      message: |-
+        {{ range .Alerts }}
+        • **{{ .Annotations.summary }}**
+          {{ .Annotations.description }}
+        {{ end }}
 
   - name: 'discord-pods'
     discordConfigs:
@@ -146,4 +174,8 @@ spec:
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '📦 POD: {{ .GroupLabels.alertname }}'
-      message: '{{ .CommonAnnotations.summary }} - {{ .CommonAnnotations.description }}'
+      message: |-
+        {{ range .Alerts }}
+        • **{{ .Annotations.summary }}**
+          {{ .Annotations.description }}
+        {{ end }}
