@@ -21,7 +21,11 @@ spec:
         values: |
           defaultSettings:
             defaultDataPath: /mnt/data/longhorn
-            replicaSoftAntiAffinity: true
+            replicaSoftAntiAffinity: false
+            replicaZoneSoftAntiAffinity: false
+            concurrentReplicaRebuildPerNodeLimit: 2
+            defaultDataLocality: best-effort
+            replicaAutoBalance: least-effort
             createDefaultDiskLabeledNodes: true
             storageReservedPercentageForDefaultDisk: 20
             storageOverProvisioningPercentage: 100
