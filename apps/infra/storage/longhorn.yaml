@@ -65,6 +65,8 @@ spec:
           metrics:
             serviceMonitor:
               enabled: true
+              additionalLabels:
+                release: monitoring
           service:
             ui:
               type: ClusterIP

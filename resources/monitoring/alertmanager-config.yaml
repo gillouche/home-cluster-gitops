@@ -18,40 +18,32 @@ spec:
             value: Watchdog
         receiver: 'null'
       
-      # -- Critical Infrastructure (CPU, Targets, Nodes) --
+      # -- Critical Infrastructure (Important: Keep at top) --
       - matchers:
           - name: alertname
             regex: true
             value: ^(TargetDown|NodeSystemSaturation|NodeHighCPU|InstanceDown|KubeNodeNotReady|NodeOOMKillDetected)$
         receiver: 'discord-critical'
 
-      # -- Critical Severity (General) --
-      - matchers:
-          - name: severity
-            value: critical
-        receiver: 'discord-critical'
-        continue: true
-
       # -- Storage (Longhorn) --
+      # Explicitly catch storage alerts first to avoid duplicates in Critical/Warning
       - matchers:
           - name: alertname
             regex: true
             value: ^(Longhorn.*|Volume.*)$
         receiver: 'discord-storage'
-        continue: true
 
       # -- Network --
+      # Explicitly catch network alerts first
       - matchers:
           - name: alertname
             regex: true
             value: ^(Probe.*|Net.*|Network.*)$
         receiver: 'discord-network'
-        continue: true
       - matchers:
           - name: job
             value: blackbox
         receiver: 'discord-network'
-        continue: true
 
       # -- Renovate --
       - matchers:
@@ -67,7 +59,14 @@ spec:
         receiver: 'discord-pods'
         continue: true
 
-      # -- Warnings (General) --
+      # -- Critical Severity (General Catch-all) --
+      - matchers:
+          - name: severity
+            value: critical
+        receiver: 'discord-critical'
+        continue: true
+
+      # -- Warnings (General Catch-all) --
       - matchers:
           - name: severity
             value: warning
@@ -94,6 +93,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
         {{ end }}
 
   - name: 'discord-critical'
@@ -108,6 +108,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
         {{ end }}
 
   - name: 'discord-warning'
@@ -122,6 +123,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
         {{ end }}
 
   - name: 'discord-info'
@@ -136,6 +138,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
         {{ end }}
 
   - name: 'discord-network'
@@ -150,6 +153,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
         {{ end }}
 
   - name: 'discord-storage'
@@ -164,6 +168,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
         {{ end }}
 
   - name: 'discord-health'
@@ -178,6 +183,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
         {{ end }}
 
   - name: 'discord-pods'
@@ -192,4 +198,5 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
         {{ end }}
