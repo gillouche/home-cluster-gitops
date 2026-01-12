@@ -16,8 +16,8 @@ spec:
           labels:
             severity: critical
           annotations:
-            summary: "Instance {{ $labels.instance }} down"
-            description: "Node {{ $labels.instance }} has been unreachable for >1 minute."
+            summary: "Instance {{ or $labels.node $labels.instance }} down"
+            description: "Node {{ or $labels.node $labels.instance }} has been unreachable for >1 minute."
 
         - alert: KubeNodeNotReady
           expr: kube_node_status_condition{condition="Ready",status="true"} == 0
@@ -36,8 +36,8 @@ spec:
           labels:
             severity: warning
           annotations:
-            summary: "Low Disk Space on {{ $labels.instance }}"
-            description: "Node {{ $labels.instance }} has less than 15% disk space remaining."
+            summary: "Low Disk Space on {{ or $labels.node $labels.instance }}"
+            description: "Node {{ or $labels.node $labels.instance }} has less than 15% disk space remaining."
 
         - alert: NodeDiskSpaceCritical
           # Critical if < 5% free
@@ -46,8 +46,8 @@ spec:
           labels:
             severity: critical
           annotations:
-            summary: "CRITICAL Disk Space on {{ $labels.instance }}"
-            description: "Node {{ $labels.instance }} has less than 5% disk space remaining. IO failures imminent."
+            summary: "CRITICAL Disk Space on {{ or $labels.node $labels.instance }}"
+            description: "Node {{ or $labels.node $labels.instance }} has less than 5% disk space remaining. IO failures imminent."
 
         # --- Memory Saturation (Common cause of RPi freezes) ---
         - alert: NodeMemoryPressureCritical
@@ -57,8 +57,8 @@ spec:
           labels:
             severity: critical
           annotations:
-            summary: "Memory Critical on {{ $labels.instance }}"
-            description: "Node {{ $labels.instance }} has less than 5% memory available. OOM Killer imminent."
+            summary: "Memory Critical on {{ or $labels.node $labels.instance }}"
+            description: "Node {{ or $labels.node $labels.instance }} has less than 5% memory available. OOM Killer imminent."
 
         # --- CPU Saturation ---
         - alert: NodeHighCPU
@@ -68,8 +68,8 @@ spec:
           labels:
             severity: warning
           annotations:
-            summary: "High System Load on {{ $labels.instance }}"
-            description: "Node {{ $labels.instance }} load average is > 120% of capacity."
+            summary: "High System Load on {{ or $labels.node $labels.instance }}"
+            description: "Node {{ or $labels.node $labels.instance }} load average is > 120% of capacity."
         # --- System Stability (Paranoid Debugging) ---
         - alert: NodeOOMKillDetected
           # Detect kmsg 'OOM kill' events via node-exporter (requires --collector.vmstat)
@@ -78,8 +78,8 @@ spec:
           labels:
             severity: critical
           annotations:
-            summary: "OOM Kill Detected on {{ $labels.instance }}"
-            description: "Kernel OOM killer has triggered on {{ $labels.instance }}! Check logs immediately."
+            summary: "OOM Kill Detected on {{ or $labels.node $labels.instance }}"
+            description: "Kernel OOM killer has triggered on {{ or $labels.node $labels.instance }}! Check logs immediately."
 
         - alert: NodeHighIOWait
           # Critical for SD cards: if CPU is spending > 20% time waiting for IO
@@ -88,8 +88,8 @@ spec:
           labels:
             severity: warning
           annotations:
-            summary: "High IO Wait on {{ $labels.instance }}"
-            description: "Node {{ $labels.instance }} is suffering high IO wait ({{ $value }}%). SD Card may be saturated or failing."
+            summary: "High IO Wait on {{ or $labels.node $labels.instance }}"
+            description: "Node {{ or $labels.node $labels.instance }} is suffering high IO wait ({{ $value }}%). SD Card may be saturated or failing."
 
         - alert: NodeNetworkReceptionErrors
           expr: rate(node_network_receive_errs_total[2m]) > 0
@@ -97,5 +97,5 @@ spec:
           labels:
             severity: warning
           annotations:
-            summary: "Network Receive Errors on {{ $labels.instance }}"
-            description: "Node {{ $labels.instance }} interface {{ $labels.device }} is dropping packets."
+            summary: "Network Receive Errors on {{ or $labels.node $labels.instance }}"
+            description: "Node {{ or $labels.node $labels.instance }} interface {{ $labels.device }} is dropping packets."

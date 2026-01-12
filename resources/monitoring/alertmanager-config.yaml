@@ -82,11 +82,12 @@ spec:
         key: prometheus-firing
         name: monitoring-discord-webhooks
       sendResolved: true
-      title: '🔔 ALERT: {{ .GroupLabels.alertname }}'
+      title: '{{ if eq .Status "firing" }}🔔 ALERT{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
+          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
         {{ end }}
 
   - name: 'discord-critical'
@@ -95,11 +96,12 @@ spec:
         key: critical-alerts
         name: monitoring-discord-webhooks
       sendResolved: true
-      title: '🔥 CRITICAL: {{ .GroupLabels.alertname }}'
+      title: '{{ if eq .Status "firing" }}🔥 CRITICAL{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
+          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
         {{ end }}
 
   - name: 'discord-warning'
@@ -108,11 +110,12 @@ spec:
         key: warning-alerts
         name: monitoring-discord-webhooks
       sendResolved: true
-      title: '⚠️ WARNING: {{ .GroupLabels.alertname }}'
+      title: '{{ if eq .Status "firing" }}⚠️ WARNING{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
+          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
         {{ end }}
 
   - name: 'discord-info'
@@ -121,11 +124,12 @@ spec:
         key: info-alerts
         name: monitoring-discord-webhooks
       sendResolved: true
-      title: 'ℹ️ INFO: {{ .GroupLabels.alertname }}'
+      title: '{{ if eq .Status "firing" }}ℹ️ INFO{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
+          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
         {{ end }}
 
   - name: 'discord-network'
@@ -134,11 +138,12 @@ spec:
         key: network-issues
         name: monitoring-discord-webhooks
       sendResolved: true
-      title: '🌐 NETWORK: {{ .GroupLabels.alertname }}'
+      title: '{{ if eq .Status "firing" }}🌐 NETWORK{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
+          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
         {{ end }}
 
   - name: 'discord-storage'
@@ -147,11 +152,12 @@ spec:
         key: storage-issues
         name: monitoring-discord-webhooks
       sendResolved: true
-      title: '💾 STORAGE: {{ .GroupLabels.alertname }}'
+      title: '{{ if eq .Status "firing" }}💾 STORAGE{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
+          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
         {{ end }}
 
   - name: 'discord-health'
@@ -160,11 +166,12 @@ spec:
         key: cluster-health
         name: monitoring-discord-webhooks
       sendResolved: true
-      title: '🏥 HEALTH: {{ .GroupLabels.alertname }}'
+      title: '{{ if eq .Status "firing" }}🏥 HEALTH{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
+          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
         {{ end }}
 
   - name: 'discord-pods'
@@ -173,9 +180,10 @@ spec:
         key: pod-events
         name: monitoring-discord-webhooks
       sendResolved: true
-      title: '📦 POD: {{ .GroupLabels.alertname }}'
+      title: '{{ if eq .Status "firing" }}📦 POD{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
+          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
         {{ end }}
