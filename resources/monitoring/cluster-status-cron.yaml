@@ -45,23 +45,27 @@ data:
             return
 
         # Queries
-        # CPU: Avg usage across all nodes (approximate)
-        cpu_usage = query_prometheus('100 - (avg by (instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)')
+        # CPU: Avg usage AND Max usage
+        # Avg:
+        cpu_avg = query_prometheus('100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)')
+        # Max node:
+        cpu_max = query_prometheus('max(100 - (rate(node_cpu_seconds_total{mode="idle"}[5m]) * 100))')
         
         # Memory
         mem_usage = query_prometheus('sum(node_memory_MemTotal_bytes) - sum(node_memory_MemAvailable_bytes)')
         mem_total = query_prometheus('sum(node_memory_MemTotal_bytes)')
         
-        # Status
-        nodes_up = query_prometheus('count(kube_node_status_condition{condition="Ready", status="true"})')
+        # Status - count(kube_node_info) is often cleaner for node count
+        nodes_up = query_prometheus('count(kube_node_info)')
         pods_running = query_prometheus('count(kube_pod_status_phase{phase="Running"})')
         
-        # Storage
-        pvc_usage = query_prometheus('sum(kubelet_volume_stats_used_bytes)')
+        # Storage (Longhorn)
+        pvc_usage = query_prometheus('sum(longhorn_node_storage_usage_bytes)')
+        pvc_total = query_prometheus('sum(longhorn_node_storage_capacity_bytes)')
 
         # Formatting
         try:
-            cpu_text = f"{float(cpu_usage):.1f}%"
+            cpu_text = f"Avg: {float(cpu_avg):.1f}% | Max: {float(cpu_max):.1f}%"
         except: cpu_text = "N/A"
 
         try:
@@ -69,15 +73,22 @@ data:
             mem_text = f"{format_bytes(mem_usage)} / {format_bytes(mem_total)} ({mem_percent:.1f}%)"
         except: mem_text = "N/A"
 
+        try:
+            storage_percent = (float(pvc_usage) / float(pvc_total)) * 100
+            storage_text = f"{format_bytes(pvc_usage)} / {format_bytes(pvc_total)} ({storage_percent:.1f}%)"
+        except: 
+            # Fallback if longhorn metrics specific query failed, try generic
+            storage_text = f"Used: {format_bytes(pvc_usage)}"
+
         embed = {
             "title": f"ℹ️ Cluster Status Check - {datetime.now().strftime('%H:%M UTC')}",
             "color": 3066993, # Green/Blue
             "fields": [
-                {"name": "Nodes Ready", "value": str(nodes_up), "inline": True},
-                {"name": "Pods Running", "value": str(pods_running), "inline": True},
-                {"name": "CPU Usage (Avg)", "value": cpu_text, "inline": True},
-                {"name": "Memory Usage", "value": mem_text, "inline": True},
-                {"name": "Storage Used", "value": format_bytes(pvc_usage), "inline": True}
+                {"name": "Nodes", "value": str(nodes_up), "inline": True},
+                {"name": "Pods", "value": str(pods_running), "inline": True},
+                {"name": "CPU Load", "value": cpu_text, "inline": True},
+                {"name": "Memory", "value": mem_text, "inline": True},
+                {"name": "Storage (Longhorn)", "value": storage_text, "inline": True}
             ],
             "footer": {"text": "10-minute Heartbeat"}
         }
