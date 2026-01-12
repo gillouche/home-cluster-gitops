@@ -11,7 +11,7 @@ spec:
     rules:
     - alert: NetworkInterfaceDown
       expr: node_network_up{device!~"veth.*|cali.*|flannel.*|docker.*|cni.*|lo|wlan.*|wld.*|wlp.*"} == 0
-      for: 2m
+      for: 1m
       labels:
         severity: critical
       annotations:

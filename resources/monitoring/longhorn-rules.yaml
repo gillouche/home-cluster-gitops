@@ -22,7 +22,7 @@ spec:
 
     - alert: LonghornVolumeDegraded
       expr: longhorn_volume_robustness == 2
-      for: 5m
+      for: 1m
       labels:
         severity: warning
       annotations:
@@ -34,7 +34,7 @@ spec:
       # condition="ready", status="false" (or check if metric is missing/0)
       # Usually: longhorn_node_status{condition="ready"} == 0 means not ready
       expr: longhorn_node_status{condition="ready"} == 0
-      for: 2m
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -45,7 +45,7 @@ spec:
     - alert: LonghornStorageFull
       # Usage > 90%
       expr: (longhorn_node_storage_usage_bytes / longhorn_node_storage_capacity_bytes) > 0.90
-      for: 5m
+      for: 1m
       labels:
         severity: critical
       annotations:
@@ -55,7 +55,7 @@ spec:
     - alert: LonghornStorageWarning
       # Usage > 80%
       expr: (longhorn_node_storage_usage_bytes / longhorn_node_storage_capacity_bytes) > 0.80
-      for: 5m
+      for: 1m
       labels:
         severity: warning
       annotations:

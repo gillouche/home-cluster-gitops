@@ -32,7 +32,7 @@ spec:
         - alert: NodeDiskSpaceRunningOut
           # Warn if < 15% free
           expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint=""} * 100) < 15
-          for: 5m
+          for: 1m
           labels:
             severity: warning
           annotations:
@@ -42,7 +42,7 @@ spec:
         - alert: NodeDiskSpaceCritical
           # Critical if < 5% free
           expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint=""} * 100) < 5
-          for: 2m
+          for: 1m
           labels:
             severity: critical
           annotations:
@@ -53,7 +53,7 @@ spec:
         - alert: NodeMemoryPressureCritical
           # Alert if available memory < 5%
           expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100) < 5
-          for: 5m
+          for: 1m
           labels:
             severity: critical
           annotations:
@@ -64,7 +64,7 @@ spec:
         - alert: NodeHighCPU
           # 15m load average normalized by core count
           expr: node_load15 / count without (cpu, mode) (node_cpu_seconds_total{mode="idle"}) > 1.2
-          for: 5m
+          for: 2m
           labels:
             # User requested this to be Critical
             severity: critical
