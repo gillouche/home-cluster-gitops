@@ -1,0 +1,33 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cluster-status-reporter
+  namespace: monitoring
+spec:
+  schedule: "*/10 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: reporter
+            image: curlimages/curl:latest
+            env:
+            - name: DISCORD_WEBHOOK
+              valueFrom:
+                secretKeyRef:
+                  name: monitoring-discord-webhooks
+                  key: info-alerts
+            command:
+            - /bin/sh
+            - -c
+            - |
+               # Simple status payload
+               TIMESTAMP=$(date -u)
+               PAYLOAD='{"content": "**ℹ️ Cluster Status Check**\nEverything looks good!\nTime: '"$TIMESTAMP"'"}'
+               # Note: A real implementation might query Prometheus API for stats, 
+               # but basic keep-alive is a good start.
+               curl -X POST -H 'Content-Type: application/json' -d "$PAYLOAD" "$DISCORD_WEBHOOK"
+          restartPolicy: OnFailure

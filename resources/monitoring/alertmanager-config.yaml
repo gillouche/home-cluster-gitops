@@ -11,14 +11,23 @@ spec:
     groupWait: 30s
     groupInterval: 5m
     repeatInterval: 3h
-    receiver: 'discord-firing' # Default Fallback
+    receiver: 'discord-firing' # Default Fallback for anything not matched
     routes:
       - matchers:
           - name: alertname
             value: Watchdog
         receiver: 'null'
       
-      # -- Critical (RPi Freeze Risks) --
+      # -- Critical Infrastructure (CPU, Targets, Nodes) --
+      # User requested these to be critical
+      - matchers:
+          - name: alertname
+            regex: true
+            value: ^(TargetDown|NodeSystemSaturation|NodeHighCPU|InstanceDown|KubeNodeNotReady|NodeOOMKillDetected)$
+        receiver: 'discord-critical'
+        continue: true
+
+      # -- Critical Severity (General) --
       - matchers:
           - name: severity
             value: critical
@@ -33,27 +42,26 @@ spec:
         receiver: 'discord-storage'
         continue: true
 
-      # -- Network (Blackbox) --
+      # -- Network --
+      - matchers:
+          - name: alertname
+            regex: true
+            value: ^(Probe.*|Net.*|Network.*)$
+        receiver: 'discord-network'
+        continue: true
       - matchers:
           - name: job
             value: blackbox
         receiver: 'discord-network'
         continue: true
-      - matchers:
-          - name: alertname
-            regex: true
-            value: ^(Probe.*)$
-        receiver: 'discord-network'
-        continue: true
 
-      # -- Cluster Health (Nodes/Kubelet) --
+      # -- Renovate --
       - matchers:
-          - name: alertname
+          - name: job
             regex: true
-            value: ^(KubeNode.*|Kubelet.*|InstanceDown)$
-        receiver: 'discord-health'
-        continue: true
-
+            value: .*renovate.*
+        receiver: 'discord-info'
+    
       # -- Pod Events --
       - matchers:
           - name: category
@@ -87,7 +95,7 @@ spec:
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
-          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
+          *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
         {{ end }}
 
   - name: 'discord-critical'
@@ -101,7 +109,7 @@ spec:
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
-          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
+          *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
         {{ end }}
 
   - name: 'discord-warning'
@@ -115,7 +123,7 @@ spec:
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
-          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
+          *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
         {{ end }}
 
   - name: 'discord-info'
@@ -129,7 +137,7 @@ spec:
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
-          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
+          *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
         {{ end }}
 
   - name: 'discord-network'
@@ -143,7 +151,7 @@ spec:
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
-          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
+          *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
         {{ end }}
 
   - name: 'discord-storage'
@@ -157,7 +165,7 @@ spec:
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
-          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
+          *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
         {{ end }}
 
   - name: 'discord-health'
@@ -171,7 +179,7 @@ spec:
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
-          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
+          *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
         {{ end }}
 
   - name: 'discord-pods'
@@ -185,5 +193,5 @@ spec:
         {{ range .Alerts }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
-          *Node: {{ or .Labels.node .Labels.nodename .Labels.instance "N/A" }}*
+          *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | regexReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
         {{ end }}

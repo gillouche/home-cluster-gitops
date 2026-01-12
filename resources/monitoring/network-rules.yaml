@@ -1,0 +1,37 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: network-rules
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+  - name: network.rules
+    rules:
+    - alert: NetworkInterfaceDown
+      expr: node_network_up{device!~"veth.*|cali.*|flannel.*|docker.*|cni.*"} == 0
+      for: 2m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Network Interface Down on {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }}"
+        description: "Physical interface {{ $labels.device }} is down on {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }}."
+
+    - alert: NetworkHighDropRate
+      expr: rate(node_network_receive_drop_total[5m]) + rate(node_network_transmit_drop_total[5m]) > 10
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "High Network Packet Drops on {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }}"
+        description: "Node is dropping >10 packets/sec. Check network congestion or cable issues."
+
+    - alert: NetworkErrorsDetected
+      expr: rate(node_network_receive_errs_total[5m]) + rate(node_network_transmit_errs_total[5m]) > 0
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Network Errors on {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }}"
+        description: "Interface {{ $labels.device }} shows receive/transmit errors."
