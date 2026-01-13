@@ -3,12 +3,12 @@ image:
   tag: v4.38.0
 
 pod:
-  replicas: 1 # Enforce 1 replica for SQLite safety
-  securityContext:
-    fsGroup: 1000
-    runAsUser: 1000
-    runAsGroup: 1000
-
+  replicas: 1
+  securityContext: 
+    container:
+      runAsUser: 1000
+      runAsGroup: 1000
+  
   extraVolumes:
     - name: authelia-secrets
       secret:
@@ -38,13 +38,17 @@ pod:
       subPath: users_database.yml
       readOnly: true
 
+# Inject secrets that are missing from values schema via Env Vars
+extraEnv:
+  - name: AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE
+    value: /secrets/jwt_secret
+
 persistence:
   enabled: true
   size: 1Gi
   accessModes:
     - ReadWriteOnce
 
-# All Authelia Configuration goes under configMap
 configMap:
   authentication_backend:
     file:
@@ -63,10 +67,13 @@ configMap:
     redis:
       host: authelia-redis-master
       port: 6379
-      password_file: /secrets/session_secret
+      password:
+        path: /secrets/session_secret
+        disabled: false
   
   storage:
-    encryption_key: /secrets/storage_encryption_key
+    encryption_key:
+      path: /secrets/storage_encryption_key
     local:
       path: /config/db.sqlite3
 
@@ -76,14 +83,15 @@ configMap:
 
   identity_validation:
     reset_password:
-      jwt_secret: /secrets/jwt_secret
+      jwt_lifespan: '5 minutes'
+      jwt_algorithm: 'HS256'
+      # jwt_secret is set via extraEnv
 
 ingress:
   enabled: true
   className: traefik
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-  # Using rulesOverride because 'hosts' key is disallowed in this chart schema
   rulesOverride:
     - host: auth.gillouche.homelab
       http:
@@ -96,7 +104,6 @@ ingress:
                 port:
                   number: 80
 
-# Redis Subchart
 redis:
   enabled: true
   auth:
