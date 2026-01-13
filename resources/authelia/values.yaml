@@ -107,7 +107,7 @@ ingress:
   enabled: true
   className: traefik
   annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.entrypoints: web, websecure
   # Simplifed rulesOverride structure as per chart template
   rulesOverride:
     - host: auth.k3s.gillouche.homelab
