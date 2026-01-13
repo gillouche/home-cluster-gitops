@@ -54,9 +54,9 @@ configMap:
   access_control:
     default_policy: deny
     rules:
-      - domain: "auth.gillouche.homelab"
+      - domain: "auth.k3s.gillouche.homelab"
         policy: bypass
-      - domain: "*.gillouche.homelab"
+      - domain: "*.k3s.gillouche.homelab"
         policy: one_factor
 
   session:
@@ -64,7 +64,7 @@ configMap:
     encryption_key:
       path: session_secret
     cookies:
-      - domain: gillouche.homelab
+      - domain: k3s.gillouche.homelab
         subdomain: auth
     redis:
       host: authelia-redis-master
@@ -110,7 +110,7 @@ ingress:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
   # Simplifed rulesOverride structure as per chart template
   rulesOverride:
-    - host: auth.gillouche.homelab
+    - host: auth.k3s.gillouche.homelab
       path: "/"
 
 redis:

@@ -7,7 +7,7 @@ spec:
   forwardAuth:
     # Point to the internal Authelia service (port 80/http)
     # ?rd parameter tells Authelia where to redirect the user for login
-    address: http://authelia.security.svc.cluster.local/api/verify?rd=https://auth.gillouche.homelab
+    address: http://authelia.security.svc.cluster.local/api/verify?rd=https://auth.k3s.gillouche.homelab
     trustForwardHeader: true
     authResponseHeaders:
       - Remote-User
