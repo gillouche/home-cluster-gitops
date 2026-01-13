@@ -6,12 +6,10 @@ pod:
   replicas: 1
   
   securityContext:
-    # "pod" key here maps to PodSecurityContext
     pod:
       fsGroup: 1000
       runAsUser: 1000
       runAsGroup: 1000
-    # "container" key here maps to SecurityContext
     container:
       runAsUser: 1000
       runAsGroup: 1000
@@ -52,6 +50,10 @@ persistence:
     - ReadWriteOnce
 
 configMap:
+  # Explicitly set server path to empty string (root) to satisfy Ingress validation
+  server:
+    path: ""
+
   authentication_backend:
     file:
       path: /config/users_database.yml
@@ -100,7 +102,7 @@ ingress:
     - host: auth.gillouche.homelab
       http:
         paths:
-          - path: /
+          - path: "/"
             pathType: Prefix
             backend:
               service:
