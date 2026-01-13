@@ -4,6 +4,7 @@ image:
 
 pod:
   replicas: 1
+  kind: Deployment
   
   securityContext:
     pod:
@@ -59,6 +60,8 @@ configMap:
 
   session:
     # Required for Ingress validation and App logic
+    encryption_key:
+      path: session_secret
     cookies:
       - domain: gillouche.homelab
         subdomain: auth
@@ -74,7 +77,15 @@ configMap:
     encryption_key:
       # Relative path within /secrets provided by 'secret' block
       path: storage_encryption_key
+    postgres:
+      enabled: true
+      address: 'tcp://192.168.0.247:15432'
+      database: authelia
+      username: authelia
+      password:
+        path: postgres_password
     local:
+      enabled: false
       path: /config/db.sqlite3
 
   notifier:
