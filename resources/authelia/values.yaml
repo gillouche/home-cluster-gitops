@@ -92,7 +92,7 @@ configMap:
   notifier:
     filesystem:
       enabled: true
-      filename: /config/emails.txt
+      filename: /tmp/emails.txt
 
   identity_validation:
     reset_password:
