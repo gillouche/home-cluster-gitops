@@ -4,7 +4,14 @@ image:
 
 pod:
   replicas: 1
-  securityContext: 
+  
+  securityContext:
+    # "pod" key here maps to PodSecurityContext
+    pod:
+      fsGroup: 1000
+      runAsUser: 1000
+      runAsGroup: 1000
+    # "container" key here maps to SecurityContext
     container:
       runAsUser: 1000
       runAsGroup: 1000
@@ -37,11 +44,6 @@ pod:
       mountPath: /config/users_database.yml
       subPath: users_database.yml
       readOnly: true
-
-# Inject secrets that are missing from values schema via Env Vars
-extraEnv:
-  - name: AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE
-    value: /secrets/jwt_secret
 
 persistence:
   enabled: true
@@ -85,7 +87,9 @@ configMap:
     reset_password:
       jwt_lifespan: '5 minutes'
       jwt_algorithm: 'HS256'
-      # jwt_secret is set via extraEnv
+      secret:
+        path: /secrets/jwt_secret
+        disabled: false
 
 ingress:
   enabled: true
