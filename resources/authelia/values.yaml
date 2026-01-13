@@ -47,6 +47,7 @@ configMap:
 
   authentication_backend:
     file:
+      enabled: true
       path: /config/users_database.yml
       watch: true
 
@@ -90,6 +91,7 @@ configMap:
 
   notifier:
     filesystem:
+      enabled: true
       filename: /config/emails.txt
 
   identity_validation:
