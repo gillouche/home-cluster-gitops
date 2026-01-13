@@ -80,7 +80,7 @@ configMap:
       path: storage_encryption_key
     postgres:
       enabled: true
-      address: 'tcp://192.168.0.247:15432'
+      address: 'tcp://192.168.0.247:15432?sslmode=disable'
       database: authelia
       username: authelia
       password:
