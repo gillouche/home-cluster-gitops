@@ -1,94 +1,102 @@
-podSecurityContext:
-  fsGroup: 1000
-
 image:
   repository: authelia/authelia
   tag: v4.38.0
 
-authentication_backend:
-  file:
-    path: /config/users_database.yml
-    watch: true
+pod:
+  replicas: 1 # Enforce 1 replica for SQLite safety
+  securityContext:
+    fsGroup: 1000
+    runAsUser: 1000
+    runAsGroup: 1000
 
-access_control:
-  default_policy: deny
-  rules:
-    - domain: "auth.gillouche.homelab"
-      policy: bypass
-    - domain: "*.gillouche.homelab"
-      policy: one_factor
+  extraVolumes:
+    - name: authelia-secrets
+      secret:
+        secretName: authelia-secrets
+    - name: user-database
+      secret:
+        secretName: authelia-secrets
+        items:
+          - key: users_database.yml
+            path: users_database.yml
 
-session:
-  # redis field is used for redis configuration
-  redis:
-    host: authelia-redis-master
-    port: 6379
-    # password is set via secret environment variable in extraEnv usually, 
-    # but strictly speaking Authelia config file expects a password field or path.
-    # We will use the Redis Subchart and rely on Authelia loading the secret if configured properly.
-    # Actually, simpler: define the secret path for session.
-  secret:
-    path: /secrets/session_secret
-    # We will mount these secrets
+  extraVolumeMounts:
+    - name: authelia-secrets
+      mountPath: /secrets/jwt_secret
+      subPath: jwt_secret
+      readOnly: true
+    - name: authelia-secrets
+      mountPath: /secrets/session_secret
+      subPath: session_secret
+      readOnly: true
+    - name: authelia-secrets
+      mountPath: /secrets/storage_encryption_key
+      subPath: storage_encryption_key
+      readOnly: true
+    - name: user-database
+      mountPath: /config/users_database.yml
+      subPath: users_database.yml
+      readOnly: true
 
-storage:
-  encryption_key:
-    path: /secrets/storage_encryption_key
-  local:
-    path: /config/db.sqlite3
+persistence:
+  enabled: true
+  size: 1Gi
+  accessModes:
+    - ReadWriteOnce
 
-identity_validation:
-  reset_password:
-    jwt_secret:
-      path: /secrets/jwt_secret
+# All Authelia Configuration goes under configMap
+configMap:
+  authentication_backend:
+    file:
+      path: /config/users_database.yml
+      watch: true
 
-notifier:
-  filesystem:
-    filename: /config/emails.txt
+  access_control:
+    default_policy: deny
+    rules:
+      - domain: "auth.gillouche.homelab"
+        policy: bypass
+      - domain: "*.gillouche.homelab"
+        policy: one_factor
+
+  session:
+    redis:
+      host: authelia-redis-master
+      port: 6379
+      password_file: /secrets/session_secret
+  
+  storage:
+    encryption_key: /secrets/storage_encryption_key
+    local:
+      path: /config/db.sqlite3
+
+  notifier:
+    filesystem:
+      filename: /config/emails.txt
+
+  identity_validation:
+    reset_password:
+      jwt_secret: /secrets/jwt_secret
 
 ingress:
   enabled: true
-  ingressClassName: traefik
+  className: traefik
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
-  hosts:
-     - host: auth.gillouche.homelab
-       paths:
-         - path: /
-           pathType: Prefix
+  # Using rulesOverride because 'hosts' key is disallowed in this chart schema
+  rulesOverride:
+    - host: auth.gillouche.homelab
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: authelia
+                port:
+                  number: 80
 
-# Mount the Sealed Secret as files
-extraVolumes:
-  - name: authelia-secrets
-    secret:
-      secretName: authelia-secrets
-  # Mount the User Database (which is inside the same secret)
-  - name: user-database
-    secret:
-      secretName: authelia-secrets
-      items:
-        - key: users_database.yml
-          path: users_database.yml
-
-extraVolumeMounts:
-  - name: authelia-secrets
-    mountPath: /secrets/jwt_secret
-    subPath: jwt_secret
-    readOnly: true
-  - name: authelia-secrets
-    mountPath: /secrets/session_secret
-    subPath: session_secret
-    readOnly: true
-  - name: authelia-secrets
-    mountPath: /secrets/storage_encryption_key
-    subPath: storage_encryption_key
-    readOnly: true
-  - name: user-database
-    mountPath: /config/users_database.yml
-    subPath: users_database.yml
-    readOnly: true
-
-# Redis Subchart Configuration
+# Redis Subchart
 redis:
   enabled: true
   auth:
