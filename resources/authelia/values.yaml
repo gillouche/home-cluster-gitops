@@ -68,6 +68,10 @@ configMap:
         policy: one_factor
 
   session:
+    # Required for Ingress validation and App logic
+    cookies:
+      - domain: gillouche.homelab
+        subdomain: auth
     redis:
       host: authelia-redis-master
       port: 6379
