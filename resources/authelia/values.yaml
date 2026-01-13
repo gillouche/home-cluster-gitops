@@ -14,10 +14,8 @@ pod:
       runAsUser: 1000
       runAsGroup: 1000
   
+  # Only custom volumes here (database). Secrets are handled by 'secret' block below.
   extraVolumes:
-    - name: authelia-secrets
-      secret:
-        secretName: authelia-secrets
     - name: user-database
       secret:
         secretName: authelia-secrets
@@ -26,18 +24,6 @@ pod:
             path: users_database.yml
 
   extraVolumeMounts:
-    - name: authelia-secrets
-      mountPath: /secrets/jwt_secret
-      subPath: jwt_secret
-      readOnly: true
-    - name: authelia-secrets
-      mountPath: /secrets/session_secret
-      subPath: session_secret
-      readOnly: true
-    - name: authelia-secrets
-      mountPath: /secrets/storage_encryption_key
-      subPath: storage_encryption_key
-      readOnly: true
     - name: user-database
       mountPath: /config/users_database.yml
       subPath: users_database.yml
@@ -48,6 +34,10 @@ persistence:
   size: 1Gi
   accessModes:
     - ReadWriteOnce
+
+secret:
+  # Enable native secret mounting
+  existingSecret: authelia-secrets
 
 configMap:
   # Explicitly set server path to empty string (root) to match Ingress
@@ -76,12 +66,14 @@ configMap:
       host: authelia-redis-master
       port: 6379
       password:
-        path: /secrets/session_secret
+        # Relative path within /secrets provided by 'secret' block
+        path: session_secret
         disabled: false
   
   storage:
     encryption_key:
-      path: /secrets/storage_encryption_key
+      # Relative path within /secrets provided by 'secret' block
+      path: storage_encryption_key
     local:
       path: /config/db.sqlite3
 
@@ -94,7 +86,8 @@ configMap:
       jwt_lifespan: '5 minutes'
       jwt_algorithm: 'HS256'
       secret:
-        path: /secrets/jwt_secret
+        # Relative path within /secrets provided by 'secret' block
+        path: jwt_secret
         disabled: false
 
 ingress:
