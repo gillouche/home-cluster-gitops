@@ -50,7 +50,7 @@ persistence:
     - ReadWriteOnce
 
 configMap:
-  # Explicitly set server path to empty string (root) to satisfy Ingress validation
+  # Explicitly set server path to empty string (root) to match Ingress
   server:
     path: ""
 
@@ -98,17 +98,10 @@ ingress:
   className: traefik
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
+  # Simplifed rulesOverride structure as per chart template
   rulesOverride:
     - host: auth.gillouche.homelab
-      http:
-        paths:
-          - path: "/"
-            pathType: Prefix
-            backend:
-              service:
-                name: authelia
-                port:
-                  number: 80
+      path: "/"
 
 redis:
   enabled: true
