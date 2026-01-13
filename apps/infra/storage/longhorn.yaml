@@ -62,6 +62,8 @@ spec:
               type: ClusterIP
           ingress:
             enabled: false
+            annotations:
+              traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
     - repoURL: https://github.com/gillouche/home-cluster-gitops.git
       targetRevision: HEAD
       path: resources/longhorn
