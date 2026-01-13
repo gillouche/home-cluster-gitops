@@ -37,13 +37,8 @@ spec:
                     - matchExpressions:
                         - key: node-class
                           operator: In
-                          values: ["rpi5"]
-                        - key: storage
-                          operator: In
-                          values: ["ssd", "sdcard"]
-                        - key: reliability
-                          operator: In
-                          values: ["best-effort", "stable"]
+                          values: ["homeserver"]
+
           longhornUI:
             affinity:
               nodeAffinity:
@@ -52,16 +47,11 @@ spec:
                     - matchExpressions:
                         - key: node-class
                           operator: In
-                          values: ["rpi5"]
-                        - key: storage
-                          operator: In
-                          values: ["ssd", "sdcard"]
-                        - key: reliability
-                          operator: In
-                          values: ["best-effort", "stable"]
+                          values: ["homeserver"]
+
           persistence:
             defaultClass: true
-            defaultClassReplicaCount: 2
+            defaultClassReplicaCount: 1
           metrics:
             serviceMonitor:
               enabled: true
