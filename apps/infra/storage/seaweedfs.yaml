@@ -163,6 +163,7 @@ spec:
               pathType: "Prefix"
               annotations:
                 traefik.ingress.kubernetes.io/router.entrypoints: web
+                traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
     - repoURL: https://github.com/gillouche/home-cluster-gitops.git
       targetRevision: HEAD
       path: resources/seaweedfs

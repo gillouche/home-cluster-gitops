@@ -146,6 +146,33 @@ spec:
               annotations:
                 traefik.ingress.kubernetes.io/router.entrypoints: web
             
+            # Grafana OIDC Config
+            grafana.ini:
+              server:
+                root_url: https://grafana.k3s.gillouche.homelab
+              auth.generic_oauth:
+                enabled: true
+                name: Authelia
+                icon: signin
+                client_id: grafana
+                client_secret: $__file{/etc/secrets/auth_generic_oauth/client_secret}
+                scopes: openid profile email groups
+                empty_scopes: false
+                auth_url: https://auth.k3s.gillouche.homelab/api/oidc/authorization
+                token_url: https://auth.k3s.gillouche.homelab/api/oidc/token
+                api_url: https://auth.k3s.gillouche.homelab/api/oidc/userinfo
+                login_attribute_path: preferred_username
+                groups_attribute_path: groups
+                role_attribute_path: contains(groups[*], 'admins') && 'Admin' || contains(groups[*], 'dev') && 'Editor' || 'Viewer'
+            
+            # Mount secret as file for security
+            extraSecretMounts:
+              - name: auth-generic-oauth-secret-mount
+                secretName: monitoring-grafana
+                defaultMode: 0440
+                mountPath: /etc/secrets/auth_generic_oauth
+                readOnly: true
+            
             # Use default dashboards
             dashboardProviders:
               dashboardproviders.yaml:

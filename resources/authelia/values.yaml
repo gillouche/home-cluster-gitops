@@ -103,6 +103,48 @@ configMap:
         path: jwt_secret
         disabled: false
 
+  identity_providers:
+    oidc:
+      enabled: true
+      hmac_secret:
+        path: session_secret
+      issuer_private_key:
+        path: session_secret
+      access_token_lifespan: 1h
+      authorize_code_lifespan: 1m
+      id_token_lifespan: 1h
+      refresh_token_lifespan: 90m
+      clients:
+        - client_name: ArgoCD
+          client_id: argocd
+          client_secret:
+            path: argocd_client_secret
+          public: false
+          authorization_policy: one_factor
+          redirect_uris:
+            - https://argocd.k3s.gillouche.homelab/auth/callback
+          scopes:
+            - openid
+            - groups
+            - profile
+            - email
+          userinfo_signing_algorithm: none
+
+        - client_name: Grafana
+          client_id: grafana
+          client_secret:
+            path: grafana_client_secret
+          public: false
+          authorization_policy: one_factor
+          redirect_uris:
+            - https://grafana.k3s.gillouche.homelab/login/generic_oauth
+          scopes:
+            - openid
+            - groups
+            - profile
+            - email
+          userinfo_signing_algorithm: none
+
 ingress:
   enabled: true
   className: traefik
