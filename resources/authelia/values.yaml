@@ -76,7 +76,7 @@ configMap:
   session:
     # Required for Ingress validation and App logic
     encryption_key:
-      path: /secrets/internal/session_secret
+      path: session_secret
     cookies:
       - domain: k3s.gillouche.homelab
         subdomain: auth
@@ -84,7 +84,7 @@ configMap:
       host: authelia-redis-master
       port: 6379
       password:
-        path: /secrets/internal/session_secret
+        path: session_secret
         disabled: false
   
   storage:
@@ -125,7 +125,7 @@ configMap:
         - client_name: ArgoCD
           client_id: argocd
           client_secret:
-            path: /secrets/internal/argocd_client_secret
+            path: argocd_client_secret
           public: false
           authorization_policy: one_factor
           redirect_uris:
@@ -139,7 +139,7 @@ configMap:
         - client_name: Grafana
           client_id: grafana
           client_secret:
-            path: /secrets/internal/grafana_client_secret
+            path: grafana_client_secret
           public: false
           authorization_policy: one_factor
           redirect_uris:
