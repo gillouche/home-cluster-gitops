@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: redis
-          image: redis:7.4.2-alpine
+          image: redis:7.4.7-alpine
           args:
             - redis-server
             - --requirepass
