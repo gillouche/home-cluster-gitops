@@ -32,12 +32,18 @@ spec:
               default: true
             exposedPort: 9000
             protocol: TCP
+            forwardedHeaders:
+              trustedIPs:
+                - 192.168.0.253
           websecure:
             port: 9443
             expose:
               default: true
             exposedPort: 9443
             protocol: TCP
+            forwardedHeaders:
+              trustedIPs:
+                - 192.168.0.253
         service:
           enabled: true
           type: LoadBalancer
