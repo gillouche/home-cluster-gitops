@@ -55,7 +55,8 @@ spec:
                 - prometheus.k3s.gillouche.homelab
               annotations:
                 traefik.ingress.kubernetes.io/router.entrypoints: web
-                traefik.ingress.kubernetes.io/router.middlewares: monitoring-authelia@kubernetescrd
+                traefik.ingress.kubernetes.io/router.middlewares: authelia@kubernetescrd
+              pathType: Prefix
               
           alertmanager:
             alertmanagerSpec:
@@ -112,6 +113,8 @@ spec:
                 - alertmanager.k3s.gillouche.homelab
               annotations:
                 traefik.ingress.kubernetes.io/router.entrypoints: web
+                traefik.ingress.kubernetes.io/router.middlewares: authelia@kubernetescrd
+              pathType: Prefix
   
           grafana:
             deploymentStrategy:
@@ -145,6 +148,7 @@ spec:
                 - grafana.k3s.gillouche.homelab
               annotations:
                 traefik.ingress.kubernetes.io/router.entrypoints: web
+                traefik.ingress.kubernetes.io/router.middlewares: authelia@kubernetescrd
             
             # Grafana OIDC Config
             grafana.ini:
