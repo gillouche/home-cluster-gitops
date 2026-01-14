@@ -30,14 +30,7 @@ spec:
             storageReservedPercentageForDefaultDisk: 20
             storageOverProvisioningPercentage: 100
           longhornManager:
-            affinity:
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                        - key: node-class
-                          operator: In
-                          values: ["homeserver"]
+            affinity: {}
 
           longhornUI:
             affinity:
