@@ -27,6 +27,8 @@ pod:
       value: /secrets/authelia-secrets/session_secret
     - name: AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
       value: /secrets/authelia-secrets/storage_encryption_key
+    - name: AUTHELIA_SESSION_REDIS_PASSWORD_FILE
+      value: /secrets/authelia-secrets/session_secret
   
   securityContext:
     pod:
@@ -110,6 +112,8 @@ configMap:
         subdomain: auth
     redis:
       enabled: true
+      password:
+        disabled: true
 
   storage:
     encryption_key:
