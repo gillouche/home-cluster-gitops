@@ -2,8 +2,9 @@ image:
   repository: authelia/authelia
   tag: "4.39.13"
 
+replicaCount: 1
+
 pod:
-  replicas: 1
   kind: Deployment
   
   securityContext:
@@ -43,11 +44,10 @@ secret:
 configMap:
   # Explicitly set server path to empty string (root) to match Ingress
   server:
-    path: ""
+    path: "/"
 
   authentication_backend:
     file:
-      enabled: true
       path: /config/users_database.yml
       watch: true
 
@@ -61,18 +61,14 @@ configMap:
 
   session:
     # Required for Ingress validation and App logic
-    encryption_key:
-      path: session_secret
     cookies:
       - domain: k3s.gillouche.homelab
         subdomain: auth
     redis:
       host: authelia-redis-master
       port: 6379
-      password:
-        # Relative path within /secrets provided by 'secret' block
-        path: session_secret
-        disabled: false
+      password: null # Disable this block in favor of password_file
+      password_file: /secrets/internal/session_secret
   
   storage:
     encryption_key:
@@ -145,7 +141,15 @@ ingress:
   # Simplifed rulesOverride structure as per chart template
   rulesOverride:
     - host: auth.k3s.gillouche.homelab
-      path: "/"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: authelia
+                port:
+                  number: 80
 
 redis:
   enabled: true
