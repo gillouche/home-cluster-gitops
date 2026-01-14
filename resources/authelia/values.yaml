@@ -137,7 +137,6 @@ configMap:
             - groups
             - profile
             - email
-          userinfo_signing_algorithm: none
 
 ingress:
   enabled: true
