@@ -122,7 +122,6 @@ configMap:
             - groups
             - profile
             - email
-          userinfo_signing_algorithm: none
 
         - client_name: Grafana
           client_id: grafana
