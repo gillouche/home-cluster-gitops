@@ -23,6 +23,10 @@ pod:
   env:
     - name: AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE
       value: /secrets/authelia-secrets/jwt_secret
+    - name: AUTHELIA_SESSION_SECRET_FILE
+      value: /secrets/authelia-secrets/session_secret
+    - name: AUTHELIA_STORAGE_ENCRYPTION_KEY_FILE
+      value: /secrets/authelia-secrets/storage_encryption_key
   
   securityContext:
     pod:
@@ -74,8 +78,13 @@ secret:
   additionalSecrets:
     authelia-secrets:
       items:
+      items:
         - key: jwt_secret
           path: jwt_secret
+        - key: session_secret
+          path: session_secret
+        - key: storage_encryption_key
+          path: storage_encryption_key
 
 configMap:
   # Use custom ConfigMap for actual Authelia configuration
@@ -95,6 +104,9 @@ configMap:
       enabled: true  # Fake LDAP to bypass HA restriction (actual config uses file auth)
 
   session:
+    encryption_key:
+      secret:
+        disabled: true
     cookies:
       - domain: k3s.gillouche.homelab
         subdomain: auth
@@ -102,6 +114,9 @@ configMap:
       enabled: true
 
   storage:
+    encryption_key:
+      secret:
+        disabled: true
     postgres:
       enabled: true
 
