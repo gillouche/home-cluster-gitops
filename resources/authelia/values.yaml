@@ -30,7 +30,8 @@ pod:
       runAsUser: 1000
       runAsGroup: 1000
   
-  # Only custom volumes here (database). Secrets are handled by 'secret' block below.
+  # Custom volumes for user database and OIDC client secrets
+  # Note: OIDC client secrets are NOT auto-mounted by the chart, must be added manually
   extraVolumes:
     - name: user-database
       secret:
@@ -38,11 +39,22 @@ pod:
         items:
           - key: users_database.yml
             path: users_database.yml
+    - name: oidc-client-secrets
+      secret:
+        secretName: authelia-secrets
+        items:
+          - key: argocd_client_secret
+            path: argocd_client_secret
+          - key: grafana_client_secret
+            path: grafana_client_secret
 
   extraVolumeMounts:
     - name: user-database
       mountPath: /config/users_database.yml
       subPath: users_database.yml
+      readOnly: true
+    - name: oidc-client-secrets
+      mountPath: /secrets/oidc
       readOnly: true
 
 persistence:
@@ -125,7 +137,7 @@ configMap:
         - client_name: ArgoCD
           client_id: argocd
           client_secret:
-            path: argocd_client_secret
+            path: /secrets/oidc/argocd_client_secret
           public: false
           authorization_policy: one_factor
           redirect_uris:
@@ -139,7 +151,7 @@ configMap:
         - client_name: Grafana
           client_id: grafana
           client_secret:
-            path: grafana_client_secret
+            path: /secrets/oidc/grafana_client_secret
           public: false
           authorization_policy: one_factor
           redirect_uris:
