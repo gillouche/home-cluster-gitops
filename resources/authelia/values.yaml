@@ -92,8 +92,8 @@ configMap:
         subdomain: auth
     redis:
       enabled: true
-      deploy: true
-      host: authelia-redis-master
+      deploy: false
+      host: authelia-redis
       port: 6379
       password:
         path: session_secret
@@ -178,17 +178,3 @@ ingress:
     - host: auth.k3s.gillouche.homelab
       path: /
 
-redis:
-  enabled: true
-  image:
-    registry: docker.io
-    repository: redis
-    tag: "7-alpine"
-  auth:
-    enabled: true
-    existingSecret: authelia-secrets
-    existingSecretPasswordKey: session_secret
-  architecture: standalone
-  master:
-    persistence:
-      enabled: false
