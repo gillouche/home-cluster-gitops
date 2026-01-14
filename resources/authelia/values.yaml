@@ -20,6 +20,9 @@ pod:
                     - authelia
             topologyKey: "kubernetes.io/hostname"  
 
+  env:
+    - name: AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE
+      value: /secrets/authelia-secrets/jwt_secret
   
   securityContext:
     pod:
@@ -68,10 +71,20 @@ persistence:
 secret:
   # Enable native secret mounting
   existingSecret: authelia-secrets
+  additionalSecrets:
+    authelia-secrets:
+      items:
+        - key: jwt_secret
+          path: jwt_secret
 
 configMap:
   # Use custom ConfigMap for actual Authelia configuration
   existingConfigMap: authelia-config
+
+  identity_validation:
+    reset_password:
+      secret:
+        disabled: true
 
   # These values are used by the chart for validation and stateful check
   # The actual config comes from authelia-config ConfigMap which uses file-based auth
