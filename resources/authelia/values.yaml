@@ -180,6 +180,8 @@ ingress:
 
 redis:
   enabled: true
+  image:
+    tag: "7.4"
   auth:
     enabled: true
     existingSecret: authelia-secrets
