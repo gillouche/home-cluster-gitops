@@ -39,7 +39,7 @@ pod:
         items:
           - key: users_database.yml
             path: users_database.yml
-    - name: oidc-client-secrets
+    - name: oidc-secrets
       secret:
         secretName: authelia-secrets
         items:
@@ -47,13 +47,15 @@ pod:
             path: argocd_client_secret
           - key: grafana_client_secret
             path: grafana_client_secret
+          - key: oidc_jwks_key
+            path: oidc_jwks_key
 
   extraVolumeMounts:
     - name: user-database
       mountPath: /config/users_database.yml
       subPath: users_database.yml
       readOnly: true
-    - name: oidc-client-secrets
+    - name: oidc-secrets
       mountPath: /secrets/oidc
       readOnly: true
 
@@ -68,12 +70,9 @@ secret:
   existingSecret: authelia-secrets
 
 configMap:
-  # Explicitly set server path to empty string (root) to match Ingress
-  server:
-    path: "/"
-
   authentication_backend:
     file:
+      enabled: true
       path: /config/users_database.yml
       watch: true
 
@@ -86,18 +85,17 @@ configMap:
         policy: one_factor
 
   session:
-    # Required for Ingress validation and App logic
     encryption_key:
       path: session_secret
     cookies:
       - domain: k3s.gillouche.homelab
         subdomain: auth
     redis:
+      enabled: true
       host: authelia-redis-master
       port: 6379
       password:
         path: session_secret
-        disabled: false
   
   storage:
     encryption_key:
@@ -133,6 +131,13 @@ configMap:
       enabled: true
       hmac_secret:
         path: session_secret
+      # JWKS for signing OIDC tokens
+      jwks:
+        - key_id: 'default'
+          algorithm: 'RS256'
+          use: 'sig'
+          key:
+            path: /secrets/oidc/oidc_jwks_key
       clients:
         - client_name: ArgoCD
           client_id: argocd
