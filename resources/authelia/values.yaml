@@ -75,6 +75,8 @@ configMap:
 
   session:
     # Required for Ingress validation and App logic
+    encryption_key:
+      path: /secrets/internal/session_secret
     cookies:
       - domain: k3s.gillouche.homelab
         subdomain: auth
