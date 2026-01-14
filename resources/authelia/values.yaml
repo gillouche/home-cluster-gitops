@@ -112,7 +112,7 @@ configMap:
         - client_name: ArgoCD
           client_id: argocd
           client_secret:
-            path: argocd_client_secret
+            path: /secrets/internal/argocd_client_secret
           public: false
           authorization_policy: one_factor
           redirect_uris:
@@ -126,7 +126,7 @@ configMap:
         - client_name: Grafana
           client_id: grafana
           client_secret:
-            path: grafana_client_secret
+            path: /secrets/internal/grafana_client_secret
           public: false
           authorization_policy: one_factor
           redirect_uris:
