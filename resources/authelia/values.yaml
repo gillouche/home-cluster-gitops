@@ -2,21 +2,24 @@ image:
   repository: authelia/authelia
   tag: "4.39.13"
 
+
 pod:
   replicas: 2
   kind: Deployment
-  
-  # Ensure High Availability by spreading pods across different nodes
-  affinity:
-    podAntiAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        - labelSelector:
-            matchExpressions:
-              - key: app.kubernetes.io/name
-                operator: In
-                values:
-                  - authelia
-          topologyKey: "kubernetes.io/hostname"
+
+  selectors:
+    # Ensure High Availability by spreading pods across different nodes
+    affinity:
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                    - authelia
+            topologyKey: "kubernetes.io/hostname"  
+
   
   securityContext:
     pod:
