@@ -47,7 +47,7 @@ spec:
               alertingEndpoints:
                 - namespace: monitoring
                   name: alertmanager-operated
-                  port: web
+                  port: http-web
             ingress:
               enabled: true
               ingressClassName: traefik
