@@ -1,0 +1,146 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: authelia-config
+  namespace: security
+  labels:
+    app.kubernetes.io/name: authelia
+data:
+  configuration.yaml: |
+    ---
+    theme: 'light'
+    server:
+      address: 'tcp://0.0.0.0:9091/'
+      buffers:
+        read: 4096
+        write: 4096
+      timeouts:
+        read: '6 seconds'
+        write: '6 seconds'
+        idle: '30 seconds'
+      endpoints:
+        authz:
+          forward-auth:
+            implementation: 'ForwardAuth'
+    log:
+      level: 'info'
+      format: 'text'
+      keep_stdout: true
+    identity_validation:
+      reset_password:
+        jwt_lifespan: '5 minutes'
+        jwt_algorithm: 'HS256'
+    totp:
+      issuer: 'Authelia'
+      algorithm: 'SHA1'
+      digits: 6
+      period: 30
+    webauthn:
+      display_name: 'Authelia'
+    ntp:
+      address: 'udp://time.cloudflare.com:123'
+      version: 4
+      max_desync: '3 seconds'
+      disable_startup_check: false
+    authentication_backend:
+      password_reset:
+        disable: false
+      refresh_interval: '5 minutes'
+      file:
+        path: '/config/users_database.yml'
+        watch: true
+        password:
+          algorithm: 'argon2'
+          argon2:
+            variant: 'argon2id'
+            iterations: 3
+            memory: 65536
+            parallelism: 4
+            key_length: 32
+            salt_length: 16
+    session:
+      name: 'authelia_session'
+      same_site: 'lax'
+      inactivity: '5 minutes'
+      expiration: '1 hour'
+      remember_me: '1 month'
+      cookies:
+        - domain: 'k3s.gillouche.homelab'
+          authelia_url: 'https://auth.k3s.gillouche.homelab'
+      redis:
+        host: 'authelia-redis'
+        port: 6379
+        database_index: 0
+        maximum_active_connections: 8
+        minimum_idle_connections: 0
+    regulation:
+      max_retries: 3
+      find_time: '2 minutes'
+      ban_time: '5 minutes'
+    storage:
+      postgres:
+        address: 'tcp://192.168.0.247:15432'
+        timeout: '5 seconds'
+        database: 'authelia'
+        schema: 'public'
+        username: 'authelia'
+    notifier:
+      disable_startup_check: false
+      filesystem:
+        filename: '/tmp/emails.txt'
+    identity_providers:
+      oidc:
+        lifespans:
+          access_token: '1 hour'
+          authorize_code: '1 minute'
+        enforce_pkce: 'public_clients_only'
+        jwks:
+          - algorithm: 'RS256'
+            use: 'sig'
+            key_id: 'default'
+            key: {{ secret "/secrets/oidc/oidc_jwks_key" | mindent 10 "|" | msquote }}
+        clients:
+          - client_id: 'argocd'
+            client_name: 'ArgoCD'
+            client_secret: '{{ secret "/secrets/oidc/argocd_client_secret" }}'
+            public: false
+            redirect_uris:
+              - 'https://argocd.k3s.gillouche.homelab/auth/callback'
+            scopes:
+              - 'openid'
+              - 'groups'
+              - 'profile'
+              - 'email'
+            grant_types:
+              - 'authorization_code'
+            response_types:
+              - 'code'
+            authorization_policy: 'one_factor'
+            consent_mode: 'auto'
+          - client_id: 'grafana'
+            client_name: 'Grafana'
+            client_secret: '{{ secret "/secrets/oidc/grafana_client_secret" }}'
+            public: false
+            redirect_uris:
+              - 'https://grafana.k3s.gillouche.homelab/login/generic_oauth'
+            scopes:
+              - 'openid'
+              - 'groups'
+              - 'profile'
+              - 'email'
+            grant_types:
+              - 'authorization_code'
+            response_types:
+              - 'code'
+            authorization_policy: 'one_factor'
+            consent_mode: 'auto'
+    access_control:
+      default_policy: 'deny'
+      rules:
+        - policy: bypass
+          domain:
+            - 'auth.k3s.gillouche.homelab'
+        - policy: one_factor
+          domain:
+            - '*.k3s.gillouche.homelab'
