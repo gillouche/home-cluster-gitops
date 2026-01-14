@@ -29,6 +29,8 @@ pod:
       value: /secrets/authelia-secrets/storage_encryption_key
     - name: AUTHELIA_SESSION_REDIS_PASSWORD_FILE
       value: /secrets/authelia-secrets/session_secret
+    - name: AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE
+      value: /secrets/authelia-secrets/postgres_password
   
   securityContext:
     pod:
@@ -84,8 +86,12 @@ secret:
           path: jwt_secret
         - key: session_secret
           path: session_secret
+        - key: session_secret
+          path: session_secret
         - key: storage_encryption_key
           path: storage_encryption_key
+        - key: postgres_password
+          path: postgres_password
 
 configMap:
   # Use custom ConfigMap for actual Authelia configuration
@@ -103,6 +109,8 @@ configMap:
       enabled: false
     ldap:
       enabled: true  # Fake LDAP to bypass HA restriction (actual config uses file auth)
+      password:
+        disabled: true
 
   session:
     encryption_key:
@@ -120,6 +128,13 @@ configMap:
       disabled: true
     postgres:
       enabled: true
+      password:
+        disabled: true
+
+  notifier:
+    smtp:
+      password:
+        disabled: true
 
 ingress:
   enabled: true
