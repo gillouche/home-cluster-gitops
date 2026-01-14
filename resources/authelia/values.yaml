@@ -2,9 +2,8 @@ image:
   repository: authelia/authelia
   tag: "4.39.13"
 
-replicaCount: 1
-
 pod:
+  replicas: 1
   kind: Deployment
   
   securityContext:
@@ -67,8 +66,9 @@ configMap:
     redis:
       host: authelia-redis-master
       port: 6379
-      password: null # Disable this block in favor of password_file
-      password_file: /secrets/internal/session_secret
+      password:
+        path: /secrets/internal/session_secret
+        disabled: false
   
   storage:
     encryption_key:
