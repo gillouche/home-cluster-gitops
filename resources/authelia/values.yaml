@@ -181,7 +181,9 @@ ingress:
 redis:
   enabled: true
   image:
-    tag: "7.4"
+    registry: docker.io
+    repository: redis
+    tag: "7-alpine"
   auth:
     enabled: true
     existingSecret: authelia-secrets
