@@ -7,7 +7,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
 spec:
   forwardAuth:
-    address: http://authelia.security.svc.cluster.local/api/verify?rd=https://auth.k3s.gillouche.homelab
+    address: http://10.43.82.214/api/verify?rd=https://auth.k3s.gillouche.homelab
     trustForwardHeader: true
     authResponseHeaders:
       - Remote-User
