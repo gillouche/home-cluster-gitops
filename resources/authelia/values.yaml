@@ -108,12 +108,6 @@ configMap:
       enabled: true
       hmac_secret:
         path: session_secret
-      issuer_private_key:
-        path: session_secret
-      access_token_lifespan: 1h
-      authorize_code_lifespan: 1m
-      id_token_lifespan: 1h
-      refresh_token_lifespan: 90m
       clients:
         - client_name: ArgoCD
           client_id: argocd
