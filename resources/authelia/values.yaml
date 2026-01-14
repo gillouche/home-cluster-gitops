@@ -78,7 +78,6 @@ secret:
   additionalSecrets:
     authelia-secrets:
       items:
-      items:
         - key: jwt_secret
           path: jwt_secret
         - key: session_secret
@@ -105,8 +104,7 @@ configMap:
 
   session:
     encryption_key:
-      secret:
-        disabled: true
+      disabled: true
     cookies:
       - domain: k3s.gillouche.homelab
         subdomain: auth
@@ -115,8 +113,7 @@ configMap:
 
   storage:
     encryption_key:
-      secret:
-        disabled: true
+      disabled: true
     postgres:
       enabled: true
 
