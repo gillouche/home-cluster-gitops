@@ -149,6 +149,13 @@ spec:
               annotations:
                 traefik.ingress.kubernetes.io/router.entrypoints: web
             
+            # HostAliases for Authelia via Caddy (TLS)
+            hostAliases:
+              - ip: "192.168.0.252"
+                hostnames:
+                  - "auth.k3s.gillouche.homelab"
+
+            
             # Grafana OIDC Config
             grafana.ini:
               server:
