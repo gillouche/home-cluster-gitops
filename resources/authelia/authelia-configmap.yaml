@@ -19,10 +19,6 @@ data:
         read: '6 seconds'
         write: '6 seconds'
         idle: '30 seconds'
-      endpoints:
-        authz:
-          forward-auth:
-            implementation: 'ForwardAuth'
     log:
       level: 'info'
       format: 'text'
