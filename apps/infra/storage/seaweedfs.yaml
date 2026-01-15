@@ -50,6 +50,19 @@ spec:
               type: "persistentVolumeClaim"
               size: "1Gi"
               storageClass: "longhorn"
+            
+            # Increase timeouts for stability on RPi
+            livenessProbe:
+              initialDelaySeconds: 60
+              periodSeconds: 30
+              timeoutSeconds: 15
+              failureThreshold: 5
+            readinessProbe:
+              initialDelaySeconds: 30
+              periodSeconds: 30
+              timeoutSeconds: 15
+              failureThreshold: 5
+
 
           volume:
             replicas: 3
