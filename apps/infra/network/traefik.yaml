@@ -35,6 +35,7 @@ spec:
             forwardedHeaders:
               trustedIPs:
                 - 192.168.0.253
+                - 192.168.0.0/24
           websecure:
             port: 9443
             expose:
