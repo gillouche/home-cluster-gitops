@@ -53,6 +53,9 @@ spec:
               enabled: true
         # Set web as the default entrypoint
         additionalArguments:
+          - "--entrypoints.web.address=:9000"
+          - "--entrypoints.websecure.address=:9443"
+          - "--entrypoints.default.entrypoints=web"
         affinity:
           podAntiAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
