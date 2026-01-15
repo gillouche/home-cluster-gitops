@@ -1,0 +1,31 @@
+# NVIDIA Device Plugin Values (Wrapper)
+nvidia-device-plugin:
+  # Capability to support ARM64 / Tegra (Jetson) or standard discrete GPUs
+  image:
+    repository: nvcr.io/nvidia/k8s-device-plugin
+    tag: v0.14.5
+
+  # Enable compatibility checks
+  compatibility:
+    rollingUpdate:
+      maxUnavailable: 1
+
+  # Resource management
+  resources:
+    requests:
+      cpu: 50m
+      memory: 50Mi
+    limits:
+      cpu: 50m
+      memory: 50Mi
+
+  # Tolerate control plane taint if minimal cluster
+  tolerations:
+    - key: "node-role.kubernetes.io/master"
+      operator: "Exists"
+    - key: "node-role.kubernetes.io/control-plane"
+      operator: "Exists"
+
+  # Node Selector to ensure it only runs on GPU nodes
+  nodeSelector:
+    accelerator: nvidia
