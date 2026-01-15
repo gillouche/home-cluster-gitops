@@ -53,7 +53,6 @@ spec:
               enabled: true
         # Set web as the default entrypoint
         additionalArguments:
-          - "--core.defaultEntryPoint=web"
         affinity:
           podAntiAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
