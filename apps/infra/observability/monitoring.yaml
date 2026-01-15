@@ -113,7 +113,7 @@ spec:
                 - alertmanager.k3s.gillouche.homelab
               annotations:
                 traefik.ingress.kubernetes.io/router.entrypoints: web
-                traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd,monitoring-alertmanager-stripprefix@kubernetescrd
+                traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
               pathType: Prefix
   
           grafana:
