@@ -1,0 +1,33 @@
+core:
+  k3s:
+    enabled: true
+    # Important for K3s/Containerd
+    runtimePath: /run/k3s/containerd/containerd.sock
+
+  controller:
+    replicas: 1
+    pvc:
+      enabled: false
+
+  manager:
+    ingress:
+      enabled: true
+      className: traefik
+      hosts:
+        - neuvector.k3s.gillouche.homelab
+      annotations:
+        traefik.ingress.kubernetes.io/router.entrypoints: web
+        traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
+
+  cve:
+    scanner:
+      enabled: true
+      replicas: 1
+      # Tune for Pi performance
+      resources:
+        requests:
+          memory: 500Mi
+          cpu: 200m
+        limits:
+          memory: 2Gi
+          cpu: 1000m

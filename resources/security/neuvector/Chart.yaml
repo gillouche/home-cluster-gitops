@@ -1,0 +1,10 @@
+apiVersion: v2
+name: neuvector-wrapper
+description: Wrapper chart for NeuVector Security
+type: application
+version: 1.0.0
+appVersion: 5.3.0
+dependencies:
+  - name: core
+    version: 2.7.5
+    repository: https://neuvector.github.io/neuvector-helm/

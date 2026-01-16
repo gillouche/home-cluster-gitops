@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: neuvector
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    notifications.argoproj.io/subscribe.on-sync-succeeded.webhook.discord: ""
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord: ""
+    notifications.argoproj.io/subscribe.on-deployed.webhook.discord: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/gillouche/home-cluster-gitops.git
+    targetRevision: HEAD
+    path: resources/security/neuvector
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: neuvector
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
