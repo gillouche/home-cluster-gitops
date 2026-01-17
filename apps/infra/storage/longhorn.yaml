@@ -20,13 +20,13 @@ spec:
       helm:
         values: |
           defaultSettings:
-            defaultDataPath: /mnt/data/longhorn
+            defaultDataPath: ""
             replicaSoftAntiAffinity: false
             replicaZoneSoftAntiAffinity: false
             concurrentReplicaRebuildPerNodeLimit: 2
             defaultDataLocality: best-effort
             replicaAutoBalance: least-effort
-            createDefaultDiskLabeledNodes: true
+            createDefaultDiskLabeledNodes: false
             storageReservedPercentageForDefaultDisk: 20
             storageOverProvisioningPercentage: 100
           longhornManager:
@@ -44,7 +44,7 @@ spec:
 
           persistence:
             defaultClass: true
-            defaultClassReplicaCount: 1
+            defaultClassReplicaCount: 2
           metrics:
             serviceMonitor:
               enabled: true

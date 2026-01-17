@@ -5,9 +5,17 @@ core:
     runtimePath: /run/k3s/containerd/containerd.sock
 
   controller:
-    replicas: 1
+    replicas: 2
     pvc:
       enabled: false
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-class
+                  operator: In
+                  values: ["homeserver"]
 
   manager:
     ingress:
@@ -18,11 +26,27 @@ core:
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: web
         traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-class
+                  operator: In
+                  values: ["homeserver"]
 
   cve:
     scanner:
       enabled: true
-      replicas: 1
+      replicas: 2
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-class
+                    operator: In
+                    values: ["homeserver"]
       # Tune for Pi performance
       resources:
         requests:

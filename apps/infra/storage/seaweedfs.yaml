@@ -20,7 +20,7 @@ spec:
       helm:
         values: |
           master:
-            replicas: 3
+            replicas: 2
             affinity: |
               nodeAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
@@ -28,13 +28,7 @@ spec:
                     - matchExpressions:
                         - key: node-class
                           operator: In
-                          values: ["rpi5"]
-                        - key: storage
-                          operator: In
-                          values: ["ssd", "sdcard"]
-                        - key: reliability
-                          operator: In
-                          values: ["best-effort", "stable"]
+                          values: ["homeserver"]
               podAntiAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
                   - labelSelector:
@@ -51,7 +45,7 @@ spec:
               size: "1Gi"
               storageClass: "longhorn"
             
-            # Increase timeouts for stability on RPi
+            # Increase timeouts for stability
             livenessProbe:
               initialDelaySeconds: 60
               periodSeconds: 30
@@ -65,7 +59,7 @@ spec:
 
 
           volume:
-            replicas: 3
+            replicas: 2
             affinity: |
               nodeAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
@@ -73,13 +67,7 @@ spec:
                     - matchExpressions:
                         - key: node-class
                           operator: In
-                          values: ["rpi5"]
-                        - key: storage
-                          operator: In
-                          values: ["ssd", "sdcard"]
-                        - key: reliability
-                          operator: In
-                          values: ["best-effort", "stable"]
+                          values: ["homeserver"]
               podAntiAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
                   - labelSelector:
@@ -98,7 +86,7 @@ spec:
                 storageClass: "longhorn"
 
           filer:
-            replicas: 3
+            replicas: 2
             affinity: |
               nodeAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
@@ -106,13 +94,7 @@ spec:
                     - matchExpressions:
                         - key: node-class
                           operator: In
-                          values: ["rpi5"]
-                        - key: storage
-                          operator: In
-                          values: ["ssd", "sdcard"]
-                        - key: reliability
-                          operator: In
-                          values: ["best-effort", "stable"]
+                          values: ["homeserver"]
               podAntiAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
                   - labelSelector:
@@ -148,13 +130,7 @@ spec:
                     - matchExpressions:
                         - key: node-class
                           operator: In
-                          values: ["rpi5"]
-                        - key: storage
-                          operator: In
-                          values: ["ssd", "sdcard"]
-                        - key: reliability
-                          operator: In
-                          values: ["best-effort", "stable"]
+                          values: ["homeserver"]
               podAntiAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
                   - labelSelector:

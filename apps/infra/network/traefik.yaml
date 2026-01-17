@@ -20,7 +20,7 @@ spec:
     helm:
       values: |
         deployment:
-          replicas: 3
+          replicas: 2
         ports:
           traefik:
             port: 9999
@@ -72,13 +72,7 @@ spec:
                 - matchExpressions:
                     - key: node-class
                       operator: In
-                      values: ["rpi5"]
-                    - key: storage
-                      operator: In
-                      values: ["ssd", "sdcard"]
-                    - key: reliability
-                      operator: In
-                      values: ["best-effort", "stable"]
+                      values: ["homeserver"]
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system

@@ -1,0 +1,41 @@
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: homeserver
+  namespace: longhorn-system
+spec:
+  name: homeserver
+  tags:
+    - homeserver
+  disks:
+    ssd-sata:
+      path: /mnt/ssd_sata
+      allowScheduling: true
+      storageReserved: 0
+      tags: []
+    ssd-nvme:
+      path: /mnt/ssd_nvme
+      allowScheduling: true
+      storageReserved: 0
+      tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: homeserver2
+  namespace: longhorn-system
+spec:
+  name: homeserver2
+  tags:
+    - homeserver
+  disks:
+    ssd-sata:
+      path: /mnt/ssd_sata
+      allowScheduling: true
+      storageReserved: 0
+      tags: []
+    ssd-nvme:
+      path: /mnt/ssd_nvme
+      allowScheduling: true
+      storageReserved: 0
+      tags: []

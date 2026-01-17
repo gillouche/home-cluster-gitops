@@ -84,13 +84,7 @@ spec:
                       - matchExpressions:
                           - key: node-class
                             operator: In
-                            values: ["rpi5"]
-                          - key: storage
-                            operator: In
-                            values: ["ssd", "sdcard"]
-                          - key: reliability
-                            operator: In
-                            values: ["best-effort", "stable"]
+                            values: ["homeserver"]
                 podAntiAffinity:
                   requiredDuringSchedulingIgnoredDuringExecution:
                   - labelSelector:
@@ -134,13 +128,7 @@ spec:
                     - matchExpressions:
                         - key: node-class
                           operator: In
-                          values: ["rpi5"]
-                        - key: storage
-                          operator: In
-                          values: ["ssd", "sdcard"]
-                        - key: reliability
-                          operator: In
-                          values: ["best-effort", "stable"]
+                          values: ["homeserver"]
             ingress:
               enabled: true
               ingressClassName: traefik

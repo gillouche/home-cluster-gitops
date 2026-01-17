@@ -4,7 +4,7 @@ metadata:
   name: homepage
   namespace: homepage
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: homepage
@@ -21,13 +21,15 @@ spec:
               - matchExpressions:
                   - key: node-class
                     operator: In
-                    values: ["rpi5"]
-                  - key: storage
+                    values: ["homeserver"]
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app
                     operator: In
-                    values: ["ssd", "sdcard"]
-                  - key: reliability
-                    operator: In
-                    values: ["best-effort", "stable"]
+                    values: ["homepage"]
+              topologyKey: "kubernetes.io/hostname"
       initContainers:
         - name: init-config
           image: busybox:latest

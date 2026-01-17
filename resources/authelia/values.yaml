@@ -10,6 +10,13 @@ pod:
   selectors:
     # Ensure High Availability by spreading pods across different nodes
     affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-class
+                  operator: In
+                  values: ["homeserver"]
       podAntiAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:

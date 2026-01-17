@@ -20,7 +20,7 @@ spec:
     helm:
       values: |
         installCRDs: true
-        replicaCount: 3
+        replicaCount: 2
         global:
           priorityClassName: system-cluster-critical
         affinity:
@@ -30,13 +30,7 @@ spec:
                 - matchExpressions:
                     - key: node-class
                       operator: In
-                      values: ["rpi5"]
-                    - key: storage
-                      operator: In
-                      values: ["ssd", "sdcard"]
-                    - key: reliability
-                      operator: In
-                      values: ["best-effort", "stable"]
+                      values: ["homeserver"]
           podAntiAffinity:
             requiredDuringSchedulingIgnoredDuringExecution:
               - labelSelector:
@@ -49,7 +43,7 @@ spec:
                       values: ["controller"]
                 topologyKey: "kubernetes.io/hostname"
         webhook:
-          replicaCount: 3
+          replicaCount: 2
           affinity:
             nodeAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -57,13 +51,7 @@ spec:
                   - matchExpressions:
                       - key: node-class
                         operator: In
-                        values: ["rpi5"]
-                      - key: storage
-                        operator: In
-                        values: ["ssd", "sdcard"]
-                      - key: reliability
-                        operator: In
-                        values: ["best-effort", "stable"]
+                        values: ["homeserver"]
             podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
                 - labelSelector:
@@ -76,7 +64,7 @@ spec:
                         values: ["webhook"]
                   topologyKey: "kubernetes.io/hostname"
         cainjector:
-          replicaCount: 3
+          replicaCount: 2
           affinity:
             nodeAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
@@ -84,13 +72,7 @@ spec:
                   - matchExpressions:
                       - key: node-class
                         operator: In
-                        values: ["rpi5"]
-                      - key: storage
-                        operator: In
-                        values: ["ssd", "sdcard"]
-                      - key: reliability
-                        operator: In
-                        values: ["best-effort", "stable"]
+                        values: ["homeserver"]
             podAntiAffinity:
               requiredDuringSchedulingIgnoredDuringExecution:
                 - labelSelector:
