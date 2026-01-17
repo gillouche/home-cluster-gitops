@@ -66,7 +66,6 @@ spec:
           expr: node_load15 / count without (cpu, mode) (node_cpu_seconds_total{mode="idle"}) > 1.2
           for: 2m
           labels:
-            # User requested this to be Critical
             severity: critical
           annotations:
             summary: "High System Load on {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }}"

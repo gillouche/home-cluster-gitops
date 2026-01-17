@@ -148,7 +148,6 @@ ingress:
   className: traefik
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
-  # Simplifed rulesOverride structure as per chart template
   rulesOverride:
     - host: auth.k3s.gillouche.homelab
       path: /

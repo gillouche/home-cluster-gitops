@@ -18,7 +18,7 @@ spec:
             value: Watchdog
         receiver: 'null'
       
-      # -- Critical Infrastructure (Important: Keep at top) --
+      # -- Critical Infrastructure --
       - matchers:
           - name: alertname
             regex: true
