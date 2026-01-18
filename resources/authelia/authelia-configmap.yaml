@@ -81,6 +81,8 @@ data:
         database: 'authelia'
         schema: 'public'
         username: 'authelia'
+        ssl:
+          mode: 'disable'
     notifier:
       disable_startup_check: false
       filesystem:
