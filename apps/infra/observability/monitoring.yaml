@@ -60,7 +60,7 @@ spec:
               
           alertmanager:
             alertmanagerSpec:
-              replicas: 3
+              replicas: 2
               alertmanagerConfigSelector:
                 matchLabels:
                   alertmanagerConfig: discord

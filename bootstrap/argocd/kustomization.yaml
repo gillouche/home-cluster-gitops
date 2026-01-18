@@ -7,3 +7,5 @@ resources:
 
 patches:
   - path: affinity-patch.yaml
+  - path: replicas-patch.yaml
+
