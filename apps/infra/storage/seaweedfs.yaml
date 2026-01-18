@@ -20,7 +20,7 @@ spec:
       helm:
         values: |
           master:
-            replicas: 2
+            replicas: 1
             affinity: |
               nodeAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
@@ -89,7 +89,7 @@ spec:
                 storageClass: "longhorn"
 
           filer:
-            replicas: 2
+            replicas: 1
             affinity: |
               nodeAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
