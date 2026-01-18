@@ -28,4 +28,4 @@ nvidia-device-plugin:
 
   # Node Selector to ensure it only runs on GPU nodes
   nodeSelector:
-    accelerator: nvidia
+    kubernetes.io/accelerator: nvidia
