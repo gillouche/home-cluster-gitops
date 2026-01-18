@@ -60,6 +60,9 @@ spec:
 
           volume:
             replicas: 2
+            extraArgs:
+              - "-defaultReplication=010"
+              - "-rack=$(NODE_NAME)"
             affinity: |
               nodeAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
