@@ -31,11 +31,12 @@ nvidia-device-plugin:
     kubernetes.io/accelerator: nvidia
 
   # Arch Linux Fix: Explicitly mount NVML library
-  volumes:
+  # Arch Linux Fix: Explicitly mount NVML library
+  extraVolumes:
     - name: nvidia-lib
       hostPath:
         path: /usr/lib/libnvidia-ml.so.1
-  volumeMounts:
+  extraVolumeMounts:
     - name: nvidia-lib
       mountPath: /usr/lib/libnvidia-ml.so.1
       readOnly: true
