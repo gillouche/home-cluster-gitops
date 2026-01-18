@@ -29,3 +29,13 @@ nvidia-device-plugin:
   # Node Selector to ensure it only runs on GPU nodes
   nodeSelector:
     kubernetes.io/accelerator: nvidia
+
+  # Arch Linux Fix: Explicitly mount NVML library
+  volumes:
+    - name: nvidia-lib
+      hostPath:
+        path: /usr/lib/libnvidia-ml.so.1
+  volumeMounts:
+    - name: nvidia-lib
+      mountPath: /usr/lib/libnvidia-ml.so.1
+      readOnly: true
