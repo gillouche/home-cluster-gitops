@@ -3,3 +3,4 @@ tools/sealed-secrets/input/
 __pycache__/
 .envrc
 .direnv
+.idea/
