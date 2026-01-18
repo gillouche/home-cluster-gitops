@@ -20,15 +20,23 @@ def transform_ca_bundle(file_path):
         print("Error: Validation failed! Decoded content does not match original.")
         sys.exit(1)
 
-    return encoded
+
+
+    return encoded, content.decode('utf-8')
 
 def main():
-    parser = argparse.ArgumentParser(description="Transform CA bundle file into a base64 string for vault-issuer.yaml")
+    parser = argparse.ArgumentParser(description="Transform CA bundle file into values for vault-issuer.yaml and argocd-cm.yaml")
     parser.add_argument("path", help="Path to the ca bundle file")
     args = parser.parse_args()
 
-    encoded_string = transform_ca_bundle(args.path)
+    encoded_string, raw_content = transform_ca_bundle(args.path)
+    
+    print("--- vault-issuer.yaml (base64 encoded) ---")
     print(encoded_string)
+    print("\n")
+    
+    print("--- argocd-cm.yaml (PEM content) ---")
+    print(raw_content)
 
 if __name__ == "__main__":
     main()
