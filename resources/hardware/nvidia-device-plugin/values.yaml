@@ -19,24 +19,10 @@ nvidia-device-plugin:
       cpu: 50m
       memory: 50Mi
 
-  # Tolerate control plane taint if minimal cluster
-  tolerations:
-    - key: "node-role.kubernetes.io/master"
-      operator: "Exists"
-    - key: "node-role.kubernetes.io/control-plane"
-      operator: "Exists"
+
 
   # Node Selector to ensure it only runs on GPU nodes
   nodeSelector:
     kubernetes.io/accelerator: nvidia
 
-  # Arch Linux Fix: Explicitly mount NVML library
-  # Arch Linux Fix: Explicitly mount NVML library
-  extraVolumes:
-    - name: nvidia-lib
-      hostPath:
-        path: /usr/lib/libnvidia-ml.so.1
-  extraVolumeMounts:
-    - name: nvidia-lib
-      mountPath: /usr/lib/libnvidia-ml.so.1
-      readOnly: true
+
