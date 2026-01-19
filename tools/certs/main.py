@@ -16,12 +16,6 @@ RESOURCES = [
         "key": "ca-bundle.pem",
         "indent": "  ",
         "mode": "block"
-    },
-    {
-        "path": "../../resources/cert-manager/vault-issuer.yaml",
-        "key": "caBundle",
-        "indent": "    ",
-        "mode": "value_base64"
     }
 ]
 
