@@ -27,3 +27,12 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+  ignoreDifferences:
+    - group: coordination.k8s.io
+      kind: Lease
+      jsonPointers:
+        - /spec/renewTime
+        - /spec/acquireTime
+        - /spec/holderIdentity
+        - /spec/leaseDurationSeconds
+        - /spec/leaseTransitions
