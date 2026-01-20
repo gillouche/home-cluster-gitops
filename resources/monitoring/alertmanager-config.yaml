@@ -16,7 +16,8 @@ spec:
       - matchers:
           - name: alertname
             value: Watchdog
-        receiver: 'null'
+        receiver: 'discord-firing'
+        repeatInterval: 5m
       
       # -- Critical Infrastructure --
       - matchers:
