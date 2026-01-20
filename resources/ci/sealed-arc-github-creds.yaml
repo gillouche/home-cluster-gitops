@@ -1,0 +1,14 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: arc-github-creds
+  namespace: arc-systems
+spec:
+  encryptedData:
+    github_token: AgBpbB1JfIzPV60gwr95L17rbepDnaaJFnbWHTls8BjXs+fyql4UqBmS8GS3gaNFISX1RBVDn5l6MnoNh6jYZc8/GkWYUup1gIcrK4kgKhz+NZPHSFdgqjdKrBGkHhmBx9xT0q+t/PTwM9Pje+4y4JSlisgm00PMRCW5S4XWu7pUYfDtk4j1eO/1TDD/RgYu0U/4vS1d5Qk5XPihHI1EX9TCXqBpVro/HfC2DZAjaZ0xM7axsXxUqlprz0ZYjT4HKUyJHRyhSM/GfTW1DDYu1oKU88kaaGgVAH43uE48Q85xARf9p86QDxKQsDSSA9wWuxOEt24ECC9Lwn3LOGWSjLw+gonmrBSVPPMGTzCY0kDtaoFX31wMRe8l9++L3srfxnIWYp1t+4KkRLceWYCckMyEF4n+rhko6D8WMGw1C3xL9hDeVsiMHdIiHA+xsBDrlSWJtnCMipxb1DqqBmbElsWkbtQp6P6gHGlm4CAEdRotxLP0fLjLVGhmIcTvl0dgCNECvIMn5CX7ATap7xM1dN81JDye18ENJtPQa7HoGMcgUaz4RSGKolqyF55kkNz/TnFsoMmyfQpqAbt+Uzd+z/GP+FxSo80UH6pEFUKxy/PW06wR3/DuIzRVl7IhHe0s3k/9Hg6hvys1vS+QBwITIVFEaNBZ6/wtp70MRQ53Yt7ljGsFV2osRtQ69PyfMZS3vndBvRKGnRuf9tyd9NXVY50MKpP6cAnDaQrF2W1/f5BjUWkIbjIBKIjGfH8mv/1kTS5v8t0sgocfkrCuiyxgzukVD2G1nK+Q5OAYQtrl+FTu5fUfKqwHvbemvqA49KI=
+  template:
+    metadata:
+      name: arc-github-creds
+      namespace: arc-systems
+    type: Opaque

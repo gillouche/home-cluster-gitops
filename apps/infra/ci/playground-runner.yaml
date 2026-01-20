@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: playground-runner
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "6" # Depends on Controller (5)
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: default
+  sources:
+    - chart: gha-runner-scale-set
+      repoURL: "ghcr.io/actions/actions-runner-controller-charts"
+      targetRevision: "0.9.3"
+      helm:
+        values: |
+          githubConfigUrl: "https://github.com/gillouche/playground"
+          githubConfigSecret: arc-github-creds
+          minRunners: 0
+          maxRunners: 3
+          containerMode:
+            type: "dind"
+          template:
+            spec:
+              containers:
+                - name: runner
+                  image: ghcr.io/actions/actions-runner:latest
+                  command: ["/home/runner/run.sh"]
+    - repoURL: "https://github.com/gillouche/home-cluster-gitops.git"
+      targetRevision: HEAD
+      path: resources/ci
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: arc-systems
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
