@@ -24,6 +24,8 @@ spec:
             prometheusSpec:
               replicas: 1
               retention: 7d
+              externalLabels:
+                namespace: monitoring
               storageSpec:
                 volumeClaimTemplate:
                   spec:
