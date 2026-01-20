@@ -21,18 +21,15 @@ spec:
     server: https://kubernetes.default.svc
     namespace: neuvector
   syncPolicy:
-#    automated:
-#      prune: true
-#      selfHeal: true
+    automated:
+      prune: true
+      selfHeal: true
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+      - RespectIgnoreDifferences=true
   ignoreDifferences:
     - group: coordination.k8s.io
       kind: Lease
       jsonPointers:
-        - /spec/renewTime
-        - /spec/acquireTime
-        - /spec/holderIdentity
-        - /spec/leaseDurationSeconds
-        - /spec/leaseTransitions
+        - /spec
