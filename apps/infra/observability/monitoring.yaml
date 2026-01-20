@@ -113,12 +113,11 @@ spec:
               receivers:
               - name: 'null'
               - name: 'discord-heartbeat'
-                slack_configs:
-                - api_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/prometheus-firing
+                discord_configs:
+                - webhook_url_file: /etc/alertmanager/secrets/monitoring-discord-webhooks/prometheus-firing
                   send_resolved: true
-                  channel: '#heartbeat'
-                  title: '{{ template "slack.default.title" . }}'
-                  text: '{{ template "slack.default.text" . }}'
+                  title: '{{ template "discord.default.title" . }}'
+                  message: '{{ template "discord.default.message" . }}'
               templates:
               - '/etc/alertmanager/config/*.tmpl'
   
