@@ -17,6 +17,7 @@ spec:
       allowScheduling: true
       storageReserved: 0
       tags: []
+  tags: []
 ---
 apiVersion: longhorn.io/v1beta2
 kind: Node
@@ -37,3 +38,125 @@ spec:
       allowScheduling: true
       storageReserved: 0
       tags: []
+  tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: rpi4b8g1
+  namespace: longhorn-system
+spec:
+  name: rpi4b8g1
+  allowScheduling: false
+  disks: {}
+  tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: rpi4b8g2
+  namespace: longhorn-system
+spec:
+  name: rpi4b8g2
+  allowScheduling: false
+  disks: {}
+  tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: rpi4b8g3
+  namespace: longhorn-system
+spec:
+  name: rpi4b8g3
+  allowScheduling: false
+  disks: {}
+  tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: rpi4b8g4
+  namespace: longhorn-system
+spec:
+  name: rpi4b8g4
+  allowScheduling: false
+  disks: {}
+  tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: rpi5b8g1
+  namespace: longhorn-system
+spec:
+  name: rpi5b8g1
+  allowScheduling: false
+  disks: {}
+  tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: rpi5b16g1ssd
+  namespace: longhorn-system
+spec:
+  name: rpi5b16g1ssd
+  allowScheduling: false
+  disks: {}
+  tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: rpi5b16g2ssd
+  namespace: longhorn-system
+spec:
+  name: rpi5b16g2ssd
+  allowScheduling: false
+  disks: {}
+  tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: rpi5b16g3ssd
+  namespace: longhorn-system
+spec:
+  name: rpi5b16g3ssd
+  allowScheduling: false
+  disks: {}
+  tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: rpi5b16g4
+  namespace: longhorn-system
+spec:
+  name: rpi5b16g4
+  allowScheduling: false
+  disks: {}
+  tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: rpi5b16g5
+  namespace: longhorn-system
+spec:
+  name: rpi5b16g5
+  allowScheduling: false
+  disks: {}
+  tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: rpi5b16g6
+  namespace: longhorn-system
+spec:
+  name: rpi5b16g6
+  allowScheduling: false
+  disks: {}
+  tags: []
