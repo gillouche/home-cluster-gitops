@@ -32,6 +32,17 @@ spec:
                 - name: runner
                   image: ghcr.io/actions/actions-runner:latest
                   command: ["/home/runner/run.sh"]
+                  env:
+                    - name: NEXUS_USERNAME
+                      valueFrom:
+                        secretKeyRef:
+                          name: nexus-credentials
+                          key: nexus_username
+                    - name: NEXUS_PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          name: nexus-credentials
+                          key: nexus_password
     - repoURL: "https://github.com/gillouche/home-cluster-gitops.git"
       targetRevision: HEAD
       path: resources/ci
