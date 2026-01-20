@@ -6,8 +6,6 @@ metadata:
 spec:
   name: homeserver
   allowScheduling: true
-  tags:
-    - homeserver
   disks:
     ssd-sata:
       path: /mnt/ssd_sata
@@ -28,8 +26,6 @@ metadata:
 spec:
   name: homeserver2
   allowScheduling: true
-  tags:
-    - homeserver
   disks:
     ssd-sata:
       path: /mnt/ssd_sata
