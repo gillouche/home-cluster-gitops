@@ -9,6 +9,11 @@ metadata:
     - argoproj.io/resources-finalizer
 spec:
   project: default
+  ignoreDifferences:
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      jsonPointers:
+        - /spec/preserveUnknownFields
   sources:
     - chart: gha-runner-scale-set-controller
       repoURL: "ghcr.io/actions/actions-runner-controller-charts"
