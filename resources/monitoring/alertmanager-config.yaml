@@ -8,9 +8,9 @@ metadata:
 spec:
   route:
     groupBy: ['alertname', 'job']
-    groupWait: 30s
-    groupInterval: 5m
-    repeatInterval: 3h
+    groupWait: 1s
+    groupInterval: 1m
+    repeatInterval: 5m
     receiver: 'discord-firing' # Default Fallback for anything not matched
     routes:
       - matchers:
