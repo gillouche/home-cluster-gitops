@@ -22,7 +22,7 @@ spec:
           defaultSettings:
             defaultDataPath: ""
             replicaSoftAntiAffinity: false
-            replicaZoneSoftAntiAffinity: false
+            replicaZoneSoftAntiAffinity: true
             concurrentReplicaRebuildPerNodeLimit: 2
             defaultDataLocality: best-effort
             replicaAutoBalance: least-effort
