@@ -26,6 +26,8 @@ spec:
             type: "dind"
           template:
             spec:
+              nodeSelector:
+                node-class: homeserver
               containers:
                 - name: runner
                   image: ghcr.io/actions/actions-runner:latest
