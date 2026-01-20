@@ -5,6 +5,7 @@ metadata:
   namespace: longhorn-system
 spec:
   name: homeserver
+  allowScheduling: true
   tags:
     - homeserver
   disks:
@@ -26,6 +27,7 @@ metadata:
   namespace: longhorn-system
 spec:
   name: homeserver2
+  allowScheduling: true
   tags:
     - homeserver
   disks:
