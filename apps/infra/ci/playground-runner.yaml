@@ -15,6 +15,8 @@ spec:
       targetRevision: "0.9.3"
       helm:
         values: |
+          runnerScaleSetName: "playground-runner"
+          runnerGroup: "Default"
           githubConfigUrl: "https://github.com/gillouche/playground"
           githubConfigSecret: arc-github-creds
           minRunners: 0
@@ -24,6 +26,8 @@ spec:
             name: arc-controller-gha-rs-controller
           containerMode:
             type: "dind"
+          
+          # Runner configuration
           template:
             spec:
               nodeSelector:
