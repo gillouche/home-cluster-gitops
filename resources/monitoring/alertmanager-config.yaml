@@ -91,10 +91,11 @@ spec:
       title: '{{ if eq .Status "firing" }}🔔 ALERT{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
+        {{ if ne .Labels.alertname "Watchdog" }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
 
   - name: 'discord-critical'
@@ -106,10 +107,11 @@ spec:
       title: '{{ if eq .Status "firing" }}🔥 CRITICAL{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
+        {{ if ne .Labels.alertname "Watchdog" }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
 
   - name: 'discord-warning'
@@ -121,10 +123,11 @@ spec:
       title: '{{ if eq .Status "firing" }}⚠️ WARNING{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
+        {{ if ne .Labels.alertname "Watchdog" }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
 
   - name: 'discord-info'
@@ -136,10 +139,11 @@ spec:
       title: '{{ if eq .Status "firing" }}ℹ️ INFO{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
+        {{ if ne .Labels.alertname "Watchdog" }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
 
   - name: 'discord-network'
@@ -151,10 +155,11 @@ spec:
       title: '{{ if eq .Status "firing" }}🌐 NETWORK{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
+        {{ if ne .Labels.alertname "Watchdog" }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
 
   - name: 'discord-storage'
@@ -166,10 +171,11 @@ spec:
       title: '{{ if eq .Status "firing" }}💾 STORAGE{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
+        {{ if ne .Labels.alertname "Watchdog" }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
 
   - name: 'discord-health'
@@ -181,10 +187,11 @@ spec:
       title: '{{ if eq .Status "firing" }}🏥 HEALTH{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
+        {{ if ne .Labels.alertname "Watchdog" }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
 
   - name: 'discord-pods'
@@ -196,8 +203,9 @@ spec:
       title: '{{ if eq .Status "firing" }}📦 POD{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
+        {{ if ne .Labels.alertname "Watchdog" }}
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
