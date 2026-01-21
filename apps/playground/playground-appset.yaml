@@ -1,0 +1,37 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: playground-apps
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+  - git:
+      repoURL: https://github.com/gillouche/playground.git
+      revision: HEAD
+      files:
+      # Only apps with prod overlay
+      - path: "apps/*/deploy/prod/kustomization.yaml"
+  
+  template:
+    metadata:
+      name: 'playground-{{ index .path.segments 1 }}-{{ index .path.segments 2 }}'
+      labels:
+        environment: prod
+        project: '{{ index .path.segments 1 }}'
+    spec:
+      project: playground
+      source:
+        repoURL: https://github.com/gillouche/playground.git
+        targetRevision: HEAD
+        path: '{{ .path.path | dir }}'  # Use prod overlay directory
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'playground-{{ index .path.segments 1 }}'  # e.g., playground-demo-concept
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+

@@ -25,6 +25,7 @@ spec:
           # Pin Controller to stable nodes
           nodeSelector:
             node-class: homeserver
+          githubConfigSecret: arc-github-creds
   destination:
     server: https://kubernetes.default.svc
     namespace: arc-systems
