@@ -34,7 +34,7 @@ spec:
                 node-class: homeserver
               containers:
                 - name: runner
-                  image: ghcr.io/actions/actions-runner:latest
+                  image: nexus.gillouche.homelab/docker-hosted/arc-runner:latest
                   command: ["/home/runner/run.sh"]
                   env:
                     - name: NEXUS_USERNAME
