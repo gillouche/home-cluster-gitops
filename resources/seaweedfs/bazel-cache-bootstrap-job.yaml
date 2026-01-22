@@ -14,45 +14,49 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: bootstrap
-          image: amazon/aws-cli:2.15.6
+          image: chrislusf/seaweedfs:4.07
           env:
-            # Use Bazel credentials directly (they're configured in SeaweedFS already)
-            - name: AWS_ACCESS_KEY_ID
+            # Bazel credentials from sealed secret (for s3.configure)
+            - name: BAZEL_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: seaweedfs-access-keys
                   key: bazel_access_key
-            - name: AWS_SECRET_ACCESS_KEY
+            - name: BAZEL_SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   name: seaweedfs-access-keys
                   key: bazel_secret_key
-            - name: AWS_DEFAULT_REGION
-              value: us-east-1
-            - name: S3_ENDPOINT
-              value: http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333
+            # Filer endpoint for weed shell
+            - name: FILER_ENDPOINT
+              value: "seaweedfs-filer.seaweedfs.svc.cluster.local:8888"
           command:
-            - /bin/sh
+            - sh
             - -c
             - |
               set -e
               
-              echo "=== SeaweedFS Bazel Cache Bootstrap ==="
-              echo "S3 Endpoint: $S3_ENDPOINT"
+              echo "=== SeaweedFS Bazel Cache Bootstrap (weed shell) ==="
+              echo "Filer: $FILER_ENDPOINT"
               
-              # Create bucket (idempotent)
-              echo "Creating bazel-cache bucket..."
-              aws --endpoint-url=$S3_ENDPOINT \
-                s3 mb s3://bazel-cache 2>&1 || echo "Bucket already exists (this is fine)"
+              # Use weed shell to configure S3
+              weed shell -master="$FILER_ENDPOINT" <<EOF
+              # Create bucket
+              s3.bucket.create -name=bazel-cache
+              
+              # Create bazel user
+              s3.configure \
+                -user=bazel-cache \
+                -access_key=$BAZEL_ACCESS_KEY \
+                -secret_key=$BAZEL_SECRET_KEY \
+                -actions=Read,Write,List \
+                -buckets=bazel-cache
               
               # List buckets to verify
-              echo "Verifying bucket list..."
-              aws --endpoint-url=$S3_ENDPOINT s3 ls
+              s3.bucket.list
+              EOF
               
-              # Try to access the bazel-cache bucket
-              echo "Accessing bazel-cache bucket..."
-              aws --endpoint-url=$S3_ENDPOINT s3 ls s3://bazel-cache/ || echo "Bucket exists but may be empty"
-              
-              echo "=== Bootstrap Complete ===" 
-              echo "Bucket: bazel-cache created/verified"
-              echo "Note: SeaweedFS uses the credentials from seaweedfs-access-keys"
+              echo "=== Bootstrap Complete ==="
+              echo "Created bucket: bazel-cache"
+              echo "Created user: bazel-cache"
+              echo "User has Read/Write/List access to bazel-cache bucket only"
