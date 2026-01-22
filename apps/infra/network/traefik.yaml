@@ -21,6 +21,9 @@ spec:
       values: |
         deployment:
           replicas: 2
+          rollingUpdate:
+            maxUnavailable: 1
+            maxSurge: 1
         ports:
           traefik:
             port: 9999

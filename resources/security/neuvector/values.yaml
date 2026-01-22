@@ -6,6 +6,11 @@ core:
 
   controller:
     replicas: 2
+    strategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: 1
+        maxSurge: 1
     pvc:
       enabled: false
     affinity:
@@ -39,6 +44,11 @@ core:
     scanner:
       enabled: true
       replicas: 2
+      strategy:
+        type: RollingUpdate
+        rollingUpdate:
+          maxUnavailable: 1
+          maxSurge: 1
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:

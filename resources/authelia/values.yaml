@@ -5,6 +5,11 @@ image:
 
 pod:
   replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
   kind: Deployment
 
   selectors:
