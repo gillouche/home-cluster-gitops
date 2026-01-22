@@ -26,3 +26,31 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
+    source:
+      helm:
+        values: |
+          replicas: 2
+          
+          # Pin to homeservers but allow rollout overlap
+          nodeSelector:
+            node-class: homeserver
+            
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: node-class
+                        operator: In
+                        values: ["homeserver"]
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values: ["homepage"]
+                    topologyKey: "kubernetes.io/hostname"

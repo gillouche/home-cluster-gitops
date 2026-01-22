@@ -139,16 +139,18 @@ spec:
                           operator: In
                           values: ["homeserver"]
               podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: app.kubernetes.io/name
-                          operator: In
-                          values: ["seaweedfs"]
-                        - key: app.kubernetes.io/component
-                          operator: In
-                          values: ["s3"]
-                    topologyKey: "kubernetes.io/hostname"
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  - weight: 100
+                    podAffinityTerm:
+                      labelSelector:
+                        matchExpressions:
+                          - key: app.kubernetes.io/name
+                            operator: In
+                            values: ["seaweedfs"]
+                          - key: app.kubernetes.io/component
+                            operator: In
+                            values: ["s3"]
+                      topologyKey: "kubernetes.io/hostname"
             # Use the sealed secret we just created
             existingSecret: "seaweedfs-s3-secret"
             ingress:
