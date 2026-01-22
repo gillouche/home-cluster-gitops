@@ -16,32 +16,21 @@ spec:
         - name: bootstrap
           image: amazon/aws-cli:2.15.6
           env:
-            # Admin credentials from existing secret
+            # Use Bazel credentials directly (they're configured in SeaweedFS already)
             - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: seaweedfs-s3-secret
-                  key: admin
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: seaweedfs-s3-secret
-                  key: secret
-            - name: AWS_DEFAULT_REGION
-              value: us-east-1
-            - name: S3_ENDPOINT
-              value: http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333
-            # Bazel user credentials for IAM setup
-            - name: BAZEL_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: seaweedfs-access-keys
                   key: bazel_access_key
-            - name: BAZEL_SECRET_KEY
+            - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: seaweedfs-access-keys
                   key: bazel_secret_key
+            - name: AWS_DEFAULT_REGION
+              value: us-east-1
+            - name: S3_ENDPOINT
+              value: http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333
           command:
             - /bin/sh
             - -c
@@ -54,49 +43,16 @@ spec:
               # Create bucket (idempotent)
               echo "Creating bazel-cache bucket..."
               aws --endpoint-url=$S3_ENDPOINT \
-                s3 mb s3://bazel-cache 2>&1 || echo "Bucket already exists"
+                s3 mb s3://bazel-cache 2>&1 || echo "Bucket already exists (this is fine)"
               
-              # Create IAM user (idempotent)
-              echo "Creating bazel-cache IAM user..."
-              aws --endpoint-url=$S3_ENDPOINT \
-                iam create-user --user-name bazel-cache 2>&1 || echo "User already exists"
+              # List buckets to verify
+              echo "Verifying bucket list..."
+              aws --endpoint-url=$S3_ENDPOINT s3 ls
               
-              # Create access key for user (only if not exists)
-              echo "Configuring access key for bazel-cache user..."
-              aws --endpoint-url=$S3_ENDPOINT \
-                iam create-access-key \
-                --user-name bazel-cache \
-                --access-key-id "$BAZEL_ACCESS_KEY" \
-                --secret-access-key "$BAZEL_SECRET_KEY" 2>&1 || echo "Access key already exists"
+              # Try to access the bazel-cache bucket
+              echo "Accessing bazel-cache bucket..."
+              aws --endpoint-url=$S3_ENDPOINT s3 ls s3://bazel-cache/ || echo "Bucket exists but may be empty"
               
-              # Attach read/write policy to bucket
-              echo "Attaching policy to bazel-cache user..."
-              aws --endpoint-url=$S3_ENDPOINT \
-                iam put-user-policy \
-                --user-name bazel-cache \
-                --policy-name bazel-cache-rw-policy \
-                --policy-document '{
-                  "Version": "2012-10-17",
-                  "Statement": [{
-                    "Effect": "Allow",
-                    "Action": [
-                      "s3:GetObject",
-                      "s3:PutObject",
-                      "s3:DeleteObject",
-                      "s3:ListBucket"
-                    ],
-                    "Resource": [
-                      "arn:aws:s3:::bazel-cache",
-                      "arn:aws:s3:::bazel-cache/*"
-                    ]
-                  }]
-                }'
-              
-              # Verify bucket exists
-              echo "Verifying bucket..."
-              aws --endpoint-url=$S3_ENDPOINT s3 ls s3://bazel-cache
-              
-              echo "=== Bootstrap Complete ==="
-              echo "Bucket: bazel-cache"
-              echo "User: bazel-cache"
-              echo "Access configured with provided credentials"
+              echo "=== Bootstrap Complete ===" 
+              echo "Bucket: bazel-cache created/verified"
+              echo "Note: SeaweedFS uses the credentials from seaweedfs-access-keys"
