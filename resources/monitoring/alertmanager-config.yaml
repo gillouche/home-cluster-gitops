@@ -16,8 +16,10 @@ spec:
       - matchers:
           - name: alertname
             value: Watchdog
-        receiver: 'discord-firing'
+        receiver: 'discord-heartbeat'
         repeatInterval: 5m
+
+      - matchers:
       
       # -- Critical Infrastructure --
       - matchers:
@@ -169,6 +171,22 @@ spec:
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '{{ if eq .Status "firing" }}💾 STORAGE{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
+      message: |-
+        {{ range .Alerts }}
+        {{ if ne .Labels.alertname "Watchdog" }}
+        • **{{ .Annotations.summary }}**
+          {{ .Annotations.description }}
+          *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
+          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
+        {{ end }}
+
+  - name: 'discord-heartbeat'
+    discordConfigs:
+    - apiURL:
+        key: prometheus-firing
+        name: monitoring-discord-webhooks
+      sendResolved: true
+      title: '{{ if eq .Status "firing" }}💓 HEARTBEAT{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
       message: |-
         {{ range .Alerts }}
         {{ if ne .Labels.alertname "Watchdog" }}
