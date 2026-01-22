@@ -61,6 +61,10 @@ spec:
                   volumeMounts:
                     - name: dind-sock
                       mountPath: /var/run
+                    - name: root-ca
+                      mountPath: /etc/ssl/certs/homelab-ca.crt
+                      subPath: ca.crt
+                      readOnly: true
                 - name: dind
                   image: docker:dind
                   args: ["dockerd", "--host=unix:///var/run/docker.sock", "--group=$(DOCKER_GROUP_GID)"]
