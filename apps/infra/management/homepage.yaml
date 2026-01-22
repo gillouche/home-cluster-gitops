@@ -17,17 +17,6 @@ spec:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
     path: resources/homepage
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: homepage
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
-  source:
     helm:
       values: |
         replicas: 2
@@ -54,3 +43,13 @@ spec:
                         operator: In
                         values: ["homepage"]
                   topologyKey: "kubernetes.io/hostname"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: homepage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
