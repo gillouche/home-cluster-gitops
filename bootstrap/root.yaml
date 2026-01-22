@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
-    path: apps/infra
+    path: apps
     directory:
       recurse: true
   destination:

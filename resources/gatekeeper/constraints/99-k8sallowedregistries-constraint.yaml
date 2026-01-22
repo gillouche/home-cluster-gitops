@@ -5,15 +5,8 @@ metadata:
     argocd.argoproj.io/sync-wave: '2'
   name: allow-approved-registries
 spec:
-  enforcementAction: dryrun
+  enforcementAction: deny
   match:
-    excludedNamespaces:
-    - kube-system
-    - gatekeeper-system
-    - kube-public
-    - longhorn-system
-    - kubernetes-dashboard
-    - sealed-secrets
     kinds:
     - apiGroups:
       - ''
@@ -27,6 +20,6 @@ spec:
         - playground
   parameters:
     registries:
-    - docker.io/library/
-    - ghcr.io/
-    - quay.io/
+    - nexus.gillouche.homelab/
+    - k8s.gcr.io/
+    - registry.k8s.io/

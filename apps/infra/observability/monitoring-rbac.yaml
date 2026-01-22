@@ -12,7 +12,7 @@ metadata:
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
-  project: default
+  project: infra-observability
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD

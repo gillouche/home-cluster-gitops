@@ -8,7 +8,7 @@ metadata:
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
-  project: default
+  project: infra-base
   ignoreDifferences:
     - group: apiextensions.k8s.io
       kind: CustomResourceDefinition

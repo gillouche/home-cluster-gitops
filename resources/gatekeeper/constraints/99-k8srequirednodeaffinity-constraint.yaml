@@ -1,0 +1,23 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredNodeAffinity
+metadata:
+  name: require-rpi-affinity
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: policy-tier
+          operator: In
+          values: ["playground"]
+  parameters:
+    message: "Playground workloads must run on Raspberry Pi nodes (node-group=rpi)."
+    nodeAffinity:
+      key: topology.kubernetes.io/node-group
+      operator: In
+      values: ["rpi"]

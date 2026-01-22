@@ -8,7 +8,7 @@ metadata:
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
-  project: default
+  project: infra-base
   sources:
     - chart: gha-runner-scale-set
       repoURL: "ghcr.io/actions/actions-runner-controller-charts"

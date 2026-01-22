@@ -5,15 +5,8 @@ metadata:
     argocd.argoproj.io/sync-wave: '2'
   name: block-nodeport-services
 spec:
-  enforcementAction: dryrun
+  enforcementAction: deny
   match:
-    excludedNamespaces:
-    - kube-system
-    - gatekeeper-system
-    - kube-public
-    - longhorn-system
-    - kubernetes-dashboard
-    - sealed-secrets
     kinds:
     - apiGroups:
       - ''

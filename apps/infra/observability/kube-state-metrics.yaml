@@ -12,7 +12,7 @@ metadata:
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
-  project: default
+  project: infra-observability
   source:
     chart: kube-state-metrics
     repoURL: https://prometheus-community.github.io/helm-charts

@@ -12,7 +12,7 @@ metadata:
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
-  project: default
+  project: infra-base
   source:
     chart: traefik
     repoURL: https://traefik.github.io/charts

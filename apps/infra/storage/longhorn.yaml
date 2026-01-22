@@ -12,7 +12,7 @@ metadata:
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
-  project: default
+  project: infra-storage
   sources:
     - chart: longhorn
       repoURL: https://charts.longhorn.io

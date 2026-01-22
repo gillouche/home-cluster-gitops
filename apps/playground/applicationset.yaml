@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: playground-apps
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - git:
+      repoURL: https://github.com/gillouche/playground.git
+      revision: HEAD
+      files:
+        - path: "apps/*/deploy/*/kustomization.yaml"
+
+  template:
+    metadata:
+      name: 'playground-{{ index .path.segments 3 }}-{{ index .path.segments 1 }}' # e.g. playground-test-demo-concept
+      annotations:
+        argocd.argoproj.io/sync-wave: "5"
+    spec:
+      project: 'playground-{{ index .path.segments 3 }}' # e.g. playground-test
+      source:
+        repoURL: https://github.com/gillouche/playground.git
+        targetRevision: HEAD
+        path: '{{ .path.path | dir }}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'playground-{{ index .path.segments 3 }}-{{ index .path.segments 1 }}' # e.g. playground-test-demo-concept
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+        managedNamespaceMetadata:
+          labels:
+            policy-tier: playground

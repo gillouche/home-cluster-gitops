@@ -12,7 +12,7 @@ metadata:
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
-  project: default
+  project: infra-base
   source:
     repoURL: https://github.com/ROCm/k8s-device-plugin
     targetRevision: amd-gpu-helm-0.21.0

@@ -1,0 +1,54 @@
+apiVersion: templates.gatekeeper.sh/v1beta1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequirednodeaffinity
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredNodeAffinity
+      validation:
+        openAPIV3Schema:
+          properties:
+            message:
+              type: string
+            nodeAffinity:
+              type: object
+              description: "The required node affinity spec."
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequirednodeaffinity
+
+        violation[{"msg": msg}] {
+          input.review.object.kind == "Pod"
+          not has_required_affinity(input.review.object.spec)
+          msg := get_message(input.parameters)
+        }
+
+        has_required_affinity(spec) {
+          affinity := spec.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution
+          term := affinity.nodeSelectorTerms[_]
+          match_expression(term)
+        }
+
+        match_expression(term) {
+          expression := term.matchExpressions[_]
+          expression.key == input.parameters.nodeAffinity.key
+          expression.operator == input.parameters.nodeAffinity.operator
+          verify_values(expression.values, input.parameters.nodeAffinity.values)
+        }
+
+        verify_values(actual, expected) {
+          # Check if at least one expected value is in actual values
+          some i
+          actual[i] == expected[_]
+        }
+
+        get_message(parameters) = msg {
+          msg := parameters.message
+        } else = msg {
+          msg := sprintf("Pod must have node affinity for key %v", [parameters.nodeAffinity.key])
+        }
