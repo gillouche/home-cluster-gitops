@@ -24,19 +24,30 @@ spec:
           controllerServiceAccount:
             namespace: arc-systems
             name: arc-controller-gha-rs-controller
-          containerMode:
-            type: "dind"
           
-          # Runner configuration
+          # Disable auto-dind to allow manual sidecar configuration
+          # containerMode:
+          #   type: "dind"
+
           template:
             spec:
               nodeSelector:
                 node-class: homeserver
+              volumes:
+                - name: dind-sock
+                  emptyDir: {}
+                - name: dind-externals
+                  emptyDir: {}
+                - name: root-ca
+                  secret:
+                    secretName: homelab-root-ca
               containers:
                 - name: runner
                   image: nexus.gillouche.homelab/docker-hosted/arc-runner:latest
                   command: ["/home/runner/run.sh"]
                   env:
+                    - name: DOCKER_HOST
+                      value: unix:///var/run/docker.sock
                     - name: NEXUS_USERNAME
                       valueFrom:
                         secretKeyRef:
@@ -47,6 +58,25 @@ spec:
                         secretKeyRef:
                           name: nexus-credentials
                           key: nexus_password
+                  volumeMounts:
+                    - name: dind-sock
+                      mountPath: /var/run
+                - name: dind
+                  image: docker:dind
+                  args: ["dockerd", "--host=unix:///var/run/docker.sock", "--group=$(DOCKER_GROUP_GID)"]
+                  env:
+                    - name: DOCKER_GROUP_GID
+                      value: "1001"
+                  securityContext:
+                    privileged: true
+                  volumeMounts:
+                    - name: dind-sock
+                      mountPath: /var/run
+                    - name: dind-externals
+                      mountPath: /home/runner/externals
+                    - name: root-ca
+                      mountPath: /etc/docker/certs.d/nexus.gillouche.homelab
+                      readOnly: true
     - repoURL: "https://github.com/gillouche/home-cluster-gitops.git"
       targetRevision: HEAD
       path: resources/ci
