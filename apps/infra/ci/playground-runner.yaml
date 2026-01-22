@@ -58,6 +58,17 @@ spec:
                         secretKeyRef:
                           name: nexus-credentials
                           key: nexus_password
+                    # Bazel remote cache credentials (SeaweedFS S3)
+                    - name: SEAWEEDFS_ACCESS_KEY
+                      valueFrom:
+                        secretKeyRef:
+                          name: bazel-cache-credentials
+                          key: bazel_access_key
+                    - name: SEAWEEDFS_SECRET_KEY
+                      valueFrom:
+                        secretKeyRef:
+                          name: bazel-cache-credentials
+                          key: bazel_secret_key
                   volumeMounts:
                     - name: dind-sock
                       mountPath: /var/run
