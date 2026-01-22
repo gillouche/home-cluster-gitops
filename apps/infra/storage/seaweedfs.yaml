@@ -30,16 +30,18 @@ spec:
                           operator: In
                           values: ["homeserver"]
               podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: app.kubernetes.io/name
-                          operator: In
-                          values: ["seaweedfs"]
-                        - key: app.kubernetes.io/component
-                          operator: In
-                          values: ["master"]
-                    topologyKey: "kubernetes.io/hostname"
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  - weight: 100
+                    podAffinityTerm:
+                      labelSelector:
+                        matchExpressions:
+                          - key: app.kubernetes.io/name
+                            operator: In
+                            values: ["seaweedfs"]
+                          - key: app.kubernetes.io/component
+                            operator: In
+                            values: ["master"]
+                      topologyKey: "kubernetes.io/hostname"
             data:
               type: "persistentVolumeClaim"
               size: "1Gi"
@@ -76,16 +78,18 @@ spec:
                           operator: In
                           values: ["homeserver"]
               podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: app.kubernetes.io/name
-                          operator: In
-                          values: ["seaweedfs"]
-                        - key: app.kubernetes.io/component
-                          operator: In
-                          values: ["volume"]
-                    topologyKey: "kubernetes.io/hostname"
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  - weight: 100
+                    podAffinityTerm:
+                      labelSelector:
+                        matchExpressions:
+                          - key: app.kubernetes.io/name
+                            operator: In
+                            values: ["seaweedfs"]
+                          - key: app.kubernetes.io/component
+                            operator: In
+                            values: ["volume"]
+                      topologyKey: "kubernetes.io/hostname"
             dataDirs:
               - name: data1
                 type: "persistentVolumeClaim"
@@ -103,16 +107,18 @@ spec:
                           operator: In
                           values: ["homeserver"]
               podAntiAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  - labelSelector:
-                      matchExpressions:
-                        - key: app.kubernetes.io/name
-                          operator: In
-                          values: ["seaweedfs"]
-                        - key: app.kubernetes.io/component
-                          operator: In
-                          values: ["filer"]
-                    topologyKey: "kubernetes.io/hostname"
+                preferredDuringSchedulingIgnoredDuringExecution:
+                  - weight: 100
+                    podAffinityTerm:
+                      labelSelector:
+                        matchExpressions:
+                          - key: app.kubernetes.io/name
+                            operator: In
+                            values: ["seaweedfs"]
+                          - key: app.kubernetes.io/component
+                            operator: In
+                            values: ["filer"]
+                      topologyKey: "kubernetes.io/hostname"
             data:
               type: "persistentVolumeClaim"
               size: "10Gi"
