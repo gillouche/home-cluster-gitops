@@ -110,13 +110,11 @@ spec:
                 routes:
                 - matchers:
                   - alertname = Watchdog
-                  receiver: 'discord-heartbeat'
+                  receiver: 'monitoring/discord-config/discord-heartbeat'
                   repeat_interval: 5m
               receivers:
               - name: 'null'
-              - name: 'discord-heartbeat'
-                # Moved to AlertmanagerConfig (resources/monitoring/alertmanager-config.yaml)
-                # to avoid Operator sync error with webhook_url_file
+
               templates:
               - '/etc/alertmanager/config/*.tmpl'
   
