@@ -16,47 +16,38 @@ spec:
         - name: bootstrap
           image: chrislusf/seaweedfs:4.07
           env:
-            # Bazel credentials from sealed secret (for s3.configure)
-            - name: BAZEL_ACCESS_KEY
+            - name: ACCESS_KEY
               valueFrom:
                 secretKeyRef:
                   name: seaweedfs-access-keys
                   key: bazel_access_key
-            - name: BAZEL_SECRET_KEY
+            - name: SECRET_KEY
               valueFrom:
                 secretKeyRef:
                   name: seaweedfs-access-keys
                   key: bazel_secret_key
-            # Filer endpoint for weed shell
-            - name: FILER_ENDPOINT
-              value: "seaweedfs-filer.seaweedfs.svc.cluster.local:8888"
           command:
             - sh
             - -c
             - |
               set -e
               
-              echo "=== SeaweedFS Bazel Cache Bootstrap (weed shell) ==="
-              echo "Filer: $FILER_ENDPOINT"
+              echo "=== SeaweedFS Bazel Cache Bootstrap ==="
               
-              # Use weed shell to configure S3
-              weed shell -master="$FILER_ENDPOINT" <<EOF
-              # Create bucket
+              # weed shell auto-discovers master/filer in-cluster
+              weed shell <<EOF
               s3.bucket.create -name=bazel-cache
               
-              # Create bazel user
               s3.configure \
                 -user=bazel-cache \
-                -access_key=$BAZEL_ACCESS_KEY \
-                -secret_key=$BAZEL_SECRET_KEY \
+                -access_key=\$ACCESS_KEY \
+                -secret_key=\$SECRET_KEY \
                 -actions=Read,Write,List \
                 -buckets=bazel-cache
               
-              # List buckets to verify
               s3.bucket.list
               EOF
               
               echo "=== Bootstrap Complete ==="
               echo "Created bucket: bazel-cache"
-              echo "Created user: bazel-cache"
-              echo "User has Read/Write/List access to bazel-cache bucket only"
+              echo "Configured user: bazel-cache with bucket-scoped permissions"
