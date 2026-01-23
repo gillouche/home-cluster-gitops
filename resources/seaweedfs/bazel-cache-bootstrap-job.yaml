@@ -40,10 +40,11 @@ spec:
                 -access_key=$ACCESS_KEY \
                 -secret_key=$SECRET_KEY \
                 -buckets=bazel-cache \
-                -actions=Read,Write,List
+                -actions=Read,Write,List \
+                -apply
 
-              s3.bucket.list
               s3.configure
+              s3.bucket.list
               EOF
 
               echo "=== Bootstrap Complete ==="
