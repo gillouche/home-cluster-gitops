@@ -31,22 +31,19 @@ spec:
             - |
               set -e
 
-              echo "=== SeaweedFS Bazel Cache Bootstrap ==="
+              echo "=== SeaweedFS Bazel Cache Bootstrap (v4.x) ==="
 
               weed shell -master=seaweedfs-master.seaweedfs.svc.cluster.local:9333 <<EOF
               s3.bucket.create -name=bazel-cache
 
-              s3.user.create \
-                -name=bazel-cache \
+              s3.configure \
                 -access_key=$ACCESS_KEY \
-                -secret_key=$SECRET_KEY
-
-              s3.user.attach \
-                -name=bazel-cache \
-                -bucket=bazel-cache \
+                -secret_key=$SECRET_KEY \
+                -buckets=bazel-cache \
                 -actions=Read,Write,List
 
               s3.bucket.list
+              s3.configuration
               EOF
 
               echo "=== Bootstrap Complete ==="
