@@ -23,7 +23,7 @@ spec:
       source:
         repoURL: https://github.com/gillouche/playground.git
         targetRevision: HEAD
-        path: '{{ .path.path | dir }}'
+        path: 'apps/{{ index .path.segments 1 }}/deploy/{{ index .path.segments 3 }}'
       destination:
         server: https://kubernetes.default.svc
         namespace: 'playground-{{ index .path.segments 3 }}-{{ index .path.segments 1 }}' # e.g. playground-test-demo-concept
