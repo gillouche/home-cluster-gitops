@@ -12,6 +12,8 @@ spec:
       revision: HEAD
       files:
         - path: "apps/*/deploy/*/kustomization.yaml"
+      exclude:
+        - path: "**/base/kustomization.yaml"
 
   template:
     metadata:
