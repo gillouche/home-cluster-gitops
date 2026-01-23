@@ -19,7 +19,6 @@ spec:
         receiver: 'discord-heartbeat'
         repeatInterval: 5m
 
-      - matchers:
       
       # -- Critical Infrastructure --
       - matchers:
