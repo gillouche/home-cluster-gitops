@@ -20,6 +20,6 @@ spec:
         - playground
   parameters:
     labels:
-    - app.kubernetes.io/name
-    - app.kubernetes.io/part-of
-    - app.kubernetes.io/managed-by
+    - app
+    - concept
+    - environment
