@@ -5,6 +5,8 @@ metadata:
   namespace: seaweedfs
   annotations:
     argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
 spec:
   backoffLimit: 3
   ttlSecondsAfterFinished: 600
@@ -13,31 +15,41 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: bootstrap
-          image: chrislusf/seaweedfs:4.07
-          env:
-            - name: ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: seaweedfs-access-keys
-                  key: bazel_access_key
-            - name: SECRET_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: seaweedfs-access-keys
-                  key: bazel_secret_key
+          image: curlimages/curl
           command:
             - sh
             - -c
             - |
-              set -euo pipefail
-
+              set -e
               echo "=== SeaweedFS Bazel Cache Bootstrap ==="
+              
+              FILER_HOST="seaweedfs-filer.seaweedfs.svc.cluster.local"
+              FILER_PORT="8888"
+              
+              echo "Waiting for Filer ($FILER_HOST:$FILER_PORT)..."
+              until curl -s http://$FILER_HOST:$FILER_PORT/ > /dev/null; do
+                echo "Waiting for filer..."
+                sleep 2
+              done
 
-              MASTER_SERVICE=seaweedfs-master.seaweedfs.svc.cluster.local:9333
-
-              echo "--- Creating bucket (master) ---"
-              weed shell -master=$MASTER_SERVICE <<EOF || true
-              s3.bucket.create -name=bazel-cache || echo "Bucket already exists"
-              EOF
-
-              echo "=== Bootstrap Complete ==="
+              echo "--- Applying S3 Configuration ---"
+              # Apply the JSON config directly to the Filer's admin API
+              # This bypasses the shell complexities and is the native way SeaweedFS stores config
+              curl -v -X POST \
+                "http://$FILER_HOST:$FILER_PORT/admin/s3_configuration" \
+                -H "Content-Type: application/json" \
+                -d @/etc/seaweedfs/s3_config.json
+              
+              echo -e "\n\n--- Verifying Configuration ---"
+              curl -s "http://$FILER_HOST:$FILER_PORT/admin/s3_configuration"
+              
+              echo -e "\n\n=== Bootstrap Complete ==="
+              
+          volumeMounts:
+            - name: access-keys
+              mountPath: /etc/seaweedfs
+              readOnly: true
+      volumes:
+        - name: access-keys
+          secret:
+            secretName: seaweedfs-access-keys
