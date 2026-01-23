@@ -36,14 +36,14 @@ spec:
               weed shell -master=seaweedfs-master.seaweedfs.svc.cluster.local:9333 <<EOF
               s3.bucket.create -name=bazel-cache
 
-              s3.configure \
-                -access_key=$ACCESS_KEY \
-                -secret_key=$SECRET_KEY \
+              s3.configure.identity \
+                -name=bazel-cache \
+                -credentials="$ACCESS_KEY:$SECRET_KEY" \
                 -buckets=bazel-cache \
                 -actions=Read,Write,List
 
               s3.bucket.list
-              s3.configuration
+              s3.configure
               EOF
 
               echo "=== Bootstrap Complete ==="
