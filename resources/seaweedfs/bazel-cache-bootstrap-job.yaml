@@ -15,36 +15,29 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: bootstrap
-          image: curlimages/curl
+          image: chrislusf/seaweedfs:4.07
           command:
             - sh
             - -c
             - |
               set -e
-              echo "=== SeaweedFS Bazel Cache Bootstrap ==="
+              echo "=== SeaweedFS Bootstrap ==="
               
-              FILER_HOST="seaweedfs-filer.seaweedfs.svc.cluster.local"
-              FILER_PORT="8888"
+              # Wait a moment for services to settle if running in strict sync wave
+              sleep 5
               
-              echo "Waiting for Filer ($FILER_HOST:$FILER_PORT)..."
-              until curl -s http://$FILER_HOST:$FILER_PORT/ > /dev/null; do
-                echo "Waiting for filer..."
-                sleep 2
-              done
-
-              echo "--- Applying S3 Configuration ---"
-              # Apply the JSON config directly to the Filer's admin API
-              # This bypasses the shell complexities and is the native way SeaweedFS stores config
-              curl -v -X POST \
-                "http://$FILER_HOST:$FILER_PORT/admin/s3_configuration" \
-                -H "Content-Type: application/json" \
-                -d @/etc/seaweedfs/s3_config.json
+              echo "Connecting to Master to create bucket and apply S3 config..."
               
-              echo -e "\n\n--- Verifying Configuration ---"
-              curl -s "http://$FILER_HOST:$FILER_PORT/admin/s3_configuration"
+              # Execute weed shell commands
+              # s3.bucket.create: Creates the bucket if it doesn't exist
+              # s3.configure: Applies the full S3 identity configuration from the mounted JSON file
               
-              echo -e "\n\n=== Bootstrap Complete ==="
+              weed shell -master=seaweedfs-master.seaweedfs.svc.cluster.local:9333 <<EOF
+              s3.bucket.create -name=bazel-cache
+              s3.configure -s3.config=/etc/seaweedfs/s3_config.json -apply 
+              EOF
               
+              echo "Bootstrap commands executed."
           volumeMounts:
             - name: access-keys
               mountPath: /etc/seaweedfs
