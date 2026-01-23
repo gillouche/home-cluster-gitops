@@ -40,15 +40,4 @@ spec:
               s3.bucket.create -name=bazel-cache || echo "Bucket already exists"
               EOF
 
-              echo "--- Configuring S3 identity (local filer) ---"
-              weed shell <<EOF
-              s3.configure \
-                -access_key=$ACCESS_KEY \
-                -secret_key=$SECRET_KEY \
-                -buckets=bazel-cache \
-                -actions=Read,Write,List \
-                -apply
-              s3.configure
-              EOF
-
               echo "=== Bootstrap Complete ==="
