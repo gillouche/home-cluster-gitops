@@ -110,7 +110,7 @@ spec:
                 routes:
                 - matchers:
                   - alertname = Watchdog
-                  receiver: 'monitoring/discord-config/discord-heartbeat'
+                  receiver: 'discord-heartbeat'
                   repeat_interval: 5m
               receivers:
               - name: 'null'
