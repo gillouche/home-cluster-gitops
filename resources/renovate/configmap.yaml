@@ -20,9 +20,9 @@ data:
           matchPackagePatterns: ['*'],
           postUpgradeTasks: {
             commands: [
-              `curl -X POST http://renovate-discord-relay.renovate.svc.cluster.local:3000/renovate \
-               -H "Content-Type: application/json" \
-               -d '{"depName":"' + process.env.RENOVATE_DEP_NAME + '","currentVersion":"' + process.env.RENOVATE_CURRENT_VERSION + '","newVersion":"' + process.env.RENOVATE_NEW_VERSION + '"}'`
+              "curl -X POST http://renovate-discord-relay.renovate.svc.cluster.local:3000/renovate \
+              -H 'Content-Type: application/json' \
+              -d \"{\\\"depName\\\":\\\"$RENOVATE_DEP_NAME\\\",\\\"currentVersion\\\":\\\"$RENOVATE_CURRENT_VERSION\\\",\\\"newVersion\\\":\\\"$RENOVATE_NEW_VERSION\\\"}\""
             ],
             executionMode: 'branch'
           }
