@@ -42,3 +42,4 @@ spec:
         managedNamespaceMetadata:
           labels:
             policy-tier: playground
+            goldilocks.fairwinds.com/enabled: "true"
