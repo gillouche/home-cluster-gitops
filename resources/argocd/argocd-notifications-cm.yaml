@@ -12,6 +12,27 @@ data:
     headers:
       - name: Content-Type
         value: application/json
+    
+    webhook:
+      discord:
+        method: POST
+        body: |
+          {
+            "embeds": [
+              {
+                "title": "✅ Application {{ .app.metadata.name }} Synced",
+                "description": "Synced successfully at `{{ .app.status.operationState.finishedAt }}`",
+                "color": 3066993,
+                "fields": [
+                  {"name": "Namespace", "value": "{{ .app.metadata.namespace }}", "inline": true},
+                  {"name": "Revision", "value": "{{ .app.status.sync.revision }}", "inline": true},
+                  {"name": "Health", "value": "{{ .app.status.health.status }}", "inline": true},
+                  {"name": "Status", "value": "{{ .app.status.operationState.phase }}", "inline": true}
+                ],
+                "footer": {"text": "ArgoCD Notifications"}
+              }
+            ]
+          }
 
   service.webhook.discord.playground: |
     url: $argocd-playground
