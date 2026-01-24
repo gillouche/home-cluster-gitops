@@ -22,7 +22,7 @@ spec:
           # Use existing storage class and SSD nodes
           prometheus:
             prometheusSpec:
-              replicas: 1
+              replicas: 2
               retention: 3d
               externalLabels:
                 namespace: monitoring
