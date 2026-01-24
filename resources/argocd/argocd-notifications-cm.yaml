@@ -203,3 +203,20 @@ data:
       send: [app-deployed]
       when: app.status.operationState.phase == 'Succeeded' && app.status.health.status == 'Healthy'
 
+  subscriptions: |
+    - recipients:
+        - discord-infra
+      selector: app.spec.project =~ "infra-.*"
+      triggers:
+        - on-sync-succeeded
+        - on-sync-failed
+        - on-health-degraded
+        - on-deployed
+    - recipients:
+        - discord-playground
+      selector: app.spec.project =~ "playground-.*"
+      triggers:
+        - on-sync-succeeded
+        - on-sync-failed
+        - on-health-degraded
+        - on-deployed
