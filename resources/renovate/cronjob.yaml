@@ -14,7 +14,7 @@ spec:
             node-class: homeserver
           containers:
             - name: renovate
-              image: renovate/renovate:42.92.2
+              image: renovate/renovate:42.92.4
               env:
                 - name: LOG_LEVEL
                   value: info
