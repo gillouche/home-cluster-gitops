@@ -206,7 +206,7 @@ data:
   subscriptions: |
     - recipients:
         - discord-infra
-      selector: app.spec.project in [infra-base, infra-observability, infra-security, infra-storage, default]
+      selector: app.spec.project in (infra-base, infra-observability, infra-security, infra-storage, default)
       triggers:
         - on-sync-succeeded
         - on-sync-failed
@@ -214,7 +214,7 @@ data:
         - on-deployed
     - recipients:
         - discord-playground
-      selector: app.spec.project notin [infra-base, infra-observability, infra-security, infra-storage, default]
+      selector: app.spec.project notin (infra-base, infra-observability, infra-security, infra-storage, default)
       triggers:
         - on-sync-succeeded
         - on-sync-failed
