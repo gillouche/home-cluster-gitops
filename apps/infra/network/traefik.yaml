@@ -5,10 +5,10 @@ metadata:
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "1"
-    notifications.argoproj.io/subscribe.on-sync-succeeded.webhook.discord: ""
-    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord: ""
-    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord: ""
-    notifications.argoproj.io/subscribe.on-deployed.webhook.discord: ""
+    notifications.argoproj.io/subscribe.on-sync-succeeded.webhook.discord.infra: ""
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord.infra: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord.infra: ""
+    notifications.argoproj.io/subscribe.on-deployed.webhook.discord.infra: ""
   finalizers:
     - argoproj.io/resources-finalizer
 spec:

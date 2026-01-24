@@ -7,13 +7,18 @@ metadata:
     app.kubernetes.io/name: argocd-notifications-controller
     app.kubernetes.io/part-of: argocd
 data:
-  service.webhook.discord: |
-    url: $argocd-sync
+  service.webhook.discord.infra: |
+    url: $argocd-infra
     headers:
       - name: Content-Type
         value: application/json
 
-  template.app-sync-succeeded: |
+  service.webhook.discord.playground: |
+    url: $argocd-playground
+    headers:
+      - name: Content-Type
+        value: application/json
+
     webhook:
       discord:
         method: POST
@@ -123,7 +128,14 @@ data:
 
   subscriptions: |
     - recipients:
-        - discord
+        - discord.infra
+      triggers:
+        - on-sync-succeeded
+        - on-sync-failed
+        - on-health-degraded
+        - on-deployed
+    - recipients:
+        - discord.playground
       triggers:
         - on-sync-succeeded
         - on-sync-failed

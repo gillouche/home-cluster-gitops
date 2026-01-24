@@ -22,6 +22,10 @@ spec:
       name: 'playground-{{ index .path.segments 3 }}-{{ index .path.segments 1 }}' # e.g. playground-test-demo-concept
       annotations:
         argocd.argoproj.io/sync-wave: "5"
+        notifications.argoproj.io/subscribe.on-sync-succeeded.webhook.discord.playground: ""
+        notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord.playground: ""
+        notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord.playground: ""
+        notifications.argoproj.io/subscribe.on-deployed.webhook.discord.playground: ""
     spec:
       project: 'playground-{{ index .path.segments 3 }}' # e.g. playground-test
       source:

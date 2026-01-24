@@ -5,6 +5,10 @@ metadata:
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "6" # Depends on Controller (5)
+    notifications.argoproj.io/subscribe.on-sync-succeeded.webhook.discord.infra: ""
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord.infra: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord.infra: ""
+    notifications.argoproj.io/subscribe.on-deployed.webhook.discord.infra: ""
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
@@ -58,6 +62,11 @@ spec:
                         secretKeyRef:
                           name: nexus-credentials
                           key: nexus_username
+                    - name: DISCORD_WEBHOOK_URL
+                      valueFrom:
+                        secretKeyRef:
+                          name: github-actions-discord-webhook
+                          key: github-actions
                     - name: NEXUS_PASSWORD
                       valueFrom:
                         secretKeyRef:
