@@ -13,6 +13,8 @@ spec:
       labels:
         app: renovate-discord-relay
     spec:
+      nodeSelector:
+        node-class: homeserver
       containers:
         - name: relay
           image: nexus.gillouche.homelab/docker-hosted/renovate-discord-relay:latest
