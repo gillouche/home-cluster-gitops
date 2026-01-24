@@ -38,3 +38,7 @@ spec:
       name: neuvector-cert-upgrader-pod
       jsonPointers:
         - /metadata/annotations/cert-upgrader-uid
+    - group: admissionregistration.k8s.io
+      kind: ValidatingWebhookConfiguration
+      jsonPointers:
+        - /webhooks/0/clientConfig/caBundle
