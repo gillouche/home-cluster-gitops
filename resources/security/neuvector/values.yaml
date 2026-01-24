@@ -31,6 +31,8 @@ core:
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: web
         traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
+        traefik.ingress.kubernetes.io/service.serversscheme: https
+        traefik.ingress.kubernetes.io/service.serverstransport: neuvector-insecure@kubernetescrd
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
