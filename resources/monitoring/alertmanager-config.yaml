@@ -17,7 +17,7 @@ spec:
           - name: alertname
             value: Watchdog
         receiver: 'discord-heartbeat'
-        repeatInterval: 5m
+        repeatInterval: 30m
 
       
       # -- Critical Infrastructure --

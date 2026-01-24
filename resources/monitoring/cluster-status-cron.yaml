@@ -90,7 +90,7 @@ data:
                 {"name": "Memory", "value": mem_text, "inline": True},
                 {"name": "Storage (Longhorn)", "value": storage_text, "inline": True}
             ],
-            "footer": {"text": "10-minute Heartbeat"}
+            "footer": {"text": "Hourly Heartbeat"}
         }
 
         payload = {"embeds": [embed]}
@@ -117,7 +117,7 @@ metadata:
   name: cluster-status-reporter
   namespace: monitoring
 spec:
-  schedule: "*/10 * * * *"
+  schedule: "0 * * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   jobTemplate:
