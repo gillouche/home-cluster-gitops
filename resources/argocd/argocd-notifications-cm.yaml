@@ -7,13 +7,13 @@ metadata:
     app.kubernetes.io/name: argocd-notifications-controller
     app.kubernetes.io/part-of: argocd
 data:
-  service.webhook.discord.infra: |
+  service.webhook.discord-infra: |
     url: $argocd-infra
     headers:
       - name: Content-Type
         value: application/json
 
-  service.webhook.discord.playground: |
+  service.webhook.discord-playground: |
     url: $argocd-playground
     headers:
       - name: Content-Type
@@ -21,7 +21,7 @@ data:
 
   template.app-sync-succeeded: |
     webhook:
-      discord.infra:
+      discord-infra:
         method: POST
         body: |
           {
@@ -40,7 +40,7 @@ data:
               }
             ]
           }
-      discord.playground:
+      discord-playground:
         method: POST
         body: |
           {
@@ -62,7 +62,7 @@ data:
 
   template.app-sync-failed: |
     webhook:
-      discord.infra:
+      discord-infra:
         method: POST
         body: |
           {
@@ -81,7 +81,7 @@ data:
               }
             ]
           }
-      discord.playground:
+      discord-playground:
         method: POST
         body: |
           {
@@ -103,7 +103,7 @@ data:
 
   template.app-health-degraded: |
     webhook:
-      discord.infra:
+      discord-infra:
         method: POST
         body: |
           {
@@ -122,7 +122,7 @@ data:
               }
             ]
           }
-      discord.playground:
+      discord-playground:
         method: POST
         body: |
           {
@@ -144,7 +144,7 @@ data:
 
   template.app-deployed: |
     webhook:
-      discord.infra:
+      discord-infra:
         method: POST
         body: |
           {
@@ -163,7 +163,7 @@ data:
               }
             ]
           }
-      discord.playground:
+      discord-playground:
         method: POST
         body: |
           {
@@ -205,14 +205,14 @@ data:
 
   subscriptions: |
     - recipients:
-        - webhook:discord.infra
+        - discord-infra
       triggers:
         - on-sync-succeeded
         - on-sync-failed
         - on-health-degraded
         - on-deployed
     - recipients:
-        - webhook:discord.playground
+        - discord-playground
       triggers:
         - on-sync-succeeded
         - on-sync-failed
