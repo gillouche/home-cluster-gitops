@@ -44,7 +44,7 @@ spec:
                       topologyKey: "kubernetes.io/hostname"
             data:
               type: "persistentVolumeClaim"
-              size: "1Gi"
+              size: "5Gi"
               storageClass: "longhorn"
             
             # Increase timeouts for stability
@@ -98,7 +98,7 @@ spec:
             dataDirs:
               - name: data1
                 type: "persistentVolumeClaim"
-                size: "50Gi"
+                size: "200Gi"
                 storageClass: "longhorn"
 
           filer:
@@ -126,7 +126,7 @@ spec:
                       topologyKey: "kubernetes.io/hostname"
             data:
               type: "persistentVolumeClaim"
-              size: "10Gi"
+              size: "20Gi"
               storageClass: "longhorn"
             ingress:
               enabled: true
