@@ -2,7 +2,7 @@ apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: renovate
-  namespace: argocd
+  namespace: renovate
 spec:
   schedule: "0 0 * * *" # Run twice per week (Monday and Thursday)
   concurrencyPolicy: Forbid

@@ -1,0 +1,14 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: renovate-notifications-secret
+  namespace: renovate
+spec:
+  encryptedData:
+    renovate-updates: AgC0tAhOp7zGzbqr8VNybrnDpOQ5JwoTECt+ZxHXzCfeKEnfeMacPRyvY74w+SZTnKudg8pjapU1gbX3Muf84bmq0bh/BWMZ0uu7oQH+RRR12kgVoSlw+QIMhcqryvXvV3R2XljtRfeKwRdq4AMhrrYgRbA13DSwQvb0I1QgeT60N21N83Tomx4s2V2/rjY1jIfJ9SJ7u+vrWz4oghA86HihbNk/ADZNy9nBo4DqXIVVOoVSMOA9TJgE+bkPubyXc2xl3er6+r1BUgadR5X95dqKDYvGZaDj8TS/RYnWI+MZKa1F+OTm5Xs7bMJxF9rXukVU2NnwwNbkq7RYb6tvkQEY5cGou1D6d2Q/Iv8j9jnKrAv88HGw8sda6LrsrmiGrag041yMtNyOJwdTHF++jPqvoMlhbuXTc0fVoyUoE04V5A+IrYpjS5vg2X4bWGMHKavekj3crIqqRalvYCscXbA92TYA/9REwU7xqz4rLuegGkyoNgTW8Qj2sz9hobbbayukPh87LTvNqz23rpu+PLhKIHDdVBBeLOWGfv3wx13dfj9zq1QTKXpSRBmUNZ2HUEooUvKkN4bwZLfaOJxzw0PWh5WURjEoTw8b8yLBAMNBSnMzKNUhFAaAH9WiqQ8jat/Xk3ctBYFfujqLzNI8nvOgitse2BMWiuHaKNZ2R55JeU/28N4r98WAF8HmXfKKv0ybCJfwxiX83acmaJ3eKP0bvaDKc9P2p3wcZphoz/Htc1mw8Fnlg7tLpn7HVXVQ/GNpylNy0/Gyt/fK5pdcM453JGigBMntAHxk7cFZ2JP0NHKAi+WvS/+uEjBcroyXib18n7AZGx7jh0BXaZmoOqa6/exabHhY1SHe
+  template:
+    metadata:
+      name: renovate-notifications-secret
+      namespace: renovate
+    type: Opaque
