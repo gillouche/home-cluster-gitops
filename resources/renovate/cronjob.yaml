@@ -31,12 +31,6 @@ spec:
                     secretKeyRef:
                       name: renovate-config
                       key: token
-                - name: DISCORD_WEBHOOK
-                  valueFrom:
-                    secretKeyRef:
-                      name: argocd-notifications-secret
-                      key: renovate-updates
-                      optional: true
               volumeMounts:
                 - name: config-volume
                   mountPath: /app/renovate-config
