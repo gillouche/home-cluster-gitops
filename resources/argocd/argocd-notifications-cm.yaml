@@ -205,14 +205,14 @@ data:
 
   subscriptions: |
     - recipients:
-        - discord.infra
+        - webhook:discord.infra
       triggers:
         - on-sync-succeeded
         - on-sync-failed
         - on-health-degraded
         - on-deployed
     - recipients:
-        - discord.playground
+        - webhook:discord.playground
       triggers:
         - on-sync-succeeded
         - on-sync-failed
