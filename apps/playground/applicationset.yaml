@@ -11,11 +11,9 @@ spec:
       repoURL: https://github.com/gillouche/playground.git
       revision: HEAD
       files:
-        - path: "apps/*/deploy/*/kustomization.yaml"
-      exclude:
-        - path: "**/base/kustomization.yaml"
-        - path: "**/sandbox/kustomization.yaml"
-        - path: "apps/*/*/deploy/**"
+        - path: "apps/*/deploy/dev/kustomization.yaml"
+        - path: "apps/*/deploy/test/kustomization.yaml"
+        - path: "apps/*/deploy/prod/kustomization.yaml"
 
   template:
     metadata:
