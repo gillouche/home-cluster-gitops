@@ -206,7 +206,6 @@ data:
   subscriptions: |
     - recipients:
         - discord-infra
-      selector: app.spec.project in (infra-base, infra-security, infra-observability, infra-storage, default)
       triggers:
         - on-sync-succeeded
         - on-sync-failed
