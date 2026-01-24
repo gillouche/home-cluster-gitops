@@ -96,7 +96,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
+          *Started: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
 
   - name: 'discord-critical'
@@ -112,7 +112,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
+          *Started: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
 
   - name: 'discord-warning'
@@ -128,7 +128,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
+          *Started: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
 
   - name: 'discord-info'
@@ -144,7 +144,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
+          *Started: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
 
   - name: 'discord-network'
@@ -160,7 +160,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
+          *Started: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
 
   - name: 'discord-storage'
@@ -176,7 +176,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
+          *Started: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
 
   - name: 'discord-heartbeat'
@@ -191,7 +191,7 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
+          *Started: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*
         {{ end }}
 
 
@@ -208,5 +208,5 @@ spec:
         • **{{ .Annotations.summary }}**
           {{ .Annotations.description }}
           *Node: {{ if .Labels.node }}{{ .Labels.node }}{{ end }}{{ if and .Labels.node .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else if .Labels.instance }} ({{ .Labels.instance | reReplaceAll ":\\d+$" "" }}){{ else }}N/A{{ end }}*
-          *Time: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
+          *Started: {{ .StartsAt.Format "2006-01-02T15:04:05Z07:00" }}*{{ end }}
         {{ end }}
