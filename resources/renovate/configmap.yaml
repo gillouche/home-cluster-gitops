@@ -12,12 +12,20 @@ data:
       requireConfig: false,
 
       prCreation: 'immediate',
-
-      webhook: {
-        url: 'http://renovate-discord-relay.renovate.svc.cluster.local:3000/renovate',
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
+      
+      allowedPostUpgradeCommands: ['^curl'],
+      
+      packageRules: [
+        {
+          matchPackagePatterns: ['*'],
+          postUpgradeTasks: {
+            commands: [
+              `curl -X POST http://renovate-discord-relay.renovate.svc.cluster.local:3000/renovate \
+               -H "Content-Type: application/json" \
+               -d '{"depName":"' + process.env.RENOVATE_DEP_NAME + '","currentVersion":"' + process.env.RENOVATE_CURRENT_VERSION + '","newVersion":"' + process.env.RENOVATE_NEW_VERSION + '"}'`
+            ],
+            executionMode: 'branch'
+          }
         }
-      }
+      ]
     };
