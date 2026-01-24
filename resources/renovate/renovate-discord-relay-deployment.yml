@@ -18,6 +18,7 @@ spec:
       containers:
         - name: relay
           image: nexus.gillouche.homelab/docker-hosted/renovate-discord-relay:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 3000
           env:
