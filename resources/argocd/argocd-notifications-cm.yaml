@@ -183,39 +183,59 @@ data:
             ]
           }
 
-  trigger.on-sync-succeeded: |
-    - description: Application sync succeeded
+  trigger.on-sync-succeeded-infra: |
+    - description: Application sync succeeded (Infra)
       send: [app-sync-succeeded]
-      when: app.status.operationState.phase in ['Succeeded']
+      when: app.status.operationState.phase in ['Succeeded'] and app.spec.project matches 'infra-.*'
 
-  trigger.on-sync-failed: |
-    - description: Application sync failed
+  trigger.on-sync-failed-infra: |
+    - description: Application sync failed (Infra)
       send: [app-sync-failed]
-      when: app.status.operationState.phase in ['Failed', 'Error']
+      when: app.status.operationState.phase in ['Failed', 'Error'] and app.spec.project matches 'infra-.*'
 
-  trigger.on-health-degraded: |
-    - description: Application health degraded
+  trigger.on-health-degraded-infra: |
+    - description: Application health degraded (Infra)
       send: [app-health-degraded]
-      when: app.status.health.status == 'Degraded'
+      when: app.status.health.status == 'Degraded' and app.spec.project matches 'infra-.*'
 
-  trigger.on-deployed: |
-    - description: Application deployed and healthy
+  trigger.on-deployed-infra: |
+    - description: Application deployed and healthy (Infra)
       send: [app-deployed]
-      when: app.status.operationState.phase == 'Succeeded' && app.status.health.status == 'Healthy'
+      when: app.status.operationState.phase == 'Succeeded' and app.status.health.status == 'Healthy' and app.spec.project matches 'infra-.*'
+
+  trigger.on-sync-succeeded-playground: |
+    - description: Application sync succeeded (Playground)
+      send: [app-sync-succeeded]
+      when: app.status.operationState.phase in ['Succeeded'] and app.spec.project matches 'playground-.*'
+
+  trigger.on-sync-failed-playground: |
+    - description: Application sync failed (Playground)
+      send: [app-sync-failed]
+      when: app.status.operationState.phase in ['Failed', 'Error'] and app.spec.project matches 'playground-.*'
+
+  trigger.on-health-degraded-playground: |
+    - description: Application health degraded (Playground)
+      send: [app-health-degraded]
+      when: app.status.health.status == 'Degraded' and app.spec.project matches 'playground-.*'
+
+  trigger.on-deployed-playground: |
+    - description: Application deployed and healthy (Playground)
+      send: [app-deployed]
+      when: app.status.operationState.phase == 'Succeeded' and app.status.health.status == 'Healthy' and app.spec.project matches 'playground-.*'
 
   subscriptions: |
     - recipients:
         - discord-infra
       triggers:
-        - on-sync-succeeded
-        - on-sync-failed
-        - on-health-degraded
-        - on-deployed
+        - on-sync-succeeded-infra
+        - on-sync-failed-infra
+        - on-health-degraded-infra
+        - on-deployed-infra
   
     - recipients:
         - discord-playground
       triggers:
-        - on-sync-succeeded
-        - on-sync-failed
-        - on-health-degraded
-        - on-deployed
+        - on-sync-succeeded-playground
+        - on-sync-failed-playground
+        - on-health-degraded-playground
+        - on-deployed-playground
