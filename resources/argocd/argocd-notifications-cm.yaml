@@ -206,7 +206,7 @@ data:
   subscriptions: |
     - recipients:
         - discord-infra
-      selector: app.spec.project == 'default' || app.spec.project =~ '^infra-.*'
+      selector: app.spec.project in (infra-base, infra-security, infra-observability, infra-storage, default)
       triggers:
         - on-sync-succeeded
         - on-sync-failed
@@ -215,7 +215,6 @@ data:
   
     - recipients:
         - discord-playground
-      selector: app.spec.project =~ '^playground-.*'
       triggers:
         - on-sync-succeeded
         - on-sync-failed
