@@ -13,20 +13,11 @@ data:
 
       prCreation: 'immediate',
       
-      allowedPostUpgradeCommands: ['^curl', '^env', '^echo'],
+      allowedPostUpgradeCommands: [],
       
       packageRules: [
         {
           matchPackagePatterns: ['*'],
-          postUpgradeTasks: {
-            commands: [
-              "env",
-              "curl -X POST http://renovate-discord-relay.renovate.svc.cluster.local:3000/renovate \
-              -H 'Content-Type: application/json' \
-              -d \"{\\\"depName\\\":\\\"$RENOVATE_DEP_NAME\\\",\\\"currentVersion\\\":\\\"$RENOVATE_CURRENT_VERSION\\\",\\\"newVersion\\\":\\\"$RENOVATE_NEW_VERSION\\\"}\""
-            ],
-            executionMode: 'branch'
-          }
         }
       ]
     };

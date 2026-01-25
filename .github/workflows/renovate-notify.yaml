@@ -1,0 +1,40 @@
+name: Notify Discord on Renovate PR
+
+on:
+  pull_request:
+    types: [opened]
+
+permissions:
+  contents: read
+
+jobs:
+  notify-renovate:
+    if: github.event.pull_request.user.login == 'renovate[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Renovate PR notification to Discord
+        env:
+          WEBHOOK_URL: ${{ secrets.DISCORD_RENOVATE_WEBHOOK }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          jq -n \
+            --arg title "$PR_TITLE" \
+            --arg url "$PR_URL" \
+            --arg repo "$REPO" \
+            --arg branch "$BRANCH" \
+            '{
+              content: "🤖 **Renovate opened a PR**",
+              embeds: [{
+                title: $title,
+                url: $url,
+                description: ("Repo: " + $repo + "\nBranch: " + $branch),
+                color: 15105570
+              }]
+            }' | \
+          curl -s -X POST \
+            -H "Content-Type: application/json" \
+            -d @- \
+            "$WEBHOOK_URL"
