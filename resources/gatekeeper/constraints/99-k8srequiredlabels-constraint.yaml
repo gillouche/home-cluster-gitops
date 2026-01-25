@@ -8,10 +8,14 @@ spec:
   enforcementAction: deny
   match:
     kinds:
-    - apiGroups:
-      - apps
-      kinds:
-      - Deployment
+    - apiGroups: [""]
+      kinds: ["Service", "ConfigMap", "Secret", "PersistentVolumeClaim", "ServiceAccount", "Pod"]
+    - apiGroups: ["apps"]
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+    - apiGroups: ["batch"]
+      kinds: ["Job", "CronJob"]
+    - apiGroups: ["networking.k8s.io"]
+      kinds: ["Ingress"]
     namespaceSelector:
       matchExpressions:
       - key: policy-tier
