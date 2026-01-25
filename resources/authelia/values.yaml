@@ -100,8 +100,6 @@ secret:
           path: jwt_secret
         - key: session_secret
           path: session_secret
-        - key: session_secret
-          path: session_secret
         - key: storage_encryption_key
           path: storage_encryption_key
         - key: postgres_password
