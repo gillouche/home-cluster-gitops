@@ -19,6 +19,15 @@ dashboard:
   # Security is handled by Authelia
   security:
     enabled: false
+  
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-class
+                operator: In
+                values: ["homeserver"]
 
 prometheus:
   create: false
@@ -29,9 +38,25 @@ prometheus:
 # DNS Server for DNSChaos
 dnsServer:
   create: true
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-class
+                operator: In
+                values: ["homeserver"]
 
 # Controller Manager configuration
 controllerManager:
   # Default behavior: Chaos only in the namespace where the CR is defined
   # We will enforce this via Gatekeeper or simply usage conventions for now
   enableLeaderElection: true
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-class
+                operator: In
+                values: ["homeserver"]
