@@ -1,0 +1,12 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sAllowedNamespacePattern
+metadata:
+  name: chaos-mesh-namespace-policy
+spec:
+  match:
+    groups: ["chaos-mesh.org"]
+    kinds:
+      - kind: "*"
+  parameters:
+    # Allow playground namespaces and the system namespace (chaos-mesh)
+    regex: "^(playground-.*|chaos-mesh)$"

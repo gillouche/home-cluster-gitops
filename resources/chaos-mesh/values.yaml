@@ -1,0 +1,37 @@
+# Chaos Mesh Helm Values
+
+# Use containerd runtime for K3s
+chaosDaemon:
+  runtime: containerd
+  socketPath: /run/k3s/containerd/containerd.sock
+
+dashboard:
+  create: true
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - name: chaos.k3s.gillouche.homelab
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web
+      traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
+  
+  # Security is handled by Authelia
+  security:
+    enabled: false
+
+prometheus:
+  create: false
+  # Connect to existing Prometheus
+  # Using the service name from 'monitoring' namespace
+  prometheusAddress: http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090
+
+# DNS Server for DNSChaos
+dnsServer:
+  create: true
+
+# Controller Manager configuration
+controllerManager:
+  # Default behavior: Chaos only in the namespace where the CR is defined
+  # We will enforce this via Gatekeeper or simply usage conventions for now
+  enableLeaderElection: true
