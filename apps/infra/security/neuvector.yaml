@@ -42,3 +42,28 @@ spec:
       kind: ValidatingWebhookConfiguration
       jsonPointers:
         - /webhooks/0/clientConfig/caBundle
+    - group: ""
+      kind: Secret
+      name: neuvector-controller-secret
+      jsonPointers:
+        - /data
+    - group: ""
+      kind: Secret
+      name: neuvector-manager-secret
+      jsonPointers:
+        - /data
+    - group: ""
+      kind: Secret
+      name: neuvector-internal-certs
+      jsonPointers:
+        - /data
+    - group: apps
+      kind: Deployment
+      name: neuvector-controller-pod
+      jsonPointers:
+        - /spec/template/metadata/annotations/checksum~1controller-secret
+    - group: apps
+      kind: Deployment
+      name: neuvector-manager-pod
+      jsonPointers:
+        - /spec/template/metadata/annotations/checksum~1manager-secret
