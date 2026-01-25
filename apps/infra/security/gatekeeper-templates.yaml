@@ -26,3 +26,8 @@ spec:
       selfHeal: true
     syncOptions:
       - Validate=false
+  ignoreDifferences:
+    - group: templates.gatekeeper.sh
+      kind: ConstraintTemplate
+      jsonPointers:
+        - /status
