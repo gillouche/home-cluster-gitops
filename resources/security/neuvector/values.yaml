@@ -26,8 +26,7 @@ core:
     ingress:
       enabled: true
       className: traefik
-      hosts:
-        - neuvector.k3s.gillouche.homelab
+      host: neuvector.k3s.gillouche.homelab
       annotations:
         traefik.ingress.kubernetes.io/router.entrypoints: web
         traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
