@@ -137,6 +137,11 @@ data:
         - policy: bypass
           domain:
             - 'auth.k3s.gillouche.homelab'
+        - policy: bypass
+          domain:
+            - '*.dev.k3s.gillouche.homelab'
+            - '*.test.k3s.gillouche.homelab'
+            - '*.prod.k3s.gillouche.homelab'
         - policy: one_factor
           domain:
             - '*.k3s.gillouche.homelab'
