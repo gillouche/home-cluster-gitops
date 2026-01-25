@@ -196,12 +196,13 @@ data:
   trigger.on-health-degraded-infra: |
     - description: Application health degraded (Infra)
       send: [app-health-degraded]
-      when: app.status.health.status == 'Degraded' and app.spec.project matches 'infra-.*'
+      when: app.status.health.status in ['Degraded', 'Missing', 'Unknown'] and app.spec.project matches 'infra-.*'
 
   trigger.on-deployed-infra: |
     - description: Application deployed and healthy (Infra)
       send: [app-deployed]
       when: app.status.operationState.phase == 'Succeeded' and app.status.health.status == 'Healthy' and app.spec.project matches 'infra-.*'
+      oncePer: app.status.sync.revision
 
   trigger.on-sync-succeeded-playground: |
     - description: Application sync succeeded (Playground)
@@ -216,18 +217,18 @@ data:
   trigger.on-health-degraded-playground: |
     - description: Application health degraded (Playground)
       send: [app-health-degraded]
-      when: app.status.health.status == 'Degraded' and app.spec.project matches 'playground-.*'
+      when: app.status.health.status in ['Degraded', 'Missing', 'Unknown'] and app.spec.project matches 'playground-.*'
 
   trigger.on-deployed-playground: |
     - description: Application deployed and healthy (Playground)
       send: [app-deployed]
       when: app.status.operationState.phase == 'Succeeded' and app.status.health.status == 'Healthy' and app.spec.project matches 'playground-.*'
+      oncePer: app.status.sync.revision
 
   subscriptions: |
     - recipients:
         - discord-infra
       triggers:
-        - on-sync-succeeded-infra
         - on-sync-failed-infra
         - on-health-degraded-infra
         - on-deployed-infra
@@ -235,7 +236,6 @@ data:
     - recipients:
         - discord-playground
       triggers:
-        - on-sync-succeeded-playground
         - on-sync-failed-playground
         - on-health-degraded-playground
         - on-deployed-playground
