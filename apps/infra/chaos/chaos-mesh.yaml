@@ -23,6 +23,9 @@ spec:
     - repoURL: https://github.com/gillouche/home-cluster-gitops.git
       targetRevision: HEAD
       ref: values
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      path: resources/chaos-mesh/manifests
   destination:
     server: https://kubernetes.default.svc
     namespace: chaos-mesh
