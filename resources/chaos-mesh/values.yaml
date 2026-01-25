@@ -60,3 +60,4 @@ controllerManager:
               - key: node-class
                 operator: In
                 values: ["homeserver"]
+  replicaCount: 2

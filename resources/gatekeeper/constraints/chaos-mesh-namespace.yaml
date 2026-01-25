@@ -4,9 +4,9 @@ metadata:
   name: chaos-mesh-namespace-policy
 spec:
   match:
-    groups: ["chaos-mesh.org"]
     kinds:
-      - kind: "*"
+      - apiGroups: ["chaos-mesh.org"]
+        kinds: ["*"]
   parameters:
     # Allow playground namespaces and the system namespace (chaos-mesh)
     regex: "^(playground-.*|chaos-mesh)$"
