@@ -68,9 +68,8 @@ core:
       # Tune for Pi performance
       resources:
         requests:
-          memory: 500Mi
-          cpu: 200m
-          cpu: 1000m
+          memory: 256Mi
+          cpu: 100m
 
   enforcer:
     resources:

@@ -71,8 +71,8 @@ spec:
               cpu: 10m
               memory: 50Mi
             limits:
-              cpu: 1000m
-              memory: 1Gi
+              cpu: 500m
+              memory: 256Mi
       volumes:
         - name: config-ro
           configMap:
