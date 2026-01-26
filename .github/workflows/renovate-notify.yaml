@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   notify-renovate:
-    if: github.event.pull_request.user.login == 'renovate[bot]'
+    if: startsWith(github.head_ref, 'renovate/') || github.event.pull_request.user.login == 'renovate[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Send Renovate PR notification to Discord
