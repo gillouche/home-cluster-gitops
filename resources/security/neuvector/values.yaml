@@ -21,6 +21,13 @@ core:
                 - key: node-class
                   operator: In
                   values: ["homeserver"]
+    resources:
+      requests:
+        memory: 256Mi
+        cpu: 100m
+      limits:
+        memory: 2Gi
+        cpu: 2000m
 
   manager:
     ingress:
@@ -63,6 +70,13 @@ core:
         requests:
           memory: 500Mi
           cpu: 200m
-        limits:
-          memory: 2Gi
           cpu: 1000m
+
+  enforcer:
+    resources:
+      requests:
+        memory: 128Mi
+        cpu: 50m
+      limits:
+        memory: 2Gi
+        cpu: 2000m

@@ -41,6 +41,13 @@ spec:
         - name: init-config
           image: busybox:latest
           command: ['sh', '-c', 'cp -L /app/config-ro/* /app/config/']
+          resources:
+            requests:
+              cpu: 10m
+              memory: 10Mi
+            limits:
+              cpu: 200m
+              memory: 64Mi
           volumeMounts:
             - name: config-ro
               mountPath: /app/config-ro
@@ -64,8 +71,8 @@ spec:
               cpu: 10m
               memory: 50Mi
             limits:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 1000m
+              memory: 1Gi
       volumes:
         - name: config-ro
           configMap:

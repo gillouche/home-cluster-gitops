@@ -34,6 +34,13 @@ spec:
                     resources:
                       requests:
                         storage: 50Gi
+              resources:
+                requests:
+                  memory: 512Mi
+                  cpu: 250m
+                limits:
+                  memory: 4Gi
+                  cpu: 2000m
               affinity:
                 nodeAffinity:
                   requiredDuringSchedulingIgnoredDuringExecution:
@@ -79,6 +86,13 @@ spec:
                     resources:
                       requests:
                         storage: 5Gi
+              resources:
+                requests:
+                  memory: 128Mi
+                  cpu: 50m
+                limits:
+                  memory: 2Gi
+                  cpu: 2000m
               affinity:
                 nodeAffinity:
                   requiredDuringSchedulingIgnoredDuringExecution:
@@ -221,8 +235,22 @@ spec:
           # Replace standalone exporters
           nodeExporter:
             enabled: true
+            resources:
+              requests:
+                memory: 32Mi
+                cpu: 10m
+              limits:
+                memory: 512Mi
+                cpu: 500m
           kubeStateMetrics:
             enabled: true
+            resources:
+              requests:
+                memory: 64Mi
+                cpu: 10m
+              limits:
+                memory: 1Gi
+                cpu: 500m
   
           # Disable some defaults that might be too heavy for RPIs or not needed yet
           kubeProxy:
