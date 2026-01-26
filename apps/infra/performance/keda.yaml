@@ -1,0 +1,35 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: keda
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+    notifications.argoproj.io/subscribe.on-sync-succeeded.webhook.discord-infra: ""
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-infra: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-infra: ""
+    notifications.argoproj.io/subscribe.on-deployed.webhook.discord-infra: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-performance
+  sources:
+    - chart: keda
+      repoURL: https://kedacore.github.io/charts
+      targetRevision: 2.18.3
+      helm:
+        valueFiles:
+          - $values/resources/performance/keda/values.yaml
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: keda
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
