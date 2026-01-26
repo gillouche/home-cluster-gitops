@@ -21,6 +21,14 @@ core:
                 - key: node-class
                   operator: In
                   values: ["homeserver"]
+    # Safety limits to prevent Node OOM
+    resources:
+      requests:
+        memory: 1Gi
+        cpu: 500m
+      limits:
+        memory: 4Gi
+        cpu: 2000m
 
   manager:
     ingress:
@@ -59,5 +67,17 @@ core:
                     operator: In
                     values: ["homeserver"]
       # Tune for Pi performance
+      resources:
+        requests:
+          memory: 512Mi
+          cpu: 100m
 
   enforcer:
+    # Safety limits to prevent Node OOM
+    resources:
+      requests:
+        memory: 512Mi
+        cpu: 100m
+      limits:
+        memory: 4Gi
+        cpu: 2000m
