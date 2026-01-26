@@ -21,13 +21,6 @@ core:
                 - key: node-class
                   operator: In
                   values: ["homeserver"]
-    resources:
-      requests:
-        memory: 256Mi
-        cpu: 100m
-      limits:
-        memory: 2Gi
-        cpu: 2000m
 
   manager:
     ingress:
@@ -66,16 +59,5 @@ core:
                     operator: In
                     values: ["homeserver"]
       # Tune for Pi performance
-      resources:
-        requests:
-          memory: 256Mi
-          cpu: 100m
 
   enforcer:
-    resources:
-      requests:
-        memory: 128Mi
-        cpu: 50m
-      limits:
-        memory: 2Gi
-        cpu: 2000m
