@@ -22,6 +22,8 @@ spec:
           enabled: true
           size: 10Gi
 
+        replicas: 2
+        
         # Node Placement (Root)
         nodeSelector:
           node-class: homeserver
@@ -29,6 +31,18 @@ spec:
           - key: "node-role.kubernetes.io/control-plane"
             operator: "Exists"
             effect: "NoSchedule"
+
+        # High Availability: Spread across nodes
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - labelSelector:
+                  matchExpressions:
+                    - key: app.kubernetes.io/name
+                      operator: In
+                      values:
+                        - tempo
+                topologyKey: "kubernetes.io/hostname"
 
         tempo:
           repository: grafana/tempo
