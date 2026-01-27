@@ -29,8 +29,6 @@ spec:
               s3:
                 bucket: tempo
                 endpoint: seaweedfs-s3.seaweedfs.svc.cluster.local:8333
-                access_key: "${S3_ACCESS_KEY}"
-                secret_key: "${S3_SECRET_KEY}"
                 insecure: true
         
         # Deploy as StatefulSet for stability (monolithic)
@@ -45,13 +43,19 @@ spec:
             operator: "Exists"
             effect: "NoSchedule"
 
-        # Ingester configuration (if split) or Global Config
-        # Tempo chart configuration for S3 credentials usually goes via env vars or existingSecret.
-        # We'll use extraEnvFrom pointing to a secret 'tempo-secrets'
-        
-        extraEnvFrom:
-          - secretRef:
-              name: tempo-secrets
+        # Map secrets to standard AWS Environment Variables
+        # Tempo's S3 client will automatically use these if config keys are missing.
+        extraEnv:
+          - name: AWS_ACCESS_KEY_ID
+            valueFrom:
+              secretKeyRef:
+                name: tempo-secrets
+                key: tempo_access_key
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: tempo-secrets
+                key: tempo_secret_key
 
   destination:
     server: https://kubernetes.default.svc
