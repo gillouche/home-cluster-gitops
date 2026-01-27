@@ -11,6 +11,11 @@ metadata:
     - argoproj.io/resources-finalizer
 spec:
   project: infra-ci
+  ignoreDifferences:
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      jsonPointers:
+        - /spec/preserveUnknownFields
   source:
     chart: argo-rollouts
     repoURL: https://argoproj.github.io/argo-helm
