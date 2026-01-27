@@ -17,32 +17,12 @@ spec:
     targetRevision: 1.24.3
     helm:
       values: |
-        tempo:
-          repository: grafana/tempo
-          tag: 2.9.0
-          retention: 24h
-
-          # Force legacy port 3100 to avoid conflicts/duplicates with new defaults
-          server:
-            http_listen_port: 3100
-
-          metricsGenerator:
-            enabled: false
-          
-          # Monolithic mode for simplicity
-          storage:
-            trace:
-              backend: s3
-              s3:
-                bucket: tempo
-                endpoint: seaweedfs-s3.seaweedfs.svc.cluster.local:8333
-                insecure: true
-        
-        # Deploy as StatefulSet for stability (monolithic)
-        statefulSet:
+        # Persistence (Root)
+        persistence:
           enabled: true
-        
-        # Run on Homeserver
+          size: 10Gi
+
+        # Node Placement (Root)
         nodeSelector:
           node-class: homeserver
         tolerations:
@@ -50,19 +30,37 @@ spec:
             operator: "Exists"
             effect: "NoSchedule"
 
-        # Map secrets to standard AWS Environment Variables
-        # Tempo's S3 client will automatically use these if config keys are missing.
-        extraEnv:
-          - name: AWS_ACCESS_KEY_ID
-            valueFrom:
-              secretKeyRef:
-                name: tempo-secrets
-                key: tempo_access_key
-          - name: AWS_SECRET_ACCESS_KEY
-            valueFrom:
-              secretKeyRef:
-                name: tempo-secrets
-                key: tempo_secret_key
+        tempo:
+          repository: grafana/tempo
+          tag: 2.9.0
+          # retention: 24h # S3 retention handled by backend/lifecycle
+
+          # Storage
+          storage:
+            trace:
+              backend: s3
+              s3:
+                bucket: tempo
+                endpoint: seaweedfs-s3.seaweedfs.svc.cluster.local:8333
+                insecure: true
+                s3forcepathstyle: true
+          
+          # Metrics Generator
+          metricsGenerator:
+            enabled: false
+
+          # Environment Variables (Under tempo)
+          extraEnv:
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: tempo-secrets
+                  key: tempo_access_key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: tempo-secrets
+                  key: tempo_secret_key
 
   destination:
     server: https://kubernetes.default.svc
