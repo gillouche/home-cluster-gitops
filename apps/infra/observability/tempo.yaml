@@ -28,8 +28,7 @@ spec:
               backend: s3
               s3:
                 bucket: tempo
-                endpoint: http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333
-                region: us-east-1
+                endpoint: seaweedfs-s3.seaweedfs.svc.cluster.local:8333
                 insecure: true
         
         # Deploy as StatefulSet for stability (monolithic)
