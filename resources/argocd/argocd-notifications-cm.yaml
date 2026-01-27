@@ -19,47 +19,6 @@ data:
       - name: Content-Type
         value: application/json
 
-  template.app-sync-succeeded: |
-    webhook:
-      discord-infra:
-        method: POST
-        body: |
-          {
-            "embeds": [
-              {
-                "title": "✅ Application {{ .app.metadata.name }} Synced",
-                "description": "Synced successfully at `{{ .app.status.operationState.finishedAt }}`",
-                "color": 3066993,
-                "fields": [
-                  {"name": "Namespace", "value": "{{ .app.metadata.namespace }}", "inline": true},
-                  {"name": "Revision", "value": "{{ .app.status.sync.revision }}", "inline": true},
-                  {"name": "Health", "value": "{{ .app.status.health.status }}", "inline": true},
-                  {"name": "Status", "value": "{{ .app.status.operationState.phase }}", "inline": true}
-                ],
-                "footer": {"text": "ArgoCD Notifications"}
-              }
-            ]
-          }
-      discord-playground:
-        method: POST
-        body: |
-          {
-            "embeds": [
-              {
-                "title": "✅ Application {{ .app.metadata.name }} Synced",
-                "description": "Synced successfully at `{{ .app.status.operationState.finishedAt }}`",
-                "color": 3066993,
-                "fields": [
-                  {"name": "Namespace", "value": "{{ .app.metadata.namespace }}", "inline": true},
-                  {"name": "Revision", "value": "{{ .app.status.sync.revision }}", "inline": true},
-                  {"name": "Health", "value": "{{ .app.status.health.status }}", "inline": true},
-                  {"name": "Status", "value": "{{ .app.status.operationState.phase }}", "inline": true}
-                ],
-                "footer": {"text": "ArgoCD Notifications"}
-              }
-            ]
-          }
-
   template.app-sync-failed: |
     webhook:
       discord-infra:
@@ -144,25 +103,6 @@ data:
 
   template.app-deployed: |
     webhook:
-      discord-infra:
-        method: POST
-        body: |
-          {
-            "embeds": [
-              {
-                "title": "🎉 Application {{ .app.metadata.name }} Deployed",
-                "description": "Deployed successfully and healthy at `{{ .app.status.operationState.finishedAt }}`",
-                "color": 3066993,
-                "fields": [
-                  {"name": "Namespace", "value": "{{ .app.metadata.namespace }}", "inline": true},
-                  {"name": "Revision", "value": "{{ .app.status.sync.revision }}", "inline": true},
-                  {"name": "Health", "value": "{{ .app.status.health.status }}", "inline": true},
-                  {"name": "Status", "value": "{{ .app.status.operationState.phase }}", "inline": true}
-                ],
-                "footer": {"text": "ArgoCD Notifications"}
-              }
-            ]
-          }
       discord-playground:
         method: POST
         body: |
@@ -183,11 +123,6 @@ data:
             ]
           }
 
-  trigger.on-sync-succeeded-infra: |
-    - description: Application sync succeeded (Infra)
-      send: [app-sync-succeeded]
-      when: app.status.operationState.phase in ['Succeeded'] and app.spec.project matches 'infra-.*'
-
   trigger.on-sync-failed-infra: |
     - description: Application sync failed (Infra)
       send: [app-sync-failed]
@@ -203,11 +138,6 @@ data:
       send: [app-deployed]
       when: app.status.operationState.phase == 'Succeeded' and app.status.health.status == 'Healthy' and app.spec.project matches 'infra-.*'
       oncePer: app.status.sync.revision
-
-  trigger.on-sync-succeeded-playground: |
-    - description: Application sync succeeded (Playground)
-      send: [app-sync-succeeded]
-      when: app.status.operationState.phase in ['Succeeded'] and app.spec.project matches 'playground-.*'
 
   trigger.on-sync-failed-playground: |
     - description: Application sync failed (Playground)
@@ -231,7 +161,6 @@ data:
       triggers:
         - on-sync-failed-infra
         - on-health-degraded-infra
-        - on-deployed-infra
   
     - recipients:
         - discord-playground
