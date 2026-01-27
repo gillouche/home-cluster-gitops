@@ -43,7 +43,7 @@ spec:
                 bucket: tempo
                 endpoint: seaweedfs-s3.seaweedfs.svc.cluster.local:8333
                 insecure: true
-                force_path_style: true
+                forcepathstyle: true
           
           # Metrics Generator
           metricsGenerator:
