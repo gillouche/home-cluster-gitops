@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: playground-policies
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - git:
+      repoURL: https://github.com/gillouche/playground.git
+      revision: HEAD
+      files:
+        - path: "apps/*/deploy/dev/kustomization.yaml"
+        - path: "apps/*/deploy/test/kustomization.yaml"
+        - path: "apps/*/deploy/prod/kustomization.yaml"
+  template:
+    metadata:
+      name: 'policy-{{ index .path.segments 3 }}-{{ index .path.segments 1 }}'
+    spec:
+      project: infra-security
+      source:
+        repoURL: https://github.com/gillouche/home-cluster-gitops.git
+        targetRevision: HEAD
+        path: resources/security/network-policies
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: 'playground-{{ index .path.segments 3 }}-{{ index .path.segments 1 }}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=false # Namespace should already exist from the app itself

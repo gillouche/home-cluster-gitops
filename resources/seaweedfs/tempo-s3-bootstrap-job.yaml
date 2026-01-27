@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: tempo-s3-bootstrap
+  namespace: seaweedfs
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 600
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: bootstrap
+          image: chrislusf/seaweedfs:4.07
+          env:
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: seaweedfs-access-keys
+                  key: tempo_access_key
+            - name: S3_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: seaweedfs-access-keys
+                  key: tempo_secret_key
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              echo "=== Tempo S3 Bootstrap ==="
+              sleep 5
+              
+              weed shell -master=seaweedfs-master.seaweedfs.svc.cluster.local:9333 <<EOF
+              s3.bucket.create -name=tempo
+              s3.configure -user=tempo -access_key=$S3_ACCESS_KEY -secret_key=$S3_SECRET_KEY -actions=Read:tempo,Write:tempo,List:tempo -apply
+              EOF
+              
+              echo "Bootstrap commands executed."
+          volumeMounts: []
+      volumes: []

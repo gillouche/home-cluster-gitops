@@ -1,0 +1,66 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: tempo
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "12"
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-infra: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-infra: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-observability
+  source:
+    chart: tempo
+    repoURL: https://grafana.github.io/helm-charts
+    targetRevision: 1.18.3
+    helm:
+      values: |
+        tempo:
+          repository: grafana/tempo
+          tag: 2.7.1
+          retention: 24h
+          
+          # Monolithic mode for simplicity
+          storage:
+            trace:
+              backend: s3
+              s3:
+                bucket: tempo
+                endpoint: seaweedfs-s3.seaweedfs.svc.cluster.local:8333
+                site: main
+                access_key: "${S3_ACCESS_KEY}"
+                secret_key: "${S3_SECRET_KEY}"
+                insecure: true
+        
+        # Deploy as StatefulSet for stability (monolithic)
+        statefulSet:
+          enabled: true
+        
+        # Run on Homeserver
+        nodeSelector:
+          node-class: homeserver
+        tolerations:
+          - key: "node-role.kubernetes.io/control-plane"
+            operator: "Exists"
+            effect: "NoSchedule"
+
+        # Ingester configuration (if split) or Global Config
+        # Tempo chart configuration for S3 credentials usually goes via env vars or existingSecret.
+        # We'll use extraEnvFrom pointing to a secret 'tempo-secrets'
+        
+        extraEnvFrom:
+          - secretRef:
+              name: tempo-secrets
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
