@@ -19,8 +19,15 @@ spec:
       values: |
         tempo:
           repository: grafana/tempo
-          tag: 2.7.1
+          tag: 2.9.0
           retention: 24h
+
+          # Force legacy port 3100 to avoid conflicts/duplicates with new defaults
+          server:
+            http_listen_port: 3100
+
+          metricsGenerator:
+            enabled: false
           
           # Monolithic mode for simplicity
           storage:
