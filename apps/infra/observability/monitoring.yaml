@@ -141,6 +141,13 @@ spec:
                         - key: node-class
                           operator: In
                           values: ["homeserver"]
+            
+            sidecar:
+              dashboards:
+                enabled: true
+                label: grafana_dashboard
+                searchNamespace: ALL
+            
             ingress:
               enabled: true
               ingressClassName: traefik
