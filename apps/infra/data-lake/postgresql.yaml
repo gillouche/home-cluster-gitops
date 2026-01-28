@@ -14,7 +14,7 @@ spec:
   sources:
     - chart: postgresql
       repoURL: https://charts.bitnami.com/bitnami
-      targetRevision: 15.5.30
+      targetRevision: 18.2.3
       helm:
         values: |
           fullnameOverride: postgresql
