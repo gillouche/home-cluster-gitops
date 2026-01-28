@@ -21,6 +21,10 @@ spec:
             registry: ghcr.io
             repository: googlecloudplatform/spark-operator
             tag: v1beta2-1.3.8-3.1.1
+          # Fix for root user in image
+          securityContext:
+            runAsNonRoot: false
+            runAsUser: 0
           webhook:
             enable: true
           

@@ -18,7 +18,9 @@ spec:
       helm:
         values: |
           image:
-            tag: "16.4.0-debian-12-r12" # Explicit specific tag
+            registry: docker.io
+            repository: library/postgres
+            tag: 16-alpine
           
           fullnameOverride: postgresql
           
