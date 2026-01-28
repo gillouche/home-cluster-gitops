@@ -13,8 +13,8 @@ spec:
   project: infra-data-lake
   sources:
     - chart: polaris
-      repoURL: https://charts.polaris-catalog.service
-      targetRevision: 0.1.0 # This is a placeholder, need to verify robust chart source
+      repoURL: https://downloads.apache.org/incubator/polaris/helm-chart
+      targetRevision: 0.1.0-incubating
       helm:
         values: |
           replicaCount: 2
