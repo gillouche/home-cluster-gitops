@@ -1,0 +1,65 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: trino
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-infra: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-infra: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-storage
+  sources:
+    - chart: trino
+      repoURL: https://trinodb.github.io/charts
+      targetRevision: 0.21.0
+      helm:
+        values: |
+          server:
+            workers: 2
+            coordinator:
+              jvm:
+                maxHeapSize: "2G"
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                      - matchExpressions:
+                          - key: node-class
+                            operator: In
+                            values: ["homeserver"]
+            worker:
+              jvm:
+                maxHeapSize: "4G"
+              affinity:
+                nodeAffinity:
+                  requiredDuringSchedulingIgnoredDuringExecution:
+                    nodeSelectorTerms:
+                      - matchExpressions:
+                          - key: node-class
+                            operator: In
+                            values: ["homeserver"]
+          
+          # Catalog Configuration
+          additionalCatalogs:
+            iceberg: |
+              connector.name=iceberg
+              iceberg.catalog.type=rest
+              iceberg.rest-catalog.uri=http://polaris:8181/api/catalog
+              iceberg.rest-catalog.warehouse=s3a://iceberg-data
+              # S3 Configuration
+              fs.native-s3.enabled=true
+              s3.endpoint=http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333
+              s3.path-style-access=true
+              
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: data-lake
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,64 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: postgresql
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-infra: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-infra: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-storage
+  sources:
+    - chart: postgresql
+      repoURL: oci://registry-1.docker.io/bitnamicharts
+      targetRevision: 15.5.30
+      helm:
+        values: |
+          fullnameOverride: postgresql
+          
+          # Auth configuration
+          auth:
+            username: polaris
+            database: polaris
+            # Secure password management
+            existingSecret: "lake-secrets"
+            passwordSecretKey: "postgres_polaris_password"
+            usernameSecretKey: "postgres_polaris_user"
+            
+          # Persistence
+          primary:
+            persistence:
+              enabled: true
+              storageClass: longhorn
+              size: 8Gi
+          
+          # Resource limits
+          primary:
+            resources:
+              requests:
+                cpu: 250m
+                memory: 512Mi
+              limits:
+                cpu: 500m
+                memory: 1Gi
+            # Node Affinity for homeserver
+            affinity:
+              nodeAffinity:
+                requiredDuringSchedulingIgnoredDuringExecution:
+                  nodeSelectorTerms:
+                    - matchExpressions:
+                        - key: node-class
+                          operator: In
+                          values: ["homeserver"]
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: data-lake
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

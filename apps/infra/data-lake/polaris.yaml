@@ -1,0 +1,60 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: polaris
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-infra: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-infra: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-storage
+  sources:
+    - chart: polaris
+      repoURL: https://charts.polaris-catalog.service
+      targetRevision: 0.1.0 # This is a placeholder, need to verify robust chart source
+      helm:
+        values: |
+          replicaCount: 2
+          
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: node-class
+                        operator: In
+                        values: ["homeserver"]
+
+          # Persistence Configuration
+          persistence:
+            type: eclipse-link
+            url: jdbc:postgresql://postgresql:5432/polaris
+            username: polaris
+            passwordFromSecret:
+              name: lake-secrets
+              key: postgres_polaris_password
+            
+          # Storage Configuration (SeaweedFS)
+          defaultRealm:
+            storage:
+              type: s3
+              endpoint: http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333
+              accessKeyIdFromSecret:
+                name: lake-access-keys
+                key: lake_access_key
+              secretAccessKeyFromSecret:
+                name: lake-access-keys
+                key: lake_secret_key
+              
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: data-lake
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

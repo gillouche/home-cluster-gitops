@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: spark-operator
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-infra: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-infra: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-storage
+  sources:
+    - chart: spark-operator
+      repoURL: https://googlecloudplatform.github.io/spark-on-k8s-operator
+      targetRevision: 1.1.27
+      helm:
+        values: |
+          image:
+            repository: gcr.io/spark-operator/spark-operator
+            tag: v1beta2-1.3.8-3.1.1
+          webhook:
+            enable: true
+          
+          # Node Affinity
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: node-class
+                        operator: In
+                        values: ["homeserver"]
+
+          # Metrics integration
+          metrics:
+            enable: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: data-lake
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
