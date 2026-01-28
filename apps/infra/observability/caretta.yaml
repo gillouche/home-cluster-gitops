@@ -38,6 +38,11 @@ spec:
         # Disable PSP (removed in K8s 1.25+)
         rbac:
           pspEnabled: false
+
+        # Disable PSP for sub-chart (Victoria Metrics)
+        victoria-metrics-single:
+          rbac:
+            pspEnabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
