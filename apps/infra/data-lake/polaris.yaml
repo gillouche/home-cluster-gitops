@@ -46,7 +46,7 @@ spec:
 
           # Persistence Configuration
           persistence:
-            type: eclipse-link
+            type: relational-jdbc
             url: jdbc:postgresql://postgresql:5432/polaris
             username: polaris
             passwordFromSecret:
