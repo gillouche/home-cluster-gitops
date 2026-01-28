@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: https://helm.groundcover.com
     chart: caretta
-    targetRevision: 0.1.7 # Pinning to recent stable
+    targetRevision: 0.0.16
     helm:
       values: |
         # Dashboard: We will use the main Grafana's sidecar to load this
