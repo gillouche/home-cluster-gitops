@@ -14,7 +14,7 @@ spec:
   sources:
     - chart: polaris
       repoURL: https://downloads.apache.org/incubator/polaris/helm-chart
-      targetRevision: 0.1.0-incubating
+      targetRevision: 1.3.0
       helm:
         values: |
           replicaCount: 2
