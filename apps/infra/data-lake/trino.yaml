@@ -48,13 +48,14 @@ spec:
                   memory: "3Gi"
                   cpu: "2"
               affinity:
-                nodeAffinity:
-                  requiredDuringSchedulingIgnoredDuringExecution:
-                    nodeSelectorTerms:
-                      - matchExpressions:
-                          - key: node-class
-                            operator: In
-                            values: ["homeserver"]
+              # affinity: # Removed in favor of nodeSelector
+              #   nodeAffinity:
+              #     requiredDuringSchedulingIgnoredDuringExecution:
+              #       nodeSelectorTerms:
+              #         - matchExpressions:
+              #             - key: node-class
+              #               operator: In
+              #               values: ["homeserver"]
             worker:
               jvm:
                 maxHeapSize: "4G"

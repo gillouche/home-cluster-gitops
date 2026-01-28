@@ -12,45 +12,6 @@ metadata:
 spec:
   project: infra-data-lake
   sources:
-    - chart: postgresql
-      repoURL: https://charts.bitnami.com/bitnami
-      targetRevision: 18.2.3
-      helm:
-        values: |
-          global:
-            security:
-              allowInsecureImages: true
-          image:
-            registry: docker.io
-            repository: library/postgres
-            tag: 16-alpine
-          
-          fullnameOverride: postgresql
-          
-          # Auth configuration
-          auth:
-            username: polaris
-            database: polaris
-            # Secure password management
-            existingSecret: "lake-secrets"
-            secretKeys:
-              adminPasswordKey: "postgres_polaris_password"
-              userPasswordKey: "postgres_polaris_password"
-            
-          # Persistence
-          primary:
-            persistence:
-              enabled: true
-              storageClass: longhorn
-              size: 8Gi
-          
-          # Resource limits
-          primary:
-            resources:
-              requests:
-                cpu: 250m
-                memory: 512Mi
-              limits:
                 cpu: 500m
                 memory: 1Gi
             # Node Affinity for homeserver
