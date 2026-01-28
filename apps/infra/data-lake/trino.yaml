@@ -14,7 +14,7 @@ spec:
   sources:
     - chart: trino
       repoURL: https://trinodb.github.io/charts
-      targetRevision: 1.42.0
+      targetRevision: 1.41.0
       helm:
         values: |
           imagePullSecrets: []
@@ -46,7 +46,7 @@ spec:
                   cpu: "500m"
                 limits:
                   memory: "3Gi"
-                  cpu: "2"
+                  memory: "3Gi"
                   cpu: "2"
               nodeSelector:
                 node-class: homeserver
@@ -59,7 +59,7 @@ spec:
                   cpu: "1"
                 limits:
                   memory: "6Gi" # Increased for safety
-                  cpu: "4"
+                  memory: "6Gi" # Increased for safety
                   cpu: "4"
               nodeSelector:
                 node-class: homeserver
