@@ -1,0 +1,45 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: caretta
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-observability
+  source:
+    repoURL: https://helm.groundcover.com
+    chart: caretta
+    targetRevision: 0.1.7 # Pinning to recent stable
+    helm:
+      values: |
+        # Dashboard: We will use the main Grafana's sidecar to load this
+        grafana:
+          enabled: false
+          sidecar:
+            dashboards:
+              enabled: true
+              label: grafana_dashboard
+
+        
+        # Enable Prometheus ServiceMonitor
+        serviceMonitor:
+          enabled: true
+          # Select correct labels for your Prometheus operator
+          additionalLabels: 
+            release: monitoring 
+
+        # Tolerations for all nodes (Pis + Server)
+        tolerations:
+          - operator: "Exists"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

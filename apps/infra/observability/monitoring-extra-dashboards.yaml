@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monitoring-extra-dashboards
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-observability
+  source:
+    repoURL: https://github.com/gillouche/home-cluster-gitops.git
+    targetRevision: main
+    path: resources/observability/dashboards
+    directory:
+      recurse: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
