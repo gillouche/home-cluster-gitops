@@ -49,6 +49,19 @@ spec:
                 name: lake-access-keys
                 key: lake_secret_key
               
+          # Bootstrap Credentials (Inject deterministic root keys)
+          extraEnv:
+            - name: POLARIS_BOOTSTRAP_ROOT_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: lake-secrets
+                  key: polaris_root_id
+            - name: POLARIS_BOOTSTRAP_ROOT_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: lake-secrets
+                  key: polaris_root_secret
+              
   destination:
     server: https://kubernetes.default.svc
     namespace: data-lake
