@@ -77,6 +77,16 @@ spec:
                 secretKeyRef:
                   name: lake-secrets
                   key: polaris_root_secret
+            # Force Quarkus Datasource Configuration
+            - name: QUARKUS_DATASOURCE_JDBC_URL
+              value: jdbc:postgresql://postgresql:5432/polaris
+            - name: QUARKUS_DATASOURCE_USERNAME
+              value: polaris
+            - name: QUARKUS_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: lake-secrets
+                  key: postgres_polaris_password
               
   destination:
     server: https://kubernetes.default.svc

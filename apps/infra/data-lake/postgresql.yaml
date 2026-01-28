@@ -18,7 +18,7 @@ spec:
       helm:
         values: |
           image:
-            tag: "16" # Floating tag to avoid specific revision failures
+            tag: "16.4.0-debian-12-r12" # Explicit specific tag
           
           fullnameOverride: postgresql
           
