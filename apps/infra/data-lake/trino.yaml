@@ -47,15 +47,9 @@ spec:
                 limits:
                   memory: "3Gi"
                   cpu: "2"
-              affinity:
-              # affinity: # Removed in favor of nodeSelector
-              #   nodeAffinity:
-              #     requiredDuringSchedulingIgnoredDuringExecution:
-              #       nodeSelectorTerms:
-              #         - matchExpressions:
-              #             - key: node-class
-              #               operator: In
-              #               values: ["homeserver"]
+                  cpu: "2"
+              nodeSelector:
+                node-class: homeserver
             worker:
               jvm:
                 maxHeapSize: "4G"
@@ -66,14 +60,9 @@ spec:
                 limits:
                   memory: "6Gi" # Increased for safety
                   cpu: "4"
-              affinity:
-                nodeAffinity:
-                  requiredDuringSchedulingIgnoredDuringExecution:
-                    nodeSelectorTerms:
-                      - matchExpressions:
-                          - key: node-class
-                            operator: In
-                            values: ["homeserver"]
+                  cpu: "4"
+              nodeSelector:
+                node-class: homeserver
           
           # Catalog Configuration
           additionalCatalogs:

@@ -40,6 +40,7 @@ spec:
           # Webhook Configuration
           webhook:
             enable: true
+            createRbac: true
             # Fix for root user in image
             securityContext:
               runAsNonRoot: false
