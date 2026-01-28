@@ -37,32 +37,32 @@ spec:
 
           server:
             workers: 2
-            coordinator:
-              jvm:
-                maxHeapSize: "2G"
-              resources:
-                requests:
-                  memory: "2.5Gi"
-                  cpu: "500m"
-                limits:
-                  memory: "3Gi"
-                  memory: "3Gi"
-                  cpu: "2"
-              nodeSelector:
-                node-class: homeserver
-            worker:
-              jvm:
-                maxHeapSize: "4G"
-              resources:
-                requests:
-                  memory: "4.5Gi"
-                  cpu: "1"
-                limits:
-                  memory: "6Gi" # Increased for safety
-                  memory: "6Gi" # Increased for safety
-                  cpu: "4"
-              nodeSelector:
-                node-class: homeserver
+            
+          coordinator:
+            jvm:
+              maxHeapSize: "2G"
+            resources:
+              requests:
+                memory: "2.5Gi"
+                cpu: "500m"
+              limits:
+                memory: "3Gi"
+                cpu: "2"
+            nodeSelector:
+              node-class: homeserver
+
+          worker:
+            jvm:
+              maxHeapSize: "4G"
+            resources:
+              requests:
+                memory: "4.5Gi"
+                cpu: "1"
+              limits:
+                memory: "6Gi" # Increased for safety
+                cpu: "4"
+            nodeSelector:
+              node-class: homeserver
           
           # Catalog Configuration
           additionalCatalogs:
