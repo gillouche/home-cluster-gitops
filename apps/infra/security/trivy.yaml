@@ -33,6 +33,9 @@ spec:
             - key: "node-role.kubernetes.io/control-plane"
               operator: "Exists"
               effect: "NoSchedule"
+        scanJob:
+          nodeSelector: '{"node-class":"homeserver"}'
+          tolerations: '[{"key":"node-role.kubernetes.io/control-plane","operator":"Exists","effect":"NoSchedule"}]'
         serviceMonitor:
           enabled: true
           namespace: monitoring # Important for Prometheus Operator to pick it up if configured that way
