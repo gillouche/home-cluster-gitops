@@ -17,6 +17,9 @@ spec:
       targetRevision: 18.2.3
       helm:
         values: |
+          image:
+            tag: 16.4.0-debian-12-r0 # Explicitly set a known tag if default is missing
+          
           fullnameOverride: postgresql
           
           # Auth configuration

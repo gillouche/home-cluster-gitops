@@ -18,8 +18,8 @@ spec:
       helm:
         values: |
           image:
-            repository: gcr.io/spark-operator/spark-operator
-            tag: 2.4.0
+            repository: ghcr.io/googlecloudplatform/spark-operator
+            tag: v2.4.0
           webhook:
             enable: true
           
