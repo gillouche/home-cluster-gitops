@@ -12,17 +12,9 @@ metadata:
 spec:
   project: infra-data-lake
   sources:
-                cpu: 500m
-                memory: 1Gi
-            # Node Affinity for homeserver
-            affinity:
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                        - key: node-class
-                          operator: In
-                          values: ["homeserver"]
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      path: resources/data-lake/postgres
   destination:
     server: https://kubernetes.default.svc
     namespace: data-lake
