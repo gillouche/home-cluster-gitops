@@ -13,7 +13,7 @@ spec:
   project: infra-data-lake
   sources:
     - chart: spark-operator
-      repoURL: https://kubeflow.github.io/spark-operator
+      repoURL: https://kubeflow.github.io/spark-on-k8s-operator
       targetRevision: 2.4.0
       helm:
         values: |
@@ -41,7 +41,7 @@ spec:
                         - key: node-class
                           operator: In
                           values: ["homeserver"]
-
+            
           # Webhook Configuration
           webhook:
             enable: true
@@ -70,6 +70,10 @@ spec:
           # Metrics integration
           metrics:
             enable: true
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      ref: resources
+      path: resources/data-lake
   destination:
     server: https://kubernetes.default.svc
     namespace: data-lake
