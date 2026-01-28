@@ -10,7 +10,7 @@ metadata:
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
-  project: infra-storage
+  project: infra-data-lake
   sources:
     - chart: trino
       repoURL: https://trinodb.github.io/charts
