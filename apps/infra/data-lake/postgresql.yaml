@@ -28,8 +28,9 @@ spec:
             database: polaris
             # Secure password management
             existingSecret: "lake-secrets"
-            passwordSecretKey: "postgres_polaris_password"
-            usernameSecretKey: "postgres_polaris_user"
+            secretKeys:
+              adminPasswordKey: "postgres_polaris_password"
+              userPasswordKey: "postgres_polaris_password"
             
           # Persistence
           primary:
