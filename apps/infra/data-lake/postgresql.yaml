@@ -17,6 +17,9 @@ spec:
       targetRevision: 18.2.3
       helm:
         values: |
+          global:
+            security:
+              allowInsecureImages: true
           image:
             registry: docker.io
             repository: library/postgres
