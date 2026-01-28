@@ -17,6 +17,24 @@ spec:
       targetRevision: 0.21.0
       helm:
         values: |
+          imagePullSecrets: []
+          
+          ingress:
+            enabled: true
+            className: traefik
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: websecure
+              traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
+            hosts:
+              - host: trino.k3s.gillouche.homelab
+                paths:
+                  - path: /
+                    pathType: Prefix
+            tls:
+              - secretName: trino-tls
+                hosts:
+                  - trino.k3s.gillouche.homelab
+
           server:
             workers: 2
             coordinator:
