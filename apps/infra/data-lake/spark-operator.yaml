@@ -59,13 +59,6 @@ spec:
                         - key: node-class
                           operator: In
                           values: ["homeserver"]
-            # Mount tmp for logs
-            volumeMounts:
-              - name: webhook-tmp
-                mountPath: /tmp
-            volumes:
-              - name: webhook-tmp
-                emptyDir: {}
 
           # Metrics integration
           metrics:
