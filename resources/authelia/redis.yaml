@@ -16,6 +16,8 @@ spec:
       labels:
         app.kubernetes.io/name: authelia-redis
     spec:
+      nodeSelector:
+        node-class: homeserver
       containers:
         - name: redis
           image: redis:8.4.0-alpine
