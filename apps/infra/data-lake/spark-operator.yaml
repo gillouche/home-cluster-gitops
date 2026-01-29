@@ -17,11 +17,8 @@ spec:
       targetRevision: 2.4.0
       helm:
         values: |
-          # Use default image from chart (ghcr.io/kubeflow/spark-operator)
-          # Chart v2.4.0 uses the new kubeflow image repository
-          # Pin image version to match chart
           image:
-            tag: v2.4.0
+            tag: 2.4.0
           
           # Global RBAC
           rbac:
