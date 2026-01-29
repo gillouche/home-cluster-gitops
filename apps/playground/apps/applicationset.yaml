@@ -17,21 +17,21 @@ spec:
 
   template:
     metadata:
-      name: 'playground-{{ index .path.segments 3 }}-{{ index .path.segments 1 }}' # e.g. playground-test-demo-concept
+      name: 'playground-apps-{{ index .path.segments 3 }}-{{ index .path.segments 1 }}'
       annotations:
         argocd.argoproj.io/sync-wave: "5"
         notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-playground: ""
         notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-playground: ""
         notifications.argoproj.io/subscribe.on-deployed.webhook.discord-playground: ""
     spec:
-      project: 'playground-{{ index .path.segments 3 }}' # e.g. playground-test
+      project: 'playground-apps-{{ index .path.segments 3 }}'
       source:
         repoURL: https://github.com/gillouche/playground.git
         targetRevision: HEAD
         path: 'apps/{{ index .path.segments 1 }}/deploy/{{ index .path.segments 3 }}'
       destination:
         server: https://kubernetes.default.svc
-        namespace: 'playground-{{ index .path.segments 3 }}-{{ index .path.segments 1 }}' # e.g. playground-test-demo-concept
+        namespace: 'playground-apps-{{ index .path.segments 3 }}-{{ index .path.segments 1 }}'
       syncPolicy:
         automated:
           prune: true

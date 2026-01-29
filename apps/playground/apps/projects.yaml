@@ -1,17 +1,16 @@
-
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: playground-dev
+  name: playground-apps-dev
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  description: Playground - dev environment
+  description: Playground Apps - dev environment
   sourceRepos:
   - '*'
   destinations:
-  - namespace: 'playground-dev-*'
+  - namespace: 'playground-apps-dev-*'
     server: https://kubernetes.default.svc
   clusterResourceWhitelist:
   - group: '*'
@@ -20,16 +19,16 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: playground-test
+  name: playground-apps-test
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  description: Playground - test environment
+  description: Playground Apps - test environment
   sourceRepos:
   - '*'
   destinations:
-  - namespace: 'playground-test-*'
+  - namespace: 'playground-apps-test-*'
     server: https://kubernetes.default.svc
   clusterResourceWhitelist:
   - group: '*'
@@ -38,16 +37,16 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: playground-prod
+  name: playground-apps-prod
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
-  description: Playground - prod environment
+  description: Playground Apps - prod environment
   sourceRepos:
   - '*'
   destinations:
-  - namespace: 'playground-prod-*'
+  - namespace: 'playground-apps-prod-*'
     server: https://kubernetes.default.svc
   clusterResourceWhitelist:
   - group: '*'

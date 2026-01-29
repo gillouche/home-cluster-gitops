@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: playground-infra-test
+  labels:
+    environment: test
+    policy-tier: infra

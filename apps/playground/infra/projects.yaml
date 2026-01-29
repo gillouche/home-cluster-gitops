@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: playground-infra
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  description: Playground Infrastructure (shared services per environment)
+  sourceRepos:
+    - 'https://github.com/gillouche/home-cluster-gitops.git'
+  destinations:
+    - namespace: 'playground-infra-*'
+      server: https://kubernetes.default.svc
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'

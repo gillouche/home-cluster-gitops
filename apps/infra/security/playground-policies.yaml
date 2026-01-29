@@ -25,7 +25,7 @@ spec:
         path: resources/security/network-policies
       destination:
         server: https://kubernetes.default.svc
-        namespace: 'playground-{{ index .path.segments 3 }}-{{ index .path.segments 1 }}'
+        namespace: 'playground-apps-{{ index .path.segments 3 }}-{{ index .path.segments 1 }}'
       syncPolicy:
         automated:
           prune: true

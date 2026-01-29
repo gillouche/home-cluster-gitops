@@ -1,0 +1,80 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: playground-infra-dev
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-playground: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-playground: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: playground-infra
+  source:
+    repoURL: https://github.com/gillouche/home-cluster-gitops.git
+    targetRevision: HEAD
+    path: apps/playground/infra/dev
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: playground-infra-dev
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: playground-infra-test
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-playground: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-playground: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: playground-infra
+  source:
+    repoURL: https://github.com/gillouche/home-cluster-gitops.git
+    targetRevision: HEAD
+    path: apps/playground/infra/test
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: playground-infra-test
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: playground-infra-prod
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-playground: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-playground: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: playground-infra
+  source:
+    repoURL: https://github.com/gillouche/home-cluster-gitops.git
+    targetRevision: HEAD
+    path: apps/playground/infra/prod
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: playground-infra-prod
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
