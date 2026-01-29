@@ -1,7 +1,7 @@
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: spark-operator-fix
+  name: spark-operator-rbac
   labels:
     app: spark-operator
 rules:
@@ -18,25 +18,25 @@ rules:
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: spark-operator-controller-fix
+  name: spark-operator-controller-rbac
 subjects:
   - kind: ServiceAccount
     name: spark-operator-controller
     namespace: data-lake
 roleRef:
   kind: ClusterRole
-  name: spark-operator-fix
+  name: spark-operator-rbac
   apiGroup: rbac.authorization.k8s.io
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
-  name: spark-operator-webhook-fix
+  name: spark-operator-webhook-rbac
 subjects:
   - kind: ServiceAccount
     name: spark-operator-webhook
     namespace: data-lake
 roleRef:
   kind: ClusterRole
-  name: spark-operator-fix
+  name: spark-operator-rbac
   apiGroup: rbac.authorization.k8s.io
