@@ -63,9 +63,15 @@ spec:
             volumeMounts:
               - name: webhook-tmp
                 mountPath: /tmp
+              - name: serving-certs
+                mountPath: /etc/k8s-webhook-server/serving-certs
+                readOnly: true
             volumes:
               - name: webhook-tmp
                 emptyDir: {}
+              - name: serving-certs
+                secret:
+                  secretName: spark-operator-webhook-certs
 
           # Metrics integration
           metrics:
