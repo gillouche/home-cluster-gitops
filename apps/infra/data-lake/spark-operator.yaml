@@ -13,7 +13,7 @@ spec:
   project: infra-data-lake
   sources:
     - chart: spark-operator
-      repoURL: https://kubeflow.github.io/spark-on-k8s-operator
+      repoURL: https://kubeflow.github.io/spark-operator
       targetRevision: 2.4.0
       helm:
         values: |
