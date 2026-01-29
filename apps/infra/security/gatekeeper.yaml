@@ -24,24 +24,25 @@ spec:
             maxUnavailable: 1
             maxSurge: 1
         auditInterval: 60
-        affinity:
-          nodeAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-              nodeSelectorTerms:
-                - matchExpressions:
-                    - key: node-class
-                      operator: In
-                      values: ["homeserver"]
-          podAntiAffinity:
-            preferredDuringSchedulingIgnoredDuringExecution:
-              - weight: 100
-                podAffinityTerm:
-                  labelSelector:
-                    matchExpressions:
-                      - key: app.kubernetes.io/name
+        controllerManager:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: node-class
                         operator: In
-                        values: ["gatekeeper"]
-                  topologyKey: "kubernetes.io/hostname"
+                        values: ["homeserver"]
+            podAntiAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  podAffinityTerm:
+                    labelSelector:
+                      matchExpressions:
+                        - key: app.kubernetes.io/name
+                          operator: In
+                          values: ["gatekeeper"]
+                    topologyKey: "kubernetes.io/hostname"
         audit:
           affinity:
             nodeAffinity:
