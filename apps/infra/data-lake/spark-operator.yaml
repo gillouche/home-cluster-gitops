@@ -52,10 +52,6 @@ spec:
           # Metrics integration
           metrics:
             enable: true
-    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
-      targetRevision: HEAD
-      ref: resources
-      path: resources/data-lake
   destination:
     server: https://kubernetes.default.svc
     namespace: data-lake
