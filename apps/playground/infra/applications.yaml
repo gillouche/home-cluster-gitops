@@ -14,7 +14,7 @@ spec:
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
-    path: apps/playground/infra/dev
+    path: resources/playground/infra/dev
   destination:
     server: https://kubernetes.default.svc
     namespace: playground-infra-dev
@@ -41,7 +41,7 @@ spec:
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
-    path: apps/playground/infra/test
+    path: resources/playground/infra/test
   destination:
     server: https://kubernetes.default.svc
     namespace: playground-infra-test
@@ -68,7 +68,7 @@ spec:
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
-    path: apps/playground/infra/prod
+    path: resources/playground/infra/prod
   destination:
     server: https://kubernetes.default.svc
     namespace: playground-infra-prod
