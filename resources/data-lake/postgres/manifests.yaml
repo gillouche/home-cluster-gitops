@@ -35,7 +35,7 @@ spec:
         node-class: homeserver
       containers:
         - name: postgresql
-          image: postgres:16-alpine
+          image: postgres:18-alpine
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5432
