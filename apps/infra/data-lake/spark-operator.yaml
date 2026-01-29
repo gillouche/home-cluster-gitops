@@ -28,6 +28,9 @@ spec:
 
           # Controller Configuration
           controller:
+            # Enable health probe endpoint
+            extraArgs:
+              - --health-probe-bind-address=:8081
             # Fix for root user in image
             securityContext:
               runAsNonRoot: false
