@@ -19,12 +19,12 @@ spec:
       values: |
         operator:
           replicas: 1
-          nodeSelector:
-            node-class: homeserver
           tolerations:
             - key: "node-role.kubernetes.io/control-plane"
               operator: "Exists"
               effect: "NoSchedule"
+        nodeSelector:
+          node-class: homeserver
         trivy:
           scanJob:
             nodeSelector:
