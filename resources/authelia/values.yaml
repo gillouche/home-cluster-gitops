@@ -135,12 +135,6 @@ configMap:
       password:
         disabled: true
 
-redis:
-  master:
-    nodeSelector:
-      node-class: homeserver
-
-
   storage:
     encryption_key:
       disabled: true
@@ -153,6 +147,12 @@ redis:
     smtp:
       password:
         disabled: true
+
+redis:
+  master:
+    nodeSelector:
+      node-class: homeserver
+
 
 ingress:
   enabled: true
