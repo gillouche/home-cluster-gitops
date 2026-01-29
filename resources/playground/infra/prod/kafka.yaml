@@ -60,6 +60,15 @@ spec:
             limits:
               memory: "2Gi"
               cpu: "1"
+      initContainers:
+        - name: fix-permissions
+          image: busybox:latest
+          command: ["sh", "-c", "chown -R 1000:1000 /var/lib/kafka/data"]
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/kafka/data
+          securityContext:
+            runAsUser: 0
       volumes:
         - name: data
           hostPath:
