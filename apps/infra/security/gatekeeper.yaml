@@ -25,24 +25,8 @@ spec:
             maxSurge: 1
         auditInterval: 60
         controllerManager:
-          affinity:
-            nodeAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                nodeSelectorTerms:
-                  - matchExpressions:
-                      - key: node-class
-                        operator: In
-                        values: ["homeserver"]
-            podAntiAffinity:
-              preferredDuringSchedulingIgnoredDuringExecution:
-                - weight: 100
-                  podAffinityTerm:
-                    labelSelector:
-                      matchExpressions:
-                        - key: app.kubernetes.io/name
-                          operator: In
-                          values: ["gatekeeper"]
-                    topologyKey: "kubernetes.io/hostname"
+          nodeSelector:
+            node-class: homeserver
         audit:
           affinity:
             nodeAffinity:
