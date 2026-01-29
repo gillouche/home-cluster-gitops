@@ -236,6 +236,15 @@ spec:
             enabled: false
           kubeControllerManager:
             enabled: false
+          
+          # Ensure infrastructure components run on homeserver
+          prometheusOperator:
+            nodeSelector:
+              node-class: homeserver
+          
+          blackboxExporter:
+            nodeSelector:
+              node-class: homeserver
     - repoURL: https://github.com/gillouche/home-cluster-gitops.git
       targetRevision: HEAD
       path: resources/monitoring

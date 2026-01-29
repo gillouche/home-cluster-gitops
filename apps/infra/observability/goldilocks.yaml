@@ -20,6 +20,8 @@ spec:
         dashboard:
           ingress:
             enabled: false
+          nodeSelector:
+            node-class: homeserver
   destination:
     server: https://kubernetes.default.svc
     namespace: goldilocks

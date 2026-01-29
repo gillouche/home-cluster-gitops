@@ -135,6 +135,12 @@ configMap:
       password:
         disabled: true
 
+redis:
+  master:
+    nodeSelector:
+      node-class: homeserver
+
+
   storage:
     encryption_key:
       disabled: true

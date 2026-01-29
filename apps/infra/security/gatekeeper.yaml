@@ -42,6 +42,15 @@ spec:
                         operator: In
                         values: ["gatekeeper"]
                   topologyKey: "kubernetes.io/hostname"
+        audit:
+          affinity:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - key: node-class
+                        operator: In
+                        values: ["homeserver"]
   destination:
     server: https://kubernetes.default.svc
     namespace: gatekeeper-system

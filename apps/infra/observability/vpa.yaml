@@ -20,6 +20,9 @@ spec:
         recommender:
           extraArgs:
             v: "4"
+        updater:
+          nodeSelector:
+            node-class: homeserver
   destination:
     server: https://kubernetes.default.svc
     namespace: vpa
