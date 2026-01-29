@@ -35,9 +35,6 @@ spec:
                 hosts:
                   - trino.k3s.gillouche.homelab
 
-          server:
-            workers: 2
-            
           coordinator:
             jvm:
               maxHeapSize: "2G"
@@ -51,7 +48,8 @@ spec:
             nodeSelector:
               node-class: homeserver
 
-          worker:
+          workers:
+            replicas: 2
             jvm:
               maxHeapSize: "4G"
             resources:
@@ -59,14 +57,14 @@ spec:
                 memory: "4.5Gi"
                 cpu: "1"
               limits:
-                memory: "6Gi" # Increased for safety
+                memory: "6Gi"
                 cpu: "4"
             nodeSelector:
               node-class: homeserver
           
           # Catalog Configuration
           additionalCatalogs:
-            iceberg: |
+            iceberg.properties: |
               connector.name=iceberg
               iceberg.catalog.type=rest
               iceberg.rest-catalog.uri=http://polaris:8181/api/catalog
@@ -75,6 +73,7 @@ spec:
               fs.native-s3.enabled=true
               s3.endpoint=http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333
               s3.path-style-access=true
+              s3.region=us-east-1
               
   destination:
     server: https://kubernetes.default.svc
