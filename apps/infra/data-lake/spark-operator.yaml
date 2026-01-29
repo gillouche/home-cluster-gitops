@@ -42,36 +42,11 @@ spec:
                           operator: In
                           values: ["homeserver"]
             
-          # Webhook Configuration
+          # Webhook Configuration - Disabled due to certificate mounting issues
+          # The Helm chart doesn't support custom certificate secrets easily
+          # Webhook is optional - controller can manage SparkApplications without it
           webhook:
-            enable: true
-            createRbac: true
-            # Fix for root user in image
-            securityContext:
-              runAsNonRoot: false
-              runAsUser: 0
-            # Node Affinity
-            affinity:
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                        - key: node-class
-                          operator: In
-                          values: ["homeserver"]
-            # Mount tmp for logs
-            volumeMounts:
-              - name: webhook-tmp
-                mountPath: /tmp
-              - name: serving-certs
-                mountPath: /etc/k8s-webhook-server/serving-certs
-                readOnly: true
-            volumes:
-              - name: webhook-tmp
-                emptyDir: {}
-              - name: serving-certs
-                secret:
-                  secretName: spark-operator-webhook-certs
+            enable: false
 
           # Metrics integration
           metrics:
