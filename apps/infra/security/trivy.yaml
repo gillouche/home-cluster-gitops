@@ -18,7 +18,7 @@ spec:
     helm:
       values: |
         operator:
-          replicas: 0  # Temporarily disabled - scan jobs don't respect nodeSelector
+          replicas: 1
           nodeSelector:
             node-class: homeserver
           tolerations:
@@ -33,6 +33,7 @@ spec:
             - key: "node-role.kubernetes.io/control-plane"
               operator: "Exists"
               effect: "NoSchedule"
+        # ConfigMap-level setting for scan job nodeSelector (JSON format required)
         scanJob:
           nodeSelector: '{"node-class":"homeserver"}'
           tolerations: '[{"key":"node-role.kubernetes.io/control-plane","operator":"Exists","effect":"NoSchedule"}]'
