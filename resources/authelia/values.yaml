@@ -93,9 +93,6 @@ persistence:
 secret:
   # Enable native secret mounting
   existingSecret: authelia-secrets
-  storage:
-    encryption_key:
-      disabled: true
   additionalSecrets:
     authelia-secrets:
       items:
