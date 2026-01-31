@@ -16,7 +16,7 @@ spec:
     staticConfig:
       static:
         # RPi 4 Cluster
-        #- 192.168.0.76  # rpi4b8g1
+        - 192.168.0.76  # rpi4b8g1
         - 192.168.0.77  # rpi4b8g2
         - 192.168.0.78  # rpi4b8g3
         - 192.168.0.79  # rpi4b8g4
