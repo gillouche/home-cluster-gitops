@@ -21,7 +21,7 @@ spec:
         workload.tier: infra
       containers:
         - name: kafka-ui
-          image: provectuslabs/kafka-ui:latest
+          image: kafbat/kafka-ui:v1.4.2
           ports:
             - containerPort: 8080
           env:
