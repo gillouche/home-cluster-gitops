@@ -83,6 +83,17 @@ spec:
                         secretKeyRef:
                           name: bazel-cache-credentials
                           key: bazel_secret_key
+                    # Nix binary cache credentials (SeaweedFS S3)
+                    - name: NIX_ACCESS_KEY_ID
+                      valueFrom:
+                        secretKeyRef:
+                          name: nix-cache-credentials
+                          key: nix_access_key
+                    - name: NIX_SECRET_ACCESS_KEY
+                      valueFrom:
+                        secretKeyRef:
+                          name: nix-cache-credentials
+                          key: nix_secret_key
                   volumeMounts:
                     - name: dind-sock
                       mountPath: /var/run
