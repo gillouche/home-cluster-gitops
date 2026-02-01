@@ -45,6 +45,10 @@ spec:
               size: "5Gi"
               storageClass: "longhorn"
             
+            # Volume configuration - reduce size limit to allow more volumes
+            volumeSizeLimitMB: 1000  # 1GB per volume instead of default 30GB
+            volumePreallocate: false  # Create volumes on-demand
+            
             # Increase timeouts for stability
             livenessProbe:
               initialDelaySeconds: 60
