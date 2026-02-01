@@ -1,0 +1,17 @@
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDropCapabilities
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: '2'
+  name: require-drop-capabilities
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+    namespaceSelector:
+      matchExpressions:
+        - key: policy-tier
+          operator: In
+          values: ["playground"]
