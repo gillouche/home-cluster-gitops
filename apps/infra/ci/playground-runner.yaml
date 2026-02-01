@@ -26,9 +26,15 @@ spec:
           controllerServiceAccount:
             namespace: arc-systems
             name: arc-controller-gha-rs-controller
-          
-          
-          # Disable auto-dind to allow manual sidecar configuration
+          # Pin the listener pod to the homeserver (avoid RPis)
+          listenerTemplate:
+            spec:
+              nodeSelector:
+                node-class: homeserver
+              containers:
+                - name: listener
+                  image: ghcr.io/actions/gha-runner-scale-set-controller:0.13.1
+                  command: ["/ghalistener"]
           # containerMode:
           #   type: "dind"
 
