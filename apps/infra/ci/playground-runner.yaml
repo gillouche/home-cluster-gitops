@@ -21,8 +21,8 @@ spec:
           runnerGroup: "Default"
           githubConfigUrl: "https://github.com/gillouche/playground"
           githubConfigSecret: arc-github-creds
-          minRunners: 2
-          maxRunners: 5
+          minRunners: 3
+          maxRunners: 7
           controllerServiceAccount:
             namespace: arc-systems
             name: arc-controller-gha-rs-controller
