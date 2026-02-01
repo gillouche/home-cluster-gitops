@@ -27,13 +27,6 @@ spec:
             namespace: arc-systems
             name: arc-controller-gha-rs-controller
           
-          # Pin the listener pod to the homeserver (avoid RPis)
-          listenerTemplate:
-            spec:
-              nodeSelector:
-                node-class: homeserver
-              containers:
-                - name: listener
           
           # Disable auto-dind to allow manual sidecar configuration
           # containerMode:
