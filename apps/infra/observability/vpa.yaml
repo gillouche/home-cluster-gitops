@@ -20,7 +20,12 @@ spec:
         recommender:
           extraArgs:
             v: "4"
+          nodeSelector:
+            node-class: homeserver
         updater:
+          nodeSelector:
+            node-class: homeserver
+        admissionController:
           nodeSelector:
             node-class: homeserver
   destination:
