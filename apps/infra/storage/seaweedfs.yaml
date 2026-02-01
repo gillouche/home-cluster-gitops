@@ -71,6 +71,7 @@ spec:
                 maxSurge: 1
             extraArgs:
               - "-rack=$(NODE_NAME)"
+              - "-max=200"
             extraEnv:
               - name: NODE_NAME
                 valueFrom:
