@@ -5,3 +5,4 @@ metadata:
   labels:
     environment: prod
     policy-tier: infra
+    app.kubernetes.io/part-of: playground-infra
