@@ -14,7 +14,7 @@ spec:
             node-class: homeserver
           containers:
             - name: renovate
-              image: renovate/renovate:43.0.9
+              image: renovate/renovate:43.2.1
               imagePullPolicy: IfNotPresent
               env:
                 - name: LOG_LEVEL
