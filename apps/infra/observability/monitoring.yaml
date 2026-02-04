@@ -21,6 +21,7 @@ spec:
           prometheus:
             prometheusSpec:
               replicas: 2
+              enableRemoteWriteReceiver: true
               retention: 3d
               externalLabels:
                 namespace: monitoring
@@ -228,6 +229,8 @@ spec:
                 jsonData:
                   nodeApi:
                     enabled: true
+                  serviceGraph:
+                    datasourceUid: 'Prometheus'
                   tracesToLogs:
                     datasourceUid: 'Loki'
 

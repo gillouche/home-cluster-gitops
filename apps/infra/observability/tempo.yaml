@@ -61,7 +61,10 @@ spec:
           
           # Metrics Generator
           metricsGenerator:
-            enabled: false
+            enabled: true
+            remoteWrite:
+              - url: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090/api/v1/write
+                sendExemplars: true
 
           # Compactor (Retention)
           compactor:
