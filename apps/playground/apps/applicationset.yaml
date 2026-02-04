@@ -38,10 +38,10 @@ spec:
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
-      managedNamespaceMetadata:
-        labels:
-          policy-tier: playground
-          goldilocks.fairwinds.com/enabled: "true"
+        managedNamespaceMetadata:
+          labels:
+            policy-tier: playground
+            goldilocks.fairwinds.com/enabled: "true"
       ignoreDifferences:
         - group: apps
           kind: Deployment
