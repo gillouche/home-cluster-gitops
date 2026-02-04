@@ -181,7 +181,7 @@ spec:
                 tls_client_ca: /etc/secrets/homelab-ca/ca-bundle.pem
                 login_attribute_path: preferred_username
                 groups_attribute_path: groups
-                role_attribute_path: contains(groups[*], 'admins') && 'Admin' || contains(groups[*], 'dev') && 'Editor' || 'Viewer'
+                role_attribute_path: contains(groups[*], 'admins') && 'Admin' || 'Editor'
             
             # Mount secret as file for security
             extraSecretMounts:
