@@ -221,6 +221,15 @@ spec:
                       matcherRegex: "traceID=(\\w+)"
                       name: TraceID
                       url: "$${__value.raw}"
+              - name: Tempo
+                type: tempo
+                url: http://tempo.monitoring.svc:3200
+                access: proxy
+                jsonData:
+                  nodeApi:
+                    enabled: true
+                  tracesToLogs:
+                    datasourceUid: 'Loki'
 
   
           # Replace standalone exporters
