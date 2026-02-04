@@ -38,12 +38,12 @@ spec:
           selfHeal: true
         syncOptions:
           - CreateNamespace=true
-        ignoreDifferences:
-          - group: apps
-            kind: Deployment
-            jsonPointers:
-              - /spec/replicas
-        managedNamespaceMetadata:
-          labels:
-            policy-tier: playground
-            goldilocks.fairwinds.com/enabled: "true"
+      managedNamespaceMetadata:
+        labels:
+          policy-tier: playground
+          goldilocks.fairwinds.com/enabled: "true"
+      ignoreDifferences:
+        - group: apps
+          kind: Deployment
+          jsonPointers:
+            - /spec/replicas
