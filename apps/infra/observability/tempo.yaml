@@ -63,6 +63,11 @@ spec:
           metricsGenerator:
             enabled: false
 
+          # Compactor (Retention)
+          compactor:
+            compaction:
+              retention_duration: 48h
+
           # Environment Variables (Under tempo)
           extraEnv:
             - name: AWS_ACCESS_KEY_ID
