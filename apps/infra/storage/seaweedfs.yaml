@@ -51,14 +51,14 @@ spec:
             
             # Increase timeouts for stability
             livenessProbe:
-              initialDelaySeconds: 60
+              initialDelaySeconds: 90
               periodSeconds: 30
-              timeoutSeconds: 15
+              timeoutSeconds: 30
               failureThreshold: 5
             readinessProbe:
-              initialDelaySeconds: 30
+              initialDelaySeconds: 45
               periodSeconds: 30
-              timeoutSeconds: 15
+              timeoutSeconds: 30
               failureThreshold: 5
 
 
