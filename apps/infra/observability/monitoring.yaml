@@ -20,7 +20,7 @@ spec:
           # Use existing storage class and SSD nodes
           prometheus:
             prometheusSpec:
-              replicas: 2
+              replicas: 3
               enableRemoteWriteReceiver: true
               retention: 3d
               externalLabels:
@@ -61,7 +61,7 @@ spec:
               
           alertmanager:
             alertmanagerSpec:
-              replicas: 2
+              replicas: 3
               alertmanagerConfigSelector:
                 matchLabels:
                   alertmanagerConfig: discord

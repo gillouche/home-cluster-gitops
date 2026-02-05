@@ -43,6 +43,22 @@ spec:
 apiVersion: longhorn.io/v1beta2
 kind: Node
 metadata:
+  name: homeserver3
+  namespace: longhorn-system
+spec:
+  name: homeserver3
+  allowScheduling: true
+  disks:
+    ssd-nvme:
+      path: /mnt/ssd_nvme
+      allowScheduling: true
+      storageReserved: 0
+      tags: []
+  tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
   name: rpi4b8g1
   namespace: longhorn-system
 spec:

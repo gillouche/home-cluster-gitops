@@ -18,7 +18,7 @@ spec:
       helm:
         values: |
           master:
-            replicas: 1
+            replicas: 3
             affinity: |
               nodeAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
@@ -105,7 +105,7 @@ spec:
                 storageClass: "longhorn"
 
           filer:
-            replicas: 1
+            replicas: 3
             affinity: |
               nodeAffinity:
                 requiredDuringSchedulingIgnoredDuringExecution:
@@ -143,7 +143,7 @@ spec:
 
           s3:
             enabled: true
-            replicas: 2
+            replicas: 3
             strategy:
               type: RollingUpdate
               rollingUpdate:

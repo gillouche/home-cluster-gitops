@@ -22,7 +22,7 @@ spec:
           enabled: true
           size: 10Gi
 
-        replicas: 2
+        replicas: 3
         
         # Node Placement (Root)
         nodeSelector:
