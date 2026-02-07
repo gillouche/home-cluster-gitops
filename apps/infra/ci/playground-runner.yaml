@@ -115,7 +115,8 @@ spec:
                     - name: dind-externals
                       mountPath: /home/runner/externals
                     - name: homelab-root-ca
-                      mountPath: /etc/docker/certs.d/nexus.gillouche.homelab
+                      mountPath: /etc/docker/certs.d/nexus.gillouche.homelab/ca.crt
+                      subPath: ca-bundle.pem
                       readOnly: true
   destination:
     server: https://kubernetes.default.svc
