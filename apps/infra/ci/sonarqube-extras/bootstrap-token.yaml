@@ -39,7 +39,7 @@ spec:
           until pg_isready -h "$PGHOST"; do echo "Waiting for DB..."; sleep 2; done
 
           echo "Computing SHA-384 hash of token..."
-          TOKEN_HASH=$(echo -n "$SONAR_TOKEN" | sha384sum | cut -d' ' -f1)
+          TOKEN_HASH=$(echo -n "$SONAR_TOKEN" | openssl dgst -sha384 | awk '{print $2}')
 
           echo "Checking if token already exists..."
           EXISTS=$(psql -tc "SELECT 1 FROM user_tokens WHERE token_hash = '$TOKEN_HASH'" | tr -d '[:space:]')
