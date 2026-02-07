@@ -117,9 +117,6 @@ spec:
                     - name: root-ca
                       mountPath: /etc/docker/certs.d/nexus.gillouche.homelab
                       readOnly: true
-    - repoURL: "https://github.com/gillouche/home-cluster-gitops.git"
-      targetRevision: HEAD
-      path: resources/ci
   destination:
     server: https://kubernetes.default.svc
     namespace: arc-systems
