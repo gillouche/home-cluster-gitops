@@ -37,7 +37,6 @@ spec:
     - name: sonarqube
       ensure: present
       login: true
-      createdb: false
       connectionLimit: -1
       inherit: true
       passwordSecret:
@@ -45,7 +44,6 @@ spec:
     - name: polaris
       ensure: present
       login: true
-      createdb: false 
       connectionLimit: -1
       inherit: true
       passwordSecret:
