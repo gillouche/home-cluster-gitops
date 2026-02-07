@@ -179,7 +179,7 @@ spec:
                 auth_url: https://auth.k3s.gillouche.homelab/api/oidc/authorization
                 token_url: https://auth.k3s.gillouche.homelab/api/oidc/token
                 api_url: https://auth.k3s.gillouche.homelab/api/oidc/userinfo
-                tls_client_ca: /etc/secrets/homelab-ca/ca-bundle.pem
+                tls_client_ca: /etc/secrets/homelab-root-ca/ca-bundle.pem
                 login_attribute_path: preferred_username
                 groups_attribute_path: groups
                 role_attribute_path: contains(groups[*], 'admins') && 'Admin' || 'Editor'
@@ -191,10 +191,10 @@ spec:
                 defaultMode: 0440
                 mountPath: /etc/secrets/auth_generic_oauth
                 readOnly: true
-              - name: homelab-ca-volume
-                secretName: homelab-ca
+              - name: homelab-root-ca-volume
+                secretName: homelab-root-ca
                 defaultMode: 0440
-                mountPath: /etc/secrets/homelab-ca
+                mountPath: /etc/secrets/homelab-root-ca
                 readOnly: true
             
             # Use default dashboards

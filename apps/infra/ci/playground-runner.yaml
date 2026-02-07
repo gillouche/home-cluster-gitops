@@ -76,30 +76,30 @@ spec:
                     - name: SEAWEEDFS_ACCESS_KEY
                       valueFrom:
                         secretKeyRef:
-                          name: bazel-cache-credentials
+                          name: bazel-cache-access-keys
                           key: bazel_access_key
                     - name: SEAWEEDFS_SECRET_KEY
                       valueFrom:
                         secretKeyRef:
-                          name: bazel-cache-credentials
+                          name: bazel-cache-access-keys
                           key: bazel_secret_key
                     # Nix binary cache credentials (SeaweedFS S3)
                     - name: NIX_ACCESS_KEY_ID
                       valueFrom:
                         secretKeyRef:
-                          name: nix-cache-credentials
+                          name: nix-cache-access-keys
                           key: nix_access_key
                     - name: NIX_SECRET_ACCESS_KEY
                       valueFrom:
                         secretKeyRef:
-                          name: nix-cache-credentials
+                          name: nix-cache-access-keys
                           key: nix_secret_key
                   volumeMounts:
                     - name: dind-sock
                       mountPath: /var/run
-                    - name: root-ca
-                      mountPath: /etc/ssl/certs/homelab-ca.crt
-                      subPath: ca.crt
+                    - name: homelab-root-ca
+                      mountPath: /etc/ssl/certs/ca-bundle.pem
+                      subPath: ca-bundle.pem
                       readOnly: true
                 - name: dind
                   image: docker:dind
@@ -114,7 +114,7 @@ spec:
                       mountPath: /var/run
                     - name: dind-externals
                       mountPath: /home/runner/externals
-                    - name: root-ca
+                    - name: homelab-root-ca
                       mountPath: /etc/docker/certs.d/nexus.gillouche.homelab
                       readOnly: true
   destination:
