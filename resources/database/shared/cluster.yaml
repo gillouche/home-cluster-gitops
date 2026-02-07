@@ -3,8 +3,10 @@ kind: Cluster
 metadata:
   name: shared-db
   namespace: database
-  enableSuperuserAccess: true
 spec:
+  enableSuperuserAccess: true
+  superuserSecret:
+    name: shared-db-superuser
   instances: 3
   
   # Image Configuration
