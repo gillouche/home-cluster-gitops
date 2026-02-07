@@ -94,6 +94,13 @@ spec:
                         secretKeyRef:
                           name: nix-cache-access-keys
                           key: nix_secret_key
+                    - name: SONAR_TOKEN
+                      valueFrom:
+                        secretKeyRef:
+                          name: sonarqube-token
+                          key: token
+                    - name: SONAR_HOST_URL
+                      value: "https://sonar.k3s.gillouche.homelab"
                   volumeMounts:
                     - name: dind-sock
                       mountPath: /var/run
