@@ -3,6 +3,7 @@ kind: Cluster
 metadata:
   name: shared-db
   namespace: database
+  enableSuperuserAccess: true
 spec:
   instances: 3
   
