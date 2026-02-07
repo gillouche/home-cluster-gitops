@@ -47,7 +47,7 @@ spec:
           
           jdbcOverwrite:
             enable: true
-            jdbcUrl: "jdbc:postgresql://shared-db-rw.database.svc:542/sonarqube"
+            jdbcUrl: "jdbc:postgresql://shared-db-rw.database.svc:5432/sonarqube"
             jdbcUsername: "sonarqube"
             jdbcSecretName: "shared-db-sonarqube"
             jdbcSecretPasswordKey: "password"
@@ -55,6 +55,7 @@ spec:
           
           # Custom Secrets to avoid Helm generation
           monitoringPasscodeSecretName: "sonarqube-secrets"
+          monitoringPasscodeSecretKey: "monitoring-passcode"
           
           extraEnv:
             - name: SONAR_AUTH_JWTBASE64HS256SECRET
