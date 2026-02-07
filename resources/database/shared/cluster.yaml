@@ -25,7 +25,6 @@ spec:
     - name: sonarqube
       ensure: present
       login: true
-      superuser: false
       createdb: true
       connectionLimit: -1
       inherit: true
