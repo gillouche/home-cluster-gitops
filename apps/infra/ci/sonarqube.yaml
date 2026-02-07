@@ -87,6 +87,10 @@ spec:
             enabled: true
             vmMaxMapCount: 262144
 
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      path: apps/infra/ci/sonarqube-extras
+
   destination:
     server: https://kubernetes.default.svc
     namespace: sonarqube
