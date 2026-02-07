@@ -3,24 +3,32 @@ kind: Cluster
 metadata:
   name: shared-db
   namespace: database
-  enableSuperuserAccess: true
 spec:
   instances: 3
   
-  # Pin Postgres Version
+  # Image Configuration
   imageName: ghcr.io/cloudnative-pg/postgresql:16.1
   
-  # Storage
+  # Storage Configuration
   storage:
     size: 50Gi
     storageClass: longhorn
+    resizeInUseVolumes: true
+  
+  # Monitoring
+  monitoring:
+    enablePodMonitor: false
+    # customQueriesConfigMap:
+    #   - name: cnpg-default-monitoring
+    #     key: queries
 
-  # Bootstrap (Init)
+  # Bootstrap Method (InitDB)
   bootstrap:
     initdb:
       database: sonarqube
       owner: sonarqube
-
+      
+  # Managed Roles (Users)
   managed:
     roles:
     - name: sonarqube
@@ -29,6 +37,8 @@ spec:
       createdb: true
       connectionLimit: -1
       inherit: true
+      passwordSecret:
+        name: shared-db-sonarqube
     - name: polaris
       ensure: present
       login: true
