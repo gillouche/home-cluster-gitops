@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: reflector
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-infra: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-infra: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-security
+  sources:
+    - chart: reflector
+      repoURL: https://emberstack.github.io/helm-charts
+      targetRevision: 7.1.26
+      helm:
+        values: |
+          configuration:
+            watcher:
+              # Watch secrets and configmaps
+              resources:
+                - secrets
+                - configmaps
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: kube-system # Reflector is a cluster-wide controller
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

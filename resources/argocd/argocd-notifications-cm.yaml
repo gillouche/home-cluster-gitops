@@ -101,28 +101,6 @@ data:
             ]
           }
 
-  template.app-deployed: |
-    webhook:
-      discord-playground:
-        method: POST
-        body: |
-          {
-            "embeds": [
-              {
-                "title": "🎉 Application {{ .app.metadata.name }} Deployed",
-                "description": "Deployed successfully and healthy at `{{ .app.status.operationState.finishedAt }}`",
-                "color": 3066993,
-                "fields": [
-                  {"name": "Namespace", "value": "{{ .app.metadata.namespace }}", "inline": true},
-                  {"name": "Revision", "value": "{{ .app.status.sync.revision }}", "inline": true},
-                  {"name": "Health", "value": "{{ .app.status.health.status }}", "inline": true},
-                  {"name": "Status", "value": "{{ .app.status.operationState.phase }}", "inline": true}
-                ],
-                "footer": {"text": "ArgoCD Notifications"}
-              }
-            ]
-          }
-
   trigger.on-sync-failed-infra: |
     - description: Application sync failed (Infra)
       send: [app-sync-failed]
@@ -133,12 +111,6 @@ data:
       send: [app-health-degraded]
       when: app.status.health.status in ['Degraded', 'Missing', 'Unknown'] and app.spec.project matches 'infra-.*'
 
-  trigger.on-deployed-infra: |
-    - description: Application deployed and healthy (Infra)
-      send: [app-deployed]
-      when: app.status.operationState.phase == 'Succeeded' and app.status.health.status == 'Healthy' and app.spec.project matches 'infra-.*'
-      oncePer: app.status.sync.revision
-
   trigger.on-sync-failed-playground: |
     - description: Application sync failed (Playground)
       send: [app-sync-failed]
@@ -148,12 +120,6 @@ data:
     - description: Application health degraded (Playground)
       send: [app-health-degraded]
       when: app.status.health.status in ['Degraded', 'Missing', 'Unknown'] and app.spec.project matches 'playground-.*'
-
-  trigger.on-deployed-playground: |
-    - description: Application deployed and healthy (Playground)
-      send: [app-deployed]
-      when: app.status.operationState.phase == 'Succeeded' and app.status.health.status == 'Healthy' and app.spec.project matches 'playground-.*'
-      oncePer: app.status.sync.revision
 
   subscriptions: |
     - recipients:
@@ -167,4 +133,3 @@ data:
       triggers:
         - on-sync-failed-playground
         - on-health-degraded-playground
-        - on-deployed-playground

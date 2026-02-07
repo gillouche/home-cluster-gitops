@@ -1,0 +1,37 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: shared-db
+  namespace: database
+spec:
+  instances: 3
+  
+  # Pin Postgres Version
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.1
+  
+  # Storage
+  storage:
+    size: 50Gi
+    storageClass: longhorn
+
+  # Bootstrap (Init)
+  bootstrap:
+    initdb:
+      database: sonarqube
+      owner: sonarqube
+
+  managed:
+    roles:
+    - name: sonarqube
+      ensure: present
+      login: true
+      superuser: false
+      createdb: true
+      passwordSecret:
+        name: shared-db-sonarqube
+  
+  inheritedMetadata:
+    annotations:
+      reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
+      reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "sonarqube"

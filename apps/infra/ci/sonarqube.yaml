@@ -1,0 +1,81 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: sonarqube
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-infra: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-infra: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-ci
+  sources:
+    - chart: sonarqube
+      repoURL: https://SonarSource.github.io/helm-chart-sonarqube
+      targetRevision: 10.4.1+2662
+      helm:
+        values: |
+          edition: community
+          
+          # Networking
+          ingress:
+            enabled: true
+            ingressClassName: traefik
+            hosts:
+              - name: sonar.k3s.gillouche.homelab
+                path: /
+            annotations:
+              traefik.ingress.kubernetes.io/router.entrypoints: web
+              traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
+
+          # Persistence
+          persistence:
+            enabled: true
+            storageClass: longhorn
+            accessMode: ReadWriteOnce
+            size: 50Gi
+          
+          # Config
+          sonarProperties:
+             sonar.forceAuthentication: true
+
+          # Database (External HA)
+          postgresql:
+            enabled: false # Disable embedded
+          
+          jdbcOverwrite:
+            enable: true
+            jdbcUrl: "jdbc:postgresql://shared-db-rw.database.svc:5432/sonarqube"
+            username: "sonarqube"
+            passwordSecretName: "shared-db-sonarqube" 
+            passwordSecretKey: "password"
+
+          # Resource Management
+          resources:
+            requests:
+              memory: 2Gi
+              cpu: 500m
+            limits:
+              memory: 4Gi
+              cpu: 2
+
+          # Scheduling
+          nodeSelector:
+            node-class: homeserver
+          
+          # Init Sysctl (Required for ES)
+          initSysctl:
+            enabled: true
+            vmMaxMapCount: 262144
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: sonarqube
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

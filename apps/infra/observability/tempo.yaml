@@ -76,12 +76,12 @@ spec:
             - name: AWS_ACCESS_KEY_ID
               valueFrom:
                 secretKeyRef:
-                  name: tempo-secrets
+                  name: tempo-access-keys
                   key: tempo_access_key
             - name: AWS_SECRET_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
-                  name: tempo-secrets
+                  name: tempo-access-keys
                   key: tempo_secret_key
 
   destination:

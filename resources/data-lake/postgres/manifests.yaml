@@ -48,7 +48,7 @@ spec:
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: lake-secrets
+                  name: polaris-secrets
                   key: postgres_polaris_password
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata

@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: namespace-secrets
+  namespace: argocd
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-security
+  sources:
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      path: resources/namespaces
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd # Namespace resources are usually applied at cluster scope, App lives in argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

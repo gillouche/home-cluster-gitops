@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: postgres-shared
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2" # After Operator (1)
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-database
+  sources:
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      path: resources/database/shared
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: database
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
