@@ -27,9 +27,13 @@ spec:
       login: true
       superuser: false
       createdb: true
+    - name: polaris
+      ensure: present
+      login: true
+      createdb: true # Polaris might need to create schema
   
   inheritedMetadata:
     annotations:
       reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
       reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "sonarqube"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "sonarqube,data-lake"

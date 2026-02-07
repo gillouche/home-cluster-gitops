@@ -49,11 +49,11 @@ spec:
           # Persistence Configuration
           persistence:
             type: relational-jdbc
-            url: jdbc:postgresql://postgresql:5432/polaris
+            url: jdbc:postgresql://shared-db-rw.database.svc:5432/polaris
             username: polaris
             passwordFromSecret:
-              name: lake-secrets
-              key: postgres_polaris_password
+              name: shared-db-polaris
+              key: password
             
           # Storage Configuration (SeaweedFS)
           defaultRealm:
@@ -72,23 +72,23 @@ spec:
             - name: POLARIS_BOOTSTRAP_ROOT_CLIENT_ID
               valueFrom:
                 secretKeyRef:
-                  name: lake-secrets
+                  name: polaris-secrets
                   key: polaris_root_id
             - name: POLARIS_BOOTSTRAP_ROOT_CLIENT_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: lake-secrets
+                  name: polaris-secrets
                   key: polaris_root_secret
             # Force Quarkus Datasource Configuration
             - name: QUARKUS_DATASOURCE_JDBC_URL
-              value: jdbc:postgresql://postgresql:5432/polaris
+              value: jdbc:postgresql://shared-db-rw.database.svc:5432/polaris
             - name: QUARKUS_DATASOURCE_USERNAME
               value: polaris
             - name: QUARKUS_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: lake-secrets
-                  key: postgres_polaris_password
+                  name: shared-db-polaris
+                  key: password
               
   destination:
     server: https://kubernetes.default.svc

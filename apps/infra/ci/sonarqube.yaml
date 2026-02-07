@@ -45,12 +45,16 @@ spec:
           postgresql:
             enabled: false # Disable embedded
           
-          jdbcOverwrite:
-            enable: true
-            jdbcUrl: "jdbc:postgresql://shared-db-rw.database.svc:5432/sonarqube"
-            username: "sonarqube"
-            passwordSecretName: "shared-db-sonarqube" 
-            passwordSecretKey: "password"
+          extraEnv:
+            - name: SONAR_JDBC_URL
+              value: "jdbc:postgresql://shared-db-rw.database.svc:5432/sonarqube"
+            - name: SONAR_JDBC_USERNAME
+              value: "sonarqube"
+            - name: SONAR_JDBC_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: shared-db-sonarqube
+                  key: password
 
           # Resource Management
           resources:
