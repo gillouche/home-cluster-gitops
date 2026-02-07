@@ -47,7 +47,7 @@ spec:
                   emptyDir: {}
                 - name: dind-externals
                   emptyDir: {}
-                - name: root-ca
+                - name: homelab-root-ca
                   secret:
                     secretName: homelab-root-ca
               containers:
