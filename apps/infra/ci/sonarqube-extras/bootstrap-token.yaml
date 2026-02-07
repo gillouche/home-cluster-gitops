@@ -1,0 +1,76 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: bootstrap-sonarqube-token
+  namespace: database
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: bootstrap-token
+        image: postgres:16-alpine
+        env:
+        - name: PGHOST
+          value: shared-db-rw.database.svc
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              name: shared-db-sonarqube
+              key: username
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: shared-db-sonarqube
+              key: password
+        - name: PGDATABASE
+          value: sonarqube
+        - name: SONAR_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: sonarqube-token
+              key: token
+        command:
+        - sh
+        - -c
+        - |
+          until pg_isready -h "$PGHOST"; do echo "Waiting for DB..."; sleep 2; done
+
+          echo "Computing SHA-384 hash of token..."
+          TOKEN_HASH=$(echo -n "$SONAR_TOKEN" | sha384sum | cut -d' ' -f1)
+
+          echo "Checking if token already exists..."
+          EXISTS=$(psql -tc "SELECT 1 FROM user_tokens WHERE token_hash = '$TOKEN_HASH'" | tr -d '[:space:]')
+
+          if [ "$EXISTS" = "1" ]; then
+            echo "Token already exists in database."
+            exit 0
+          fi
+
+          echo "Getting admin user UUID..."
+          ADMIN_UUID=$(psql -tc "SELECT uuid FROM users WHERE login = 'admin'" | tr -d '[:space:]')
+
+          if [ -z "$ADMIN_UUID" ]; then
+            echo "Admin user not found. SonarQube may not have initialized yet."
+            echo "This job will be retried on next sync."
+            exit 1
+          fi
+
+          echo "Inserting token into database..."
+          psql -c "INSERT INTO user_tokens (uuid, user_uuid, name, token_hash, type, created_at, expires_at, last_connection_date)
+                   VALUES (
+                     '$(cat /proc/sys/kernel/random/uuid)',
+                     '$ADMIN_UUID',
+                     'ci-token',
+                     '$TOKEN_HASH',
+                     'GLOBAL_ANALYSIS_TOKEN',
+                     EXTRACT(EPOCH FROM NOW())::bigint * 1000,
+                     NULL,
+                     NULL
+                   )
+                   ON CONFLICT (token_hash) DO NOTHING;"
+
+          echo "Token successfully inserted into SonarQube database."
+      restartPolicy: OnFailure
