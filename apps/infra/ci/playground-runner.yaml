@@ -100,7 +100,7 @@ spec:
                           name: sonarqube-token
                           key: token
                     - name: SONAR_HOST_URL
-                      value: "https://sonar.k3s.gillouche.homelab"
+                      value: "http://sonarqube-sonarqube.sonarqube.svc:9000"
                   volumeMounts:
                     - name: dind-sock
                       mountPath: /var/run
