@@ -27,8 +27,6 @@ spec:
       login: true
       superuser: false
       createdb: true
-      passwordSecret:
-        name: shared-db-sonarqube
   
   inheritedMetadata:
     annotations:
