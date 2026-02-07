@@ -52,7 +52,7 @@ spec:
             url: jdbc:postgresql://shared-db-rw.database.svc:5432/polaris
             username: polaris
             passwordFromSecret:
-              name: shared-db-polaris
+              name: polaris-secrets
               key: password
             
           # Storage Configuration (SeaweedFS)
