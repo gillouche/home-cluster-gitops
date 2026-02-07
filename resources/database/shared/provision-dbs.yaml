@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: provision-dbs
+  namespace: database
+  annotations:
+    argocd.argoproj.io/hook: Sync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: provisioner
+        image: postgres:16-alpine
+        command:
+        - sh
+        - -c
+        - |
+          # Wait for DB
+          until pg_isready -h shared-db-rw.database.svc; do echo waiting for db; sleep 2; done;
+          
+          # Function to create DB if missing
+          create_db() {
+            DB=$1
+            OWNER=$2
+            EXISTS=$(psql -tc "SELECT 1 FROM pg_database WHERE datname = '$DB'" | tr -d '[:space:]')
+            if [ "$EXISTS" = "1" ]; then
+              echo "Database $DB already exists."
+            else
+              echo "Creating database $DB owner $OWNER..."
+              psql -c "CREATE DATABASE $DB OWNER $OWNER;"
+            fi
+          }
+
+          create_db "sonarqube" "sonarqube"
+          create_db "polaris" "polaris"
+        env:
+        - name: PGHOST
+          value: shared-db-rw.database.svc
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              name: shared-db-superuser
+              key: username
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: shared-db-superuser
+              key: password
+        - name: PGDATABASE
+          value: postgres 
+      restartPolicy: OnFailure

@@ -3,6 +3,7 @@ kind: Cluster
 metadata:
   name: shared-db
   namespace: database
+  enableSuperuserAccess: true
 spec:
   instances: 3
   
@@ -34,7 +35,7 @@ spec:
     - name: sonarqube
       ensure: present
       login: true
-      createdb: true
+      createdb: false
       connectionLimit: -1
       inherit: true
       passwordSecret:
@@ -42,7 +43,7 @@ spec:
     - name: polaris
       ensure: present
       login: true
-      createdb: true 
+      createdb: false 
       connectionLimit: -1
       inherit: true
       passwordSecret:
