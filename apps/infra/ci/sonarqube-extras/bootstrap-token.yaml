@@ -59,7 +59,7 @@ spec:
           fi
 
           echo "Inserting token into database..."
-          psql -c "INSERT INTO user_tokens (uuid, user_uuid, name, token_hash, type, created_at, expires_at, last_connection_date)
+          psql -c "INSERT INTO user_tokens (uuid, user_uuid, name, token_hash, type, created_at, expiration_date, last_connection_date)
                    VALUES (
                      '$(cat /proc/sys/kernel/random/uuid)',
                      '$ADMIN_UUID',
