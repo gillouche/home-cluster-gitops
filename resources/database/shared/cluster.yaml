@@ -27,13 +27,17 @@ spec:
       login: true
       superuser: false
       createdb: true
+      connectionLimit: -1
+      inherit: true
     - name: polaris
       ensure: present
       login: true
-      createdb: true # Polaris might need to create schema
+      createdb: true 
+      connectionLimit: -1
+      inherit: true
   
   inheritedMetadata:
     annotations:
       reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
       reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "sonarqube,data-lake"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "sonarqube,data-lake,data-lake"
