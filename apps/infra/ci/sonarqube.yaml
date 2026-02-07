@@ -49,8 +49,8 @@ spec:
             enable: true
             jdbcUrl: "jdbc:postgresql://shared-db-rw.database.svc:542/sonarqube"
             jdbcUsername: "sonarqube"
-            passwordSecretName: "shared-db-sonarqube"
-            passwordSecretKey: "password"
+            jdbcSecretName: "shared-db-sonarqube"
+            jdbcSecretPasswordKey: "password"
             # We use extraEnv for password to avoid cleartext in values
           
           # Custom Secrets to avoid Helm generation
