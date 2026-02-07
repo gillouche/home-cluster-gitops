@@ -45,6 +45,8 @@ spec:
       createdb: true 
       connectionLimit: -1
       inherit: true
+      passwordSecret:
+        name: polaris-secrets
   
   inheritedMetadata:
     annotations:
