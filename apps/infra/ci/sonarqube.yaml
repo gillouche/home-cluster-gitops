@@ -48,7 +48,11 @@ spec:
           jdbcOverwrite:
             enable: true
             jdbcUrl: "jdbc:postgresql://shared-db-rw.database.svc:5432/sonarqube"
-            jdbcUsername: "sonarqube"
+            # We use extraEnv for password to avoid cleartext in values
+          
+          # Custom Secrets to avoid Helm generation
+          monitoringPasscodeSecretName: "sonarqube-secrets"
+          monitoringPasscodeSecretKey: "monitoring-passcode"
           
           extraEnv:
             - name: SONAR_JDBC_PASSWORD
