@@ -19,9 +19,6 @@ spec:
         values: |
           edition: community
 
-          # Use existing SealedSecret for proxy config (prevents Helm from creating standalone secret)
-          httpProxySecret: "sonarqube-http-proxies"
-
           # Networking
           ingress:
             enabled: true
