@@ -62,11 +62,16 @@ spec:
                         secretKeyRef:
                           name: nexus-credentials
                           key: nexus_username
-                    - name: DISCORD_WEBHOOK_URL
+                    - name: DISCORD_WEBHOOK_GITHUB_ACTIONS
                       valueFrom:
                         secretKeyRef:
                           name: github-actions-discord-webhook
                           key: github-actions
+                    - name: DISCORD_WEBHOOK_SECURITY_NOTIFICATIONS
+                      valueFrom:
+                        secretKeyRef:
+                          name: github-actions-discord-webhook
+                          key: security-notifications
                     - name: NEXUS_PASSWORD
                       valueFrom:
                         secretKeyRef:
