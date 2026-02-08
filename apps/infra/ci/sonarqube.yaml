@@ -18,7 +18,10 @@ spec:
       helm:
         values: |
           edition: community
-          
+
+          # Use existing SealedSecret for proxy config (prevents Helm from creating standalone secret)
+          httpProxySecret: "sonarqube-http-proxies"
+
           # Networking
           ingress:
             enabled: true
@@ -89,7 +92,7 @@ spec:
 
     - repoURL: https://github.com/gillouche/home-cluster-gitops.git
       targetRevision: HEAD
-      path: apps/infra/ci/sonarqube-extras
+      path: resources/sonarqube
 
   destination:
     server: https://kubernetes.default.svc

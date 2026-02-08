@@ -1,0 +1,88 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: upgrade-sonarqube-database
+  namespace: sonarqube
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: upgrade-db
+        image: curlimages/curl
+        env:
+        - name: SONAR_HOST
+          value: "http://sonarqube-sonarqube.sonarqube.svc:9000"
+        command:
+        - /bin/sh
+        - -c
+        - |
+          echo "Waiting for SonarQube to be accessible..."
+          until curl -s "$SONAR_HOST/api/system/status" > /dev/null 2>&1; do
+            echo "SonarQube not accessible yet..."
+            sleep 5
+          done
+
+          echo "Checking SonarQube status..."
+          STATUS=$(curl -s "$SONAR_HOST/api/system/status" | grep -o '"status":"[^"]*"' | cut -d'"' -f4)
+          echo "Current status: $STATUS"
+
+          if [ "$STATUS" = "UP" ]; then
+            echo "SonarQube is already up and running. No migration needed."
+            exit 0
+          fi
+
+          if [ "$STATUS" = "DB_MIGRATION_NEEDED" ]; then
+            echo "Database migration is required. Triggering migration..."
+
+            MIGRATE_RESULT=$(curl -s -X POST "$SONAR_HOST/api/system/migrate_db")
+            echo "Migration response: $MIGRATE_RESULT"
+
+            echo "Waiting for migration to complete..."
+            RETRY=0
+            MAX_RETRY=60
+            while [ $RETRY -lt $MAX_RETRY ]; do
+              sleep 10
+              STATUS=$(curl -s "$SONAR_HOST/api/system/status" | grep -o '"status":"[^"]*"' | cut -d'"' -f4)
+              echo "Status check $RETRY: $STATUS"
+
+              if [ "$STATUS" = "UP" ]; then
+                echo "Migration completed successfully!"
+                exit 0
+              elif [ "$STATUS" = "DB_MIGRATION_RUNNING" ]; then
+                echo "Migration still in progress..."
+              elif [ "$STATUS" = "DB_MIGRATION_NEEDED" ]; then
+                echo "Migration has not started, retrying trigger..."
+                curl -s -X POST "$SONAR_HOST/api/system/migrate_db"
+              else
+                echo "Unexpected status: $STATUS"
+              fi
+
+              RETRY=$((RETRY + 1))
+            done
+
+            echo "Migration did not complete within expected time."
+            exit 1
+          fi
+
+          echo "Unexpected initial status: $STATUS. Waiting for normal startup..."
+          RETRY=0
+          MAX_RETRY=30
+          while [ $RETRY -lt $MAX_RETRY ]; do
+            sleep 10
+            STATUS=$(curl -s "$SONAR_HOST/api/system/status" | grep -o '"status":"[^"]*"' | cut -d'"' -f4)
+            if [ "$STATUS" = "UP" ]; then
+              echo "SonarQube is up!"
+              exit 0
+            elif [ "$STATUS" = "DB_MIGRATION_NEEDED" ]; then
+              echo "Migration now needed, triggering..."
+              curl -s -X POST "$SONAR_HOST/api/system/migrate_db"
+            fi
+            RETRY=$((RETRY + 1))
+          done
+
+          echo "SonarQube did not become ready."
+          exit 1
+      restartPolicy: OnFailure
