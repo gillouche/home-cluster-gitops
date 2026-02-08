@@ -29,6 +29,9 @@ spec:
             annotations:
               traefik.ingress.kubernetes.io/router.entrypoints: web
               traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
+            
+            # Prevent standalone secret creation (Gatekeeper violation)
+            httpProxySecret: ""
 
           # Persistence
           persistence:
