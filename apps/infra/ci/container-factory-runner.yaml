@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: homelab-runner
+  name: container-factory-runner
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "6" # Depends on Controller (5)
@@ -17,12 +17,12 @@ spec:
       targetRevision: "0.13.1"
       helm:
         values: |
-          runnerScaleSetName: "homelab-runner"
+          runnerScaleSetName: "container-factory-runner"
           runnerGroup: "Default"
-          githubConfigUrl: "https://github.com/gillouche"
+          githubConfigUrl: "https://github.com/gillouche/container-factory"
           githubConfigSecret: arc-github-creds
           minRunners: 0
-          maxRunners: 10
+          maxRunners: 5
           controllerServiceAccount:
             namespace: arc-systems
             name: arc-controller-gha-rs-controller
