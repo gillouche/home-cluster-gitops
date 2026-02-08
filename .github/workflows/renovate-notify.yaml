@@ -9,32 +9,13 @@ permissions:
 
 jobs:
   notify-renovate:
-    if: startsWith(github.head_ref, 'renovate/') || github.event.pull_request.user.login == 'renovate[bot]'
+    if: (startsWith(github.head_ref, 'renovate/') || github.event.pull_request.user.login == 'renovate[bot]') && github.repository_owner == 'gillouche'
     runs-on: ubuntu-latest
     steps:
-      - name: Send Renovate PR notification to Discord
-        env:
-          WEBHOOK_URL: ${{ secrets.DISCORD_RENOVATE_WEBHOOK }}
-          PR_TITLE: ${{ github.event.pull_request.title }}
-          PR_URL: ${{ github.event.pull_request.html_url }}
-          REPO: ${{ github.repository }}
-          BRANCH: ${{ github.event.pull_request.head.ref }}
-        run: |
-          jq -n \
-            --arg title "$PR_TITLE" \
-            --arg url "$PR_URL" \
-            --arg repo "$REPO" \
-            --arg branch "$BRANCH" \
-            '{
-              content: "🤖 **Renovate opened a PR**",
-              embeds: [{
-                title: $title,
-                url: $url,
-                description: ("Repo: " + $repo + "\nBranch: " + $branch),
-                color: 15105570
-              }]
-            }' | \
-          curl -s -X POST \
-            -H "Content-Type: application/json" \
-            -d @- \
-            "$WEBHOOK_URL"
+      - uses: gillouche/homelab-ci/actions/renovate-notify@main
+        with:
+          webhook: ${{ secrets.DISCORD_RENOVATE_WEBHOOK }}
+          pr-title: ${{ github.event.pull_request.title }}
+          pr-url: ${{ github.event.pull_request.html_url }}
+          repo: ${{ github.repository }}
+          branch: ${{ github.event.pull_request.head.ref }}

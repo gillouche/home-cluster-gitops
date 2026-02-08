@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: playground-runner
+  name: homelab-runner
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "6" # Depends on Controller (5)
@@ -17,7 +17,7 @@ spec:
       targetRevision: "0.13.1"
       helm:
         values: |
-          runnerScaleSetName: "playground-runner"
+          runnerScaleSetName: "homelab-runner"
           runnerGroup: "Default"
           githubConfigUrl: "https://github.com/gillouche"
           githubConfigSecret: arc-github-creds
