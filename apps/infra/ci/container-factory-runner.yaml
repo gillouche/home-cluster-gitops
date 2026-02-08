@@ -104,8 +104,6 @@ spec:
                   volumeMounts:
                     - name: dind-sock
                       mountPath: /var/run
-                    - name: dind-externals
-                      mountPath: /home/runner/externals
                     - name: homelab-root-ca
                       mountPath: /etc/ssl/certs/ca-bundle.pem
                       subPath: ca-bundle.pem
