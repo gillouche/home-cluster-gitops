@@ -19,7 +19,7 @@ spec:
         values: |
           runnerScaleSetName: "playground-runner"
           runnerGroup: "Default"
-          githubConfigUrl: "https://github.com/gillouche/playground"
+          githubConfigUrl: "https://github.com/gillouche"
           githubConfigSecret: arc-github-creds
           minRunners: 3
           maxRunners: 7
