@@ -86,7 +86,7 @@ spec:
   - name: 'discord-firing'
     discordConfigs:
     - apiURL:
-        key: prometheus-firing
+        key: warning-alerts
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '{{ if eq .Status "firing" }}🔔 ALERT{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
@@ -182,7 +182,7 @@ spec:
   - name: 'discord-heartbeat'
     discordConfigs:
     - apiURL:
-        key: prometheus-firing
+        key: alertmanager-healthcheck
         name: monitoring-discord-webhooks
       sendResolved: true
       title: '{{ if eq .Status "firing" }}💓 HEARTBEAT{{ else }}✅ RESOLVED{{ end }}: {{ .GroupLabels.alertname }}'
