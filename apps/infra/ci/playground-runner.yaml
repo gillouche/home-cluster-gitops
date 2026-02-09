@@ -47,9 +47,6 @@ spec:
                   emptyDir: {}
                 - name: dind-externals
                   emptyDir: {}
-                - name: homelab-root-ca
-                  secret:
-                    secretName: homelab-root-ca
               containers:
                 - name: runner
                   image: nexus.gillouche.homelab/docker-hosted/base/actions-runner-homelab-nix:latest
@@ -57,62 +54,11 @@ spec:
                   env:
                     - name: DOCKER_HOST
                       value: unix:///var/run/docker.sock
-                    - name: NEXUS_USERNAME
-                      valueFrom:
-                        secretKeyRef:
-                          name: nexus-credentials
-                          key: nexus_username
-                    - name: DISCORD_WEBHOOK_GITHUB_ACTIONS
-                      valueFrom:
-                        secretKeyRef:
-                          name: github-actions-discord-webhook
-                          key: github-actions
-                    - name: DISCORD_WEBHOOK_SECURITY_NOTIFICATIONS
-                      valueFrom:
-                        secretKeyRef:
-                          name: github-actions-discord-webhook
-                          key: security-notifications
-                    - name: NEXUS_PASSWORD
-                      valueFrom:
-                        secretKeyRef:
-                          name: nexus-credentials
-                          key: nexus_password
-                    # Bazel remote cache credentials (SeaweedFS S3)
-                    - name: SEAWEEDFS_ACCESS_KEY
-                      valueFrom:
-                        secretKeyRef:
-                          name: bazel-cache-access-keys
-                          key: bazel_access_key
-                    - name: SEAWEEDFS_SECRET_KEY
-                      valueFrom:
-                        secretKeyRef:
-                          name: bazel-cache-access-keys
-                          key: bazel_secret_key
-                    # Nix binary cache credentials (SeaweedFS S3)
-                    - name: NIX_ACCESS_KEY_ID
-                      valueFrom:
-                        secretKeyRef:
-                          name: nix-cache-access-keys
-                          key: nix_access_key
-                    - name: NIX_SECRET_ACCESS_KEY
-                      valueFrom:
-                        secretKeyRef:
-                          name: nix-cache-access-keys
-                          key: nix_secret_key
-                    - name: SONAR_TOKEN
-                      valueFrom:
-                        secretKeyRef:
-                          name: sonarqube-token
-                          key: token
                     - name: SONAR_HOST_URL
                       value: "http://sonarqube-sonarqube.sonarqube.svc:9000"
                   volumeMounts:
                     - name: dind-sock
                       mountPath: /var/run
-                    - name: homelab-root-ca
-                      mountPath: /etc/ssl/certs/ca-bundle.pem
-                      subPath: ca-bundle.pem
-                      readOnly: true
                 - name: dind
                   image: docker:dind
                   args: ["dockerd", "--host=unix:///var/run/docker.sock", "--group=$(DOCKER_GROUP_GID)"]
@@ -126,10 +72,6 @@ spec:
                       mountPath: /var/run
                     - name: dind-externals
                       mountPath: /home/runner/externals
-                    - name: homelab-root-ca
-                      mountPath: /etc/docker/certs.d/nexus.gillouche.homelab/ca.crt
-                      subPath: ca-bundle.pem
-                      readOnly: true
   destination:
     server: https://kubernetes.default.svc
     namespace: arc-systems
