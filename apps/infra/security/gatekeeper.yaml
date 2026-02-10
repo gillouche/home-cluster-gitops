@@ -24,6 +24,10 @@ spec:
             maxUnavailable: 1
             maxSurge: 1
         auditInterval: 60
+        validatingWebhookConfiguration:
+          failurePolicy: Ignore
+        mutatingWebhookConfiguration:
+          failurePolicy: Ignore
         controllerManager:
           nodeSelector:
             node-class: homeserver
