@@ -30,7 +30,7 @@ spec:
             - containerPort: 6379
           envFrom:
             - secretRef:
-                name: redis-credentials
+                name: prod-redis-credentials
           volumeMounts:
             - name: data
               mountPath: /data
