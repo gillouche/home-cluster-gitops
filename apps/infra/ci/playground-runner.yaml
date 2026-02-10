@@ -50,6 +50,7 @@ spec:
               containers:
                 - name: runner
                   image: nexus.gillouche.homelab/docker-hosted/base/actions-runner-homelab-nix:latest
+                  imagePullPolicy: Always
                   command: ["/home/runner/run.sh"]
                   env:
                     - name: DOCKER_HOST
