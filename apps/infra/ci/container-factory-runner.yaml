@@ -60,6 +60,8 @@ spec:
                   volumeMounts:
                     - name: dind-sock
                       mountPath: /var/run
+                    - name: dind-externals
+                      mountPath: /etc/docker/certs.d
                 - name: dind
                   image: docker:dind
                   args: ["dockerd", "--host=unix:///var/run/docker.sock", "--group=$(DOCKER_GROUP_GID)"]
@@ -72,7 +74,7 @@ spec:
                     - name: dind-sock
                       mountPath: /var/run
                     - name: dind-externals
-                      mountPath: /home/runner/externals
+                      mountPath: /etc/docker/certs.d
   destination:
     server: https://kubernetes.default.svc
     namespace: arc-systems
