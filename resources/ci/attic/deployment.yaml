@@ -20,7 +20,9 @@ spec:
       containers:
         - name: attic-server
           image: nexus.gillouche.homelab/docker-hub/nixpkgs/attic:nixos-25.11-x86_64-linux
-          args: ["--config", "/etc/attic/server.toml"]
+          command:
+            - atticd
+          args: ["server", "--config", "/etc/attic/server.toml"]
           ports:
             - containerPort: 8080
               name: http
