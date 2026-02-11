@@ -1,0 +1,44 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: attic-provisioning
+  namespace: attic
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: HookSucceeded
+spec:
+  template:
+    spec:
+      containers:
+        - name: provisioner
+          image: ghcr.io/zhaofengli/attic-server:latest
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -e
+              # Wait for Attic server to be ready
+              echo "Waiting for Attic server..."
+              until curl -s http://attic-server:80; do sleep 2; done
+
+              # Use the server's own config to log in locally
+              # We use atticd commands to interact with the database/API
+              echo "Initializing caches..."
+              
+              # Log in using the pre-generated bootstrap/admin token
+              attic login homelab http://attic-server:80 "$ATTIC_BOOTSTRAP_TOKEN"
+              
+              echo "Ensuring caches exist..."
+              attic cache create nix || true
+              attic cache update nix --public-ability pull
+              
+              attic cache create bazel || true
+              attic cache update bazel --public-ability pull
+              
+              echo "Provisioning successful."
+          env:
+            - name: ATTIC_BOOTSTRAP_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: attic-secrets
+                  key: bootstrap-token
+      restartPolicy: OnFailure

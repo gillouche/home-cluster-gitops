@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: attic-server
+  namespace: attic
+  labels:
+    app.kubernetes.io/name: attic-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: attic-server
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: attic-server
+    spec:
+      containers:
+        - name: attic-server
+          image: ghcr.io/zhaofengli/attic-server:latest
+          args: ["--config", "/etc/attic/server.toml"]
+          ports:
+            - containerPort: 8080
+              name: http
+          env:
+            - name: ATTIC_SERVER_DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: attic-secrets
+                  key: database-url
+            - name: ATTIC_SERVER_TOKEN_HS256_SECRET_BASE64
+              valueFrom:
+                secretKeyRef:
+                  name: attic-secrets
+                  key: server-token-secret
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: attic-cache-access-keys
+                  key: attic_access_key
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: attic-cache-access-keys
+                  key: attic_secret_key
+          volumeMounts:
+            - name: config
+              mountPath: /etc/attic
+              readOnly: true
+            - name: signing-key
+              mountPath: /secrets
+              readOnly: true
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+      volumes:
+        - name: config
+          configMap:
+            name: attic-config
+        - name: signing-key
+          secret:
+            secretName: attic-secrets
+            items:
+              - key: signing-key
+                path: signing-key

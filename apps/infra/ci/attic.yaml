@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: attic
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5" # After database and seaweedfs
+spec:
+  project: infra-ci
+  source:
+    repoURL: https://github.com/gillouche/home-cluster-gitops.git
+    targetRevision: HEAD
+    path: resources/ci/attic
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: attic
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
