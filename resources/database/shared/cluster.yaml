@@ -48,9 +48,16 @@ spec:
       inherit: true
       passwordSecret:
         name: polaris-secrets
+    - name: attic
+      ensure: present
+      login: true
+      connectionLimit: -1
+      inherit: true
+      passwordSecret:
+        name: attic-secrets
   
   inheritedMetadata:
     annotations:
       reflector.v1.k8s.emberstack.com/reflection-allowed: "true"
       reflector.v1.k8s.emberstack.com/reflection-auto-enabled: "true"
-      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "sonarqube,data-lake"
+      reflector.v1.k8s.emberstack.com/reflection-allowed-namespaces: "sonarqube,data-lake,attic"
