@@ -19,6 +19,8 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            - name: BAZEL_REMOTE_PORT
+              value: "8080"
             - name: BA_S3_ACCESS_KEY
               valueFrom:
                 secretKeyRef:
