@@ -34,7 +34,6 @@ spec:
 
           create_db "sonarqube" "sonarqube"
           create_db "polaris" "polaris"
-          create_db "attic" "attic"
         env:
         - name: PGHOST
           value: shared-db-rw.database.svc
