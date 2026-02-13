@@ -20,7 +20,7 @@ spec:
         node-class: homeserver
       containers:
         - name: redis
-          image: redis:8.4.0-alpine
+          image: redis:8.6.0-alpine
           args:
             - redis-server
             - --requirepass
