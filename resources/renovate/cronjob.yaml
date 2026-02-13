@@ -24,7 +24,7 @@ spec:
                 - name: RENOVATE_AUTODISCOVER
                   value: "false"
                 - name: RENOVATE_REPOSITORIES
-                  value: "['gillouche/home-cluster-gitops','gillouche/playground', 'gillouche/ansible-env-bootstrap', 'gillouche/ansible-home-cluster', 'gillouche/container-factory', 'gillouche/homelab-ci']"
+                  value: '["gillouche/home-cluster-gitops","gillouche/playground","gillouche/ansible-env-bootstrap","gillouche/ansible-home-cluster","gillouche/container-factory","gillouche/homelab-ci"]'
                 - name: RENOVATE_CONFIG_FILE
                   value: "/app/renovate-config/config.js"
                 - name: RENOVATE_TOKEN
