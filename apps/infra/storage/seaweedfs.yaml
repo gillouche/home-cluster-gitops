@@ -184,6 +184,14 @@ spec:
     - repoURL: https://github.com/gillouche/home-cluster-gitops.git
       targetRevision: HEAD
       path: resources/seaweedfs
+  ignoreDifferences:
+    - group: ""
+      kind: Secret
+      name: seaweedfs-db-secret
+      jsonPointers:
+        - /data
+        - /metadata/annotations
+        - /metadata/labels
   destination:
     server: https://kubernetes.default.svc
     namespace: seaweedfs
