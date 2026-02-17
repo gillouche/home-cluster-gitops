@@ -27,6 +27,7 @@ spec:
             createDefaultDiskLabeledNodes: false
             storageReservedPercentageForDefaultDisk: 20
             storageOverProvisioningPercentage: 100
+            systemManagedComponentsResourceLimits: "cpu: 2000m, memory: 12Gi"
           longhornManager:
             affinity: {}
 
