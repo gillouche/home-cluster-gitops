@@ -42,6 +42,13 @@ spec:
             spec:
               nodeSelector:
                 node-class: homeserver
+              topologySpreadConstraints:
+                - maxSkew: 1
+                  topologyKey: kubernetes.io/hostname
+                  whenUnsatisfiable: ScheduleAnyway
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: container-factory-runner
               volumes:
                 - name: dind-sock
                   emptyDir: {}
