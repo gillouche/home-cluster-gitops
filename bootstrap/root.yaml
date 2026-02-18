@@ -16,6 +16,15 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
+  ignoreDifferences:
+    - group: argoproj.io
+      kind: Application
+      jsonPointers:
+        - /metadata/annotations/notified.notifications.argoproj.io
+    - group: argoproj.io
+      kind: AppProject
+      jsonPointers:
+        - /metadata/annotations/notified.notifications.argoproj.io
   syncPolicy:
     automated:
       prune: true
