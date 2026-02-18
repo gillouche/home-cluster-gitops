@@ -19,12 +19,14 @@ spec:
   ignoreDifferences:
     - group: argoproj.io
       kind: Application
-      jsonPointers:
-        - /metadata/annotations/notified.notifications.argoproj.io
+      jqPathExpressions:
+        - .metadata.annotations
+        - .metadata.labels
     - group: argoproj.io
       kind: AppProject
-      jsonPointers:
-        - /metadata/annotations/notified.notifications.argoproj.io
+      jqPathExpressions:
+        - .metadata.annotations
+        - .metadata.labels
   syncPolicy:
     automated:
       prune: true
