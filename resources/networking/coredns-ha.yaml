@@ -25,6 +25,7 @@ spec:
       priorityClassName: system-cluster-critical
       nodeSelector:
         kubernetes.io/os: linux
+        node-class: homeserver
       tolerations:
         - key: CriticalAddonsOnly
           operator: Exists
