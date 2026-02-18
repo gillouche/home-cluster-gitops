@@ -238,8 +238,7 @@ spec:
           # Replace standalone exporters
           nodeExporter:
             enabled: true
-          kubeStateMetrics:
-            enabled: true
+          kube-state-metrics:
             nodeSelector:
               node-class: homeserver
   
