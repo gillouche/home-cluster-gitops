@@ -9,6 +9,9 @@ spec:
     name: shared-db-superuser
   instances: 3
   
+  # Placement
+  nodeSelector:
+    node-class: homeserver
   # Image Configuration
   imageName: ghcr.io/cloudnative-pg/postgresql:16.1
   
