@@ -67,8 +67,7 @@ spec:
       jsonPointers:
         - /metadata/annotations
         - /metadata/labels
-    - group: ""
-      kind: ServiceAccount
+    - kind: ServiceAccount
       name: longhorn-service-account
       jsonPointers:
         - /metadata/annotations
