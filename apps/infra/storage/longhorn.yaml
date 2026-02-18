@@ -62,7 +62,7 @@ spec:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
   ignoreDifferences:
-    - group: scheduling.k8s.io
+    - group: "scheduling.k8s.io"
       kind: PriorityClass
       name: longhorn-critical
       jsonPointers:
