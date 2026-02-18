@@ -89,14 +89,6 @@ spec:
                 secretKeyRef:
                   name: polaris-secrets
                   key: password
-
-          # Postgres Subchart Configuration
-          postgresql:
-            auth:
-              existingSecret: polaris-secrets
-              secretKeys:
-                adminPasswordKey: password
-                userPasswordKey: password
               
   destination:
     server: https://kubernetes.default.svc
