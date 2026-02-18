@@ -17,7 +17,8 @@ spec:
     targetRevision: 7.1.0
     helm:
       values: |
-        {}
+        nodeSelector:
+          node-class: homeserver
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system

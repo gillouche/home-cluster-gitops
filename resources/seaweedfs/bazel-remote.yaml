@@ -14,6 +14,8 @@ spec:
         app: bazel-remote
     spec:
       enableServiceLinks: false
+      nodeSelector:
+        node-class: homeserver
       containers:
         - name: bazel-remote
           image: buchgr/bazel-remote-cache:latest

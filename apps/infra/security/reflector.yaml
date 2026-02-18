@@ -17,6 +17,8 @@ spec:
       targetRevision: 10.0.8
       helm:
         values: |
+          nodeSelector:
+            node-class: homeserver
           configuration:
             watcher:
               # Watch secrets and configmaps
