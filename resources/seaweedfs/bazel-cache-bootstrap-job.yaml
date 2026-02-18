@@ -13,6 +13,8 @@ spec:
   template:
     spec:
       restartPolicy: OnFailure
+      nodeSelector:
+        node-class: homeserver
       containers:
         - name: bootstrap
           image: chrislusf/seaweedfs:4.12

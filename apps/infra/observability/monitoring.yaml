@@ -240,6 +240,8 @@ spec:
             enabled: true
           kubeStateMetrics:
             enabled: true
+            nodeSelector:
+              node-class: homeserver
   
           # Disable some defaults that might be too heavy for RPIs or not needed yet
           kubeProxy:
