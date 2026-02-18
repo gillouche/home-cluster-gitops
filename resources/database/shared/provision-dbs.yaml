@@ -49,4 +49,6 @@ spec:
               key: password
         - name: PGDATABASE
           value: postgres 
+      nodeSelector:
+        node-class: homeserver
       restartPolicy: OnFailure

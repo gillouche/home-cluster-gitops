@@ -10,8 +10,15 @@ spec:
   instances: 3
   
   # Placement
-  nodeSelector:
-    node-class: homeserver
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: node-class
+            operator: In
+            values:
+            - homeserver
   # Image Configuration
   imageName: ghcr.io/cloudnative-pg/postgresql:16.1
   
