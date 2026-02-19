@@ -8,4 +8,12 @@ resources:
 patches:
   - path: affinity-patch.yaml
   - path: replicas-patch.yaml
+  - target:
+      kind: Secret
+      name: argocd-secret
+    patch: |
+      - op: add
+        path: /metadata/annotations
+        value:
+          sealedsecrets.bitnami.com/managed: "true"
 
