@@ -21,10 +21,10 @@ spec:
             defaultDataPath: "/mnt/ssd_nvme"
             replicaSoftAntiAffinity: false
             replicaZoneSoftAntiAffinity: true
-            concurrentReplicaRebuildPerNodeLimit: 1
-            replicaRebuildConcurrentSyncLimit: 2
-            replicaRebuildingBandwidthLimit: 80000000
-            replicaReplenishmentWaitInterval: 300
+            concurrentReplicaRebuildPerNodeLimit: 2
+            replicaRebuildConcurrentSyncLimit: 3
+            replicaRebuildingBandwidthLimit: 120000000
+            replicaReplenishmentWaitInterval: 60
             defaultDataLocality: best-effort
             replicaAutoBalance: least-effort
             createDefaultDiskLabeledNodes: false
