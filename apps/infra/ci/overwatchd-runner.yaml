@@ -1,0 +1,94 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: overwatchd-runner
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "6" # Depends on Controller (5)
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-infra: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-infra: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-ci
+  sources:
+    - chart: gha-runner-scale-set
+      repoURL: "ghcr.io/actions/actions-runner-controller-charts"
+      targetRevision: "0.13.1"
+      helm:
+        values: |
+          runnerScaleSetName: "overwatchd-runner"
+          runnerGroup: "Default"
+          githubConfigUrl: "https://github.com/gillouche/overwatchd"
+          githubConfigSecret: arc-github-creds
+          minRunners: 0
+          maxRunners: 3
+          controllerServiceAccount:
+            namespace: arc-systems
+            name: arc-controller-gha-rs-controller
+          # Pin the listener pod to the homeserver (avoid RPis)
+          listenerTemplate:
+            spec:
+              nodeSelector:
+                node-class: homeserver
+              containers:
+                - name: listener
+                  image: ghcr.io/actions/gha-runner-scale-set-controller:0.13.1
+                  command: ["/ghalistener"]
+          # containerMode:
+          #   type: "dind"
+
+          template:
+            spec:
+              nodeSelector:
+                node-class: homeserver
+              topologySpreadConstraints:
+                - maxSkew: 1
+                  topologyKey: kubernetes.io/hostname
+                  whenUnsatisfiable: ScheduleAnyway
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: overwatchd-runner
+              volumes:
+                - name: dind-sock
+                  emptyDir: {}
+                - name: dind-externals
+                  emptyDir: {}
+              containers:
+                - name: runner
+                  image: nexus.gillouche.homelab/docker-hosted/base/actions-runner-homelab-nix:latest
+                  imagePullPolicy: Always
+                  command: ["/home/runner/run.sh"]
+                  env:
+                    - name: DOCKER_HOST
+                      value: unix:///var/run/docker.sock
+                    - name: SONAR_HOST_URL
+                      value: "http://sonarqube-sonarqube.sonarqube.svc:9000"
+                  volumeMounts:
+                    - name: dind-sock
+                      mountPath: /var/run
+                    - name: dind-externals
+                      mountPath: /etc/docker/certs.d
+                - name: dind
+                  image: docker:dind
+                  args: ["dockerd", "--host=unix:///var/run/docker.sock", "--group=$(DOCKER_GROUP_GID)"]
+                  env:
+                    - name: DOCKER_GROUP_GID
+                      value: "1001"
+                  securityContext:
+                    privileged: true
+                  volumeMounts:
+                    - name: dind-sock
+                      mountPath: /var/run
+                    - name: dind-externals
+                      mountPath: /etc/docker/certs.d
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: arc-systems
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
