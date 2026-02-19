@@ -22,7 +22,7 @@ spec:
             replicaSoftAntiAffinity: false
             replicaZoneSoftAntiAffinity: true
             concurrentReplicaRebuildPerNodeLimit: 1
-            replicaRebuildConcurrentSyncLimit: 1
+            replicaRebuildConcurrentSyncLimit: 2
             replicaRebuildingBandwidthLimit: 80000000
             replicaReplenishmentWaitInterval: 300
             defaultDataLocality: best-effort
