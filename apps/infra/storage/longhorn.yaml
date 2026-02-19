@@ -22,6 +22,9 @@ spec:
             replicaSoftAntiAffinity: false
             replicaZoneSoftAntiAffinity: true
             concurrentReplicaRebuildPerNodeLimit: 2
+            replicaRebuildConcurrentSyncLimit: 2
+            replicaRebuildingBandwidthLimit: 80000000
+            replicaReplenishmentWaitInterval: 300
             defaultDataLocality: best-effort
             replicaAutoBalance: least-effort
             createDefaultDiskLabeledNodes: false
