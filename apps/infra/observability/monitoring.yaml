@@ -27,6 +27,9 @@ spec:
                 namespace: monitoring
               storageSpec:
                 volumeClaimTemplate:
+                  metadata:
+                    labels:
+                      recurring-job-group.longhorn.io/default: ignored
                   spec:
                     storageClassName: longhorn
                     accessModes: ["ReadWriteOnce"]
@@ -72,6 +75,9 @@ spec:
                   rollout-restart: "2026-01-11T03:00:00Z"
               storage:
                 volumeClaimTemplate:
+                  metadata:
+                    labels:
+                      recurring-job-group.longhorn.io/default: ignored
                   spec:
                     storageClassName: longhorn
                     accessModes: ["ReadWriteOnce"]

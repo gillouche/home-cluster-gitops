@@ -30,6 +30,8 @@ spec:
             createDefaultDiskLabeledNodes: false
             storageReservedPercentageForDefaultDisk: 20
             storageOverProvisioningPercentage: 100
+            orphanResourceAutoDeletion: true
+            orphanResourceAutoDeletionGracePeriod: 300
           longhornManager:
             affinity: {}
 
