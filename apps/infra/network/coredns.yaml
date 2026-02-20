@@ -20,6 +20,12 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system
+  ignoreDifferences:
+    - group: ""
+      kind: ConfigMap
+      name: coredns
+      jsonPointers:
+        - /data/NodeHosts
   syncPolicy:
     automated:
       prune: true
