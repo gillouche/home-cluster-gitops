@@ -38,17 +38,6 @@ data:
     192.168.0.87 homeserver
     192.168.0.88 homeserver2
     192.168.0.89 homeserver3
-    2a02:2788:a4:5f0:e1:ff9f:e313:4a7 rpi5b16g5
-    2a02:2788:a4:5f0:2ecf:67ff:fe27:2f85 rpi5b8g1
-    2a02:2788:a4:5f0:2ecf:67ff:fef4:c80d rpi5b16g6
-    2a02:2788:a4:5f0:2ecf:67ff:fef4:cb22 rpi5b16g4
-    2a02:2788:a4:5f0:8aa2:9eff:fe57:42de rpi5b16g3ssd
-    2a02:2788:a4:5f0:8aa2:9eff:fe57:430a rpi5b16g1ssd
-    2a02:2788:a4:5f0:8aa2:9eff:fe57:4310 rpi5b16g2ssd
-    2a02:2788:a4:5f0:da3a:ddff:fe9a:8be7 rpi4b8g4
-    2a02:2788:a4:5f0:e65f:1ff:feac:1a23 rpi4b8g3
-    2a02:2788:a4:5f0:e65f:1ff:feb4:a266 rpi4b8g2
-    2a02:2788:a4:5f0:e65f:1ff:feb4:a280 rpi4b8g1
 kind: ConfigMap
 metadata:
   name: coredns
