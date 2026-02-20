@@ -8,9 +8,6 @@ metadata:
     app.kubernetes.io/part-of: argocd
 data:
   accounts.overwatchd: apiKey
-  policy.csv: |
-    p, overwatchd, applications, get, */*, allow
-    p, overwatchd, applications, sync, */*, allow
   exec.enabled: "true"
   url: https://argocd.k3s.gillouche.homelab
   oidc.config: |

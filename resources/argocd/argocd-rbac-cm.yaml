@@ -10,3 +10,5 @@ data:
   policy.default: role:readonly
   policy.csv: |
     g, admins, role:admin
+    p, overwatchd, applications, get, */*, allow
+    p, overwatchd, applications, sync, */*, allow
