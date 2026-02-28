@@ -21,10 +21,11 @@ spec:
             defaultDataPath: "/mnt/ssd_nvme"
             replicaSoftAntiAffinity: false
             replicaZoneSoftAntiAffinity: true
+            nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
             concurrentReplicaRebuildPerNodeLimit: 2
             replicaRebuildConcurrentSyncLimit: 3
             replicaRebuildingBandwidthLimit: 120000000
-            replicaReplenishmentWaitInterval: 60
+            replicaReplenishmentWaitInterval: 30
             defaultDataLocality: best-effort
             replicaAutoBalance: least-effort
             createDefaultDiskLabeledNodes: false
@@ -32,6 +33,8 @@ spec:
             storageOverProvisioningPercentage: 100
             orphanResourceAutoDeletion: true
             orphanResourceAutoDeletionGracePeriod: 300
+            engineReplicaTimeout: 30
+            guaranteedInstanceManagerCPU: 40
           longhornManager:
             affinity: {}
 
@@ -47,7 +50,7 @@ spec:
 
           persistence:
             defaultClass: true
-            defaultClassReplicaCount: 3
+            defaultClassReplicaCount: 2
           metrics:
             serviceMonitor:
               enabled: true
