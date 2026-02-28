@@ -88,7 +88,7 @@ spec:
                     - name: action-cache
                       mountPath: /home/runner/action-archive-cache
                 - name: dind
-                  image: nexus.gillouche.homelab/docker-hub/docker:dind
+                  image: nexus.gillouche.homelab/docker-hub/library/docker:dind
                   args: ["dockerd", "--host=unix:///var/run/docker.sock", "--group=$(DOCKER_GROUP_GID)"]
                   env:
                     - name: DOCKER_GROUP_GID
