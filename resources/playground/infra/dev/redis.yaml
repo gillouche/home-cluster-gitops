@@ -21,7 +21,7 @@ spec:
         workload.tier: infra
       containers:
         - name: redis
-          image: nexus.gillouche.homelab/docker-hub/redis:8-alpine
+          image: nexus.gillouche.homelab/docker-hub/library/redis:8-alpine
           command:
             - redis-server
             - --requirepass

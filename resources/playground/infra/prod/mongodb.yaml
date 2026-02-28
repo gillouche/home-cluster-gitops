@@ -21,7 +21,7 @@ spec:
         workload.tier: infra
       containers:
         - name: mongodb
-          image: nexus.gillouche.homelab/docker-hub/mongo:8
+          image: nexus.gillouche.homelab/docker-hub/library/mongo:8
           ports:
             - containerPort: 27017
           envFrom:

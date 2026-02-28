@@ -126,7 +126,7 @@ spec:
         spec:
           containers:
           - name: reporter
-            image: nexus.gillouche.homelab/docker-hub/python:3.14-slim
+            image: nexus.gillouche.homelab/docker-hub/library/python:3.14.3-slim-trixie
             command: ["python", "/app/status_check.py"]
             env:
             - name: DISCORD_WEBHOOK_URL

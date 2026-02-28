@@ -39,7 +39,7 @@ spec:
                 topologyKey: "kubernetes.io/hostname"
       initContainers:
         - name: init-config
-          image: nexus.gillouche.homelab/docker-hub/busybox:latest
+          image: nexus.gillouche.homelab/docker-hub/library/busybox:latest
           command: ['sh', '-c', 'cp -L /app/config-ro/* /app/config/']
           volumeMounts:
             - name: config-ro

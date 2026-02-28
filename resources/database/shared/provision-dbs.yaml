@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: provisioner
-        image: nexus.gillouche.homelab/docker-hub/postgres:16-alpine
+        image: nexus.gillouche.homelab/docker-hub/library/postgres:16-alpine
         command:
         - sh
         - -c

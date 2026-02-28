@@ -62,7 +62,7 @@ spec:
               cpu: "1"
       initContainers:
         - name: fix-permissions
-          image: nexus.gillouche.homelab/docker-hub/busybox:latest
+          image: nexus.gillouche.homelab/docker-hub/library/busybox:latest
           command: ["sh", "-c", "chown -R 1000:1000 /var/lib/kafka/data"]
           volumeMounts:
             - name: data
