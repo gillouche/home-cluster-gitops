@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
       - name: bootstrap-token
-        image: alpine:latest
+        image: nexus.gillouche.homelab/docker-hub/alpine:latest
         env:
         - name: PGHOST
           value: shared-db-rw.database.svc

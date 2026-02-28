@@ -21,7 +21,7 @@ spec:
         workload.tier: infra
       containers:
         - name: postgres
-          image: postgres:18.3-alpine
+          image: nexus.gillouche.homelab/docker-hub/postgres:18.3-alpine
           ports:
             - containerPort: 5432
           envFrom:

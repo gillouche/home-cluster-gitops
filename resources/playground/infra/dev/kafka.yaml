@@ -21,7 +21,7 @@ spec:
         workload.tier: infra
       containers:
         - name: kafka
-          image: apache/kafka:4.2.0
+          image: nexus.gillouche.homelab/docker-hub/apache/kafka:4.2.0
           ports:
             - containerPort: 9092
               name: kafka
@@ -62,7 +62,7 @@ spec:
               cpu: "1"
       initContainers:
         - name: fix-permissions
-          image: busybox:latest
+          image: nexus.gillouche.homelab/docker-hub/busybox:latest
           command: ["sh", "-c", "chown -R 1000:1000 /var/lib/kafka/data"]
           volumeMounts:
             - name: data

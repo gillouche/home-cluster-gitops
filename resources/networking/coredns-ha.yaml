@@ -56,7 +56,7 @@ spec:
               k8s-app: kube-dns
       containers:
         - name: coredns
-          image: rancher/mirrored-coredns-coredns:1.14.1
+          image: nexus.gillouche.homelab/docker-hub/rancher/mirrored-coredns-coredns:1.14.1
           imagePullPolicy: IfNotPresent
           args:
             - -conf

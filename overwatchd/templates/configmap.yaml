@@ -1,0 +1,18 @@
+# ConfigMap for non-sensitive configuration.
+# ConfigMaps are stored in plain text in etcd — never put tokens or passwords here.
+# The Deployment references this via envFrom.configMapRef, which injects all
+# keys as environment variables. The Go app reads them with os.Getenv().
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "overwatchd.fullname" . }}
+  labels:
+    {{- include "overwatchd.labels" . | nindent 4 }}
+data:
+  GUILD_ID: {{ .Values.config.guildID | quote }}
+  KUBE_CONTEXT: {{ .Values.config.kubeContext | quote }}
+  ARGOCD_URL: {{ .Values.config.argocdURL | quote }}
+  ARGOCD_INSECURE: {{ .Values.config.argocdInsecure | quote }}
+  ALLOWED_USER_IDS: {{ .Values.config.allowedUserIDs | quote }}
+  LOG_FORMAT: {{ .Values.config.logFormat | quote }}
+  HEALTH_PORT: {{ .Values.config.healthPort | quote }}

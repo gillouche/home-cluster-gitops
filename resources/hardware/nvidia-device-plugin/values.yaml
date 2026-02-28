@@ -8,7 +8,7 @@ nvidia-device-plugin:
   runtimeClassName: nvidia
   # Capability to support ARM64 / Tegra (Jetson) or standard discrete GPUs
   image:
-    repository: nvcr.io/nvidia/k8s-device-plugin
+    repository: nexus.gillouche.homelab/nvcr-proxy/nvidia/k8s-device-plugin
     tag: v0.18.2
 
   # Enable compatibility checks

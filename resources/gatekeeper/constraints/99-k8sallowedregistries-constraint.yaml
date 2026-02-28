@@ -21,5 +21,3 @@ spec:
   parameters:
     registries:
     - nexus.gillouche.homelab/
-    - k8s.gcr.io/
-    - registry.k8s.io/

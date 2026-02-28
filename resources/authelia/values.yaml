@@ -1,5 +1,6 @@
 image:
-  repository: authelia/authelia
+  registry: nexus.gillouche.homelab
+  repository: docker-hub/authelia/authelia
   tag: "4.39.15"
 
 

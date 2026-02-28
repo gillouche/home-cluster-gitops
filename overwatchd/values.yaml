@@ -1,0 +1,100 @@
+# -- Container image configuration
+image:
+  # Registry where the image is hosted. This is your private Nexus registry.
+  registry: nexus.gillouche.homelab/docker-hosted
+  repository: overwatchd
+  # REQUIRED. Must be a specific, immutable tag — never "latest".
+  # CI sets this to the git short SHA (e.g. "a539516").
+  # For releases, use the version tag (e.g. "v1.0.0").
+  # The template will fail if this is empty.
+  tag: ""
+  # IfNotPresent avoids pulling on every restart when the tag hasn't changed.
+  # Use "Always" only if you deploy with mutable tags like "latest".
+  pullPolicy: IfNotPresent
+
+# -- Only 1 replica. Discord bot tokens support a single active WebSocket
+# connection. Running multiple replicas causes reconnect loops and duplicate
+# command handling. The Recreate strategy (in deployment.yaml) ensures zero
+# overlap during rollouts.
+replicaCount: 1
+
+# -- Non-sensitive configuration (stored in a ConfigMap).
+# ConfigMaps are not encrypted at rest
+config:
+  # Guild ID for instant slash command registration (dev only).
+  # Leave empty in production for global commands.
+  guildID: ""
+  # Kubernetes context. Empty = in-cluster auto-detection (correct for pods).
+  kubeContext: ""
+  # ArgoCD server URL. Required for ArgoCD commands (future phases).
+  argocdURL: ""
+  # Skip TLS verification for ArgoCD. Use "true" only if ArgoCD uses
+  # a self-signed certificate that the pod doesn't trust.
+  argocdInsecure: "false"
+  # Comma-separated Discord user IDs authorized to use the bot.
+  allowedUserIDs: ""
+  # Log output format. "json" for machine parsing, "text" for humans.
+  logFormat: "json"
+  # Port for the HTTP health server (/healthz and /readyz).
+  healthPort: "8080"
+
+# -- Sensitive values (stored in a Kubernetes Secret).
+# Secrets are base64-encoded by default — NOT encrypted. For real security:
+#   1. Enable encryption at rest in your cluster (EncryptionConfiguration)
+#   2. Use sealed-secrets, external-secrets, or a vault integration
+#
+# This chart defaults to secrets.create=false, expecting a pre-existing
+# Secret (e.g. created by a SealedSecret). The deployment always mounts
+# the secret via envFrom — if the secret doesn't exist, the pod won't start
+# (Kubernetes blocks container creation with a CreateContainerConfigError).
+secrets:
+  # Set to true only for quick local testing. In production, create the
+  # secret externally (sealed-secrets, external-secrets-operator, etc.).
+  create: false
+  # Name of the pre-existing secret. If empty, defaults to the release
+  # fullname (e.g. "overwatchd"). Your SealedSecret should target a Secret
+  # with this name, containing keys: DISCORD_TOKEN, ARGOCD_TOKEN.
+  existingSecret: ""
+  # Only used when secrets.create=true.
+  discordToken: ""
+  argocdToken: ""
+
+# -- ServiceAccount configuration.
+# A dedicated ServiceAccount isolates this workload's RBAC permissions.
+# Future phases (k8s commands) will bind ClusterRoles to this SA.
+serviceAccount:
+  create: true
+  # Override the SA name. If empty, uses the release fullname.
+  name: ""
+  # Annotations for integrations like IAM Roles for Service Accounts (IRSA)
+  # or workload identity federation.
+  annotations: {}
+
+# -- Resource requests and limits.
+# Requests: the scheduler reserves this much on a node.
+# Limits: the kubelet kills the container if it exceeds these.
+# The bot is lightweight — a Discord WebSocket + occasional HTTP calls.
+# Tune based on observed usage (check metrics in Phase 9).
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+    ephemeral-storage: 64Mi
+  limits:
+    cpu: 200m
+    memory: 128Mi
+    ephemeral-storage: 128Mi
+
+# -- Node scheduling constraints.
+# nodeSelector: simple key-value matching against node labels.
+# tolerations: allow scheduling on tainted nodes (e.g. dedicated=bots:NoSchedule).
+# affinity: advanced rules (node affinity, pod anti-affinity, topology spread).
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# -- Extra annotations added to every pod (e.g. for Prometheus scraping,
+# Istio sidecar injection, or Linkerd proxy configuration).
+podAnnotations: {}

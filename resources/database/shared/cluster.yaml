@@ -20,7 +20,7 @@ spec:
             values:
             - homeserver
   # Image Configuration
-  imageName: ghcr.io/cloudnative-pg/postgresql:16.1
+  imageName: nexus.gillouche.homelab/ghcr-proxy/cloudnative-pg/postgresql:16.1
   
   # Storage Configuration
   storage:

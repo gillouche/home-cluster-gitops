@@ -1,0 +1,27 @@
+# ClusterIP Service exposing the health check port.
+# This Service is used for:
+#   1. Kubernetes probes (liveness/readiness) — probes actually hit the pod
+#      directly, but having a Service enables kubectl port-forward and
+#      manual health checks: kubectl port-forward svc/overwatchd 8080:8080
+#   2. Future ServiceMonitor (Phase 9) — Prometheus discovers scrape targets
+#      via Services, not individual pods
+#   3. Internal DNS — other pods can reach the health endpoint at
+#      overwatchd.<namespace>.svc.cluster.local:8080
+#
+# ClusterIP (default) is correct here — no external access needed.
+# The bot communicates with Discord via outbound WebSocket, not inbound traffic.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "overwatchd.fullname" . }}
+  labels:
+    {{- include "overwatchd.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: health
+      port: {{ int .Values.config.healthPort }}
+      targetPort: health
+      protocol: TCP
+  selector:
+    {{- include "overwatchd.selectorLabels" . | nindent 4 }}

@@ -1,0 +1,31 @@
+overwatchd has been deployed.
+
+Image:  {{ include "overwatchd.image" . }}
+Secret: {{ include "overwatchd.secretName" . }}
+
+Health endpoint: http://{{ include "overwatchd.fullname" . }}:{{ .Values.config.healthPort }}
+
+Check pod status:
+  kubectl get pods -l app.kubernetes.io/name={{ include "overwatchd.name" . }} -n {{ .Release.Namespace }}
+
+View logs:
+  kubectl logs -l app.kubernetes.io/name={{ include "overwatchd.name" . }} -n {{ .Release.Namespace }} -f
+
+Test health endpoint:
+  kubectl port-forward svc/{{ include "overwatchd.fullname" . }} {{ .Values.config.healthPort }}:{{ .Values.config.healthPort }} -n {{ .Release.Namespace }}
+  curl http://localhost:{{ .Values.config.healthPort }}/healthz
+  curl http://localhost:{{ .Values.config.healthPort }}/readyz
+
+{{- if not .Values.secrets.create }}
+
+IMPORTANT: The chart expects a pre-existing secret "{{ include "overwatchd.secretName" . }}" in namespace "{{ .Release.Namespace }}" with keys:
+  - DISCORD_TOKEN
+  - ARGOCD_TOKEN
+
+If the secret does not exist, the pod will stay in CreateContainerConfigError.
+Create it via SealedSecret, ExternalSecret, or:
+  kubectl create secret generic {{ include "overwatchd.secretName" . }} \
+    --from-literal=DISCORD_TOKEN=<token> \
+    --from-literal=ARGOCD_TOKEN=<token> \
+    -n {{ .Release.Namespace }}
+{{- end }}

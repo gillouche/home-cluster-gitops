@@ -20,7 +20,7 @@ spec:
         node-class: homeserver
       containers:
         - name: redis
-          image: redis:8.6.1-alpine
+          image: nexus.gillouche.homelab/docker-hub/redis:8.6.1-alpine
           args:
             - redis-server
             - --requirepass

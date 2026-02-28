@@ -45,7 +45,8 @@ spec:
                 topologyKey: "kubernetes.io/hostname"
 
         tempo:
-          repository: nexus.gillouche.homelab/docker-hub/grafana/tempo
+          registry: nexus.gillouche.homelab
+          repository: docker-hub/grafana/tempo
           tag: 2.9.0
           livenessProbe:
             httpGet:
