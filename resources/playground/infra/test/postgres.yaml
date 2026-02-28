@@ -29,7 +29,7 @@ spec:
                 name: test-postgres-credentials
           volumeMounts:
             - name: data
-              mountPath: /var/lib/postgresql/data
+              mountPath: /var/lib/postgresql
           resources:
             requests:
               memory: "256Mi"
