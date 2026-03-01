@@ -14,13 +14,13 @@ spec:
   source:
     chart: overwatchd
     repoURL: https://nexus.gillouche.homelab/repository/helm-hosted/
-    targetRevision: 0.0.0-latest
+    targetRevision: 0.0.1
     helm:
       values: |
         image:
           registry: nexus.gillouche.homelab/docker-hosted
           repository: overwatchd
-          tag: latest
+          tag: v0.0.1
         config:
           argocdURL: "https://argocd.k3s.gillouche.homelab"
           argocdInsecure: "true"
