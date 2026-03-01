@@ -21,6 +21,7 @@ spec:
           registry: nexus.gillouche.homelab/docker-hosted
           repository: overwatchd
           tag: latest
+          pullPolicy: Always
         config:
           argocdURL: "https://argocd.k3s.gillouche.homelab"
           argocdInsecure: "true"
