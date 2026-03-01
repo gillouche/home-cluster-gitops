@@ -24,7 +24,7 @@ spec:
             nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
             concurrentReplicaRebuildPerNodeLimit: 2
             replicaRebuildConcurrentSyncLimit: 3
-            replicaRebuildingBandwidthLimit: 120000000
+            replicaRebuildingBandwidthLimit: "120000000"
             replicaReplenishmentWaitInterval: 30
             defaultDataLocality: disabled
             replicaAutoBalance: best-effort
