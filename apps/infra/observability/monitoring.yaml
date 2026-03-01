@@ -23,6 +23,14 @@ spec:
               replicas: 3
               enableRemoteWriteReceiver: true
               retention: 3d
+              walCompression: true
+              resources:
+                requests:
+                  memory: 2Gi
+                  cpu: 500m
+                limits:
+                  memory: 4Gi
+                  cpu: "2"
               externalLabels:
                 namespace: monitoring
               storageSpec:
