@@ -23,7 +23,7 @@ spec:
               replicas: 3
               enableRemoteWriteReceiver: true
               retention: 3d
-              retentionSize: 40GB
+              retentionSize: 80GB
               walCompression: true
               terminationGracePeriodSeconds: 300
               additionalArgs:
