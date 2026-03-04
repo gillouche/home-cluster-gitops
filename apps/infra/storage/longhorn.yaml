@@ -26,7 +26,7 @@ spec:
             replicaRebuildConcurrentSyncLimit: 3
             replicaRebuildingBandwidthLimit: "120000000"
             replicaReplenishmentWaitInterval: 30
-            defaultDataLocality: disabled
+            defaultDataLocality: best-effort
             replicaAutoBalance: disabled
             createDefaultDiskLabeledNodes: false
             storageReservedPercentageForDefaultDisk: 20

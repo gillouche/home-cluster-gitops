@@ -23,13 +23,20 @@ spec:
               replicas: 3
               enableRemoteWriteReceiver: true
               retention: 3d
+              retentionSize: 80GB
               walCompression: true
+              terminationGracePeriodSeconds: 300
+              additionalArgs:
+                - name: storage.tsdb.min-block-duration
+                  value: "2h"
+                - name: storage.tsdb.max-block-duration
+                  value: "2h"
               resources:
                 requests:
-                  memory: 2Gi
+                  memory: 3Gi
                   cpu: 500m
                 limits:
-                  memory: 4Gi
+                  memory: 6Gi
                   cpu: "2"
               externalLabels:
                 namespace: monitoring

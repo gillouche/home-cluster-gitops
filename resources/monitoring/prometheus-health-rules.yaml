@@ -1,0 +1,64 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: prometheus-health-rules
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: prometheus-tsdb-health
+      rules:
+        - alert: PrometheusCompactionSlow
+          expr: histogram_quantile(0.99, rate(prometheus_tsdb_compaction_duration_seconds_bucket[6h])) > 600
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Prometheus compaction slow on {{ $labels.pod }}"
+            description: "Prometheus {{ $labels.pod }} p99 compaction duration is {{ $value | humanizeDuration }}. This may indicate I/O or memory pressure."
+
+        - alert: PrometheusBlockCountHigh
+          expr: prometheus_tsdb_blocks_loaded > 40
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High TSDB block count on {{ $labels.pod }}"
+            description: "Prometheus {{ $labels.pod }} has {{ $value }} blocks loaded. Compaction may not be keeping up."
+
+        - alert: PrometheusMemoryPressure
+          expr: container_memory_working_set_bytes{container="prometheus", namespace="monitoring"} / container_spec_memory_limit_bytes{container="prometheus", namespace="monitoring"} > 0.85
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Prometheus memory pressure on {{ $labels.pod }}"
+            description: "Prometheus {{ $labels.pod }} is using {{ $value | humanizePercentage }} of its memory limit. OOM kill risk during compaction."
+
+        - alert: PrometheusStorageSpaceLow
+          expr: (1 - prometheus_tsdb_storage_blocks_bytes / (100 * 1024 * 1024 * 1024)) < 0.2
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Prometheus storage running low on {{ $labels.pod }}"
+            description: "Prometheus {{ $labels.pod }} TSDB is using more than 80% of the 100Gi volume. Compaction needs free space to operate."
+
+        - alert: PrometheusWALCorruptions
+          expr: increase(prometheus_tsdb_wal_corruptions_total[1h]) > 0
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: "WAL corruption detected on {{ $labels.pod }}"
+            description: "Prometheus {{ $labels.pod }} has detected WAL corruption. This may lead to data loss and compaction failures."
+
+        - alert: PrometheusHeadSeriesHigh
+          expr: prometheus_tsdb_head_series > 1000000
+          for: 30m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High series cardinality on {{ $labels.pod }}"
+            description: "Prometheus {{ $labels.pod }} has {{ $value | humanize }} active series. High cardinality increases memory and compaction pressure."
