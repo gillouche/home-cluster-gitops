@@ -27,7 +27,7 @@ spec:
             replicaRebuildingBandwidthLimit: "120000000"
             replicaReplenishmentWaitInterval: 30
             defaultDataLocality: best-effort
-            replicaAutoBalance: disabled
+            replicaAutoBalance: best-effort
             createDefaultDiskLabeledNodes: false
             storageReservedPercentageForDefaultDisk: 20
             storageOverProvisioningPercentage: 100
