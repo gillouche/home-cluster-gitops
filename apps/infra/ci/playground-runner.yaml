@@ -110,3 +110,17 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+      - RespectIgnoreDifferences=true
+  ignoreDifferences:
+    - group: ""
+      kind: ServiceAccount
+      jsonPointers:
+        - /metadata/finalizers
+    - group: rbac.authorization.k8s.io
+      kind: Role
+      jsonPointers:
+        - /metadata/finalizers
+    - group: rbac.authorization.k8s.io
+      kind: RoleBinding
+      jsonPointers:
+        - /metadata/finalizers
