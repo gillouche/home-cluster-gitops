@@ -30,11 +30,11 @@ spec:
             replicaAutoBalance: best-effort
             createDefaultDiskLabeledNodes: false
             storageReservedPercentageForDefaultDisk: 20
-            storageOverProvisioningPercentage: 100
+            storageOverProvisioningPercentage: 200
             orphanResourceAutoDeletion: true
             orphanResourceAutoDeletionGracePeriod: 300
             engineReplicaTimeout: 30
-            guaranteedInstanceManagerCPU: 40
+            guaranteedInstanceManagerCPU: 12
           longhornManager:
             affinity: {}
 
