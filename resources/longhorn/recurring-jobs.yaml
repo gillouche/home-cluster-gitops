@@ -9,7 +9,7 @@ spec:
   groups:
   - default
   retain: 1
-  concurrency: 3
+  concurrency: 1
 ---
 apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
@@ -22,7 +22,7 @@ spec:
   groups:
   - default
   retain: 0
-  concurrency: 3
+  concurrency: 1
 ---
 apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
@@ -35,7 +35,7 @@ spec:
   groups:
   - default
   retain: 2
-  concurrency: 3
+  concurrency: 1
 ---
 apiVersion: longhorn.io/v1beta2
 kind: RecurringJob
@@ -48,4 +48,4 @@ spec:
   groups:
   - default
   retain: 0
-  concurrency: 3
+  concurrency: 1
