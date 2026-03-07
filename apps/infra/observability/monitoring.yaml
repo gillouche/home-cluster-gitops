@@ -262,6 +262,12 @@ spec:
           kube-state-metrics:
             nodeSelector:
               node-class: homeserver
+          kubeStateMetrics:
+            serviceMonitor:
+              metricRelabelings:
+                - action: drop
+                  sourceLabels: [__name__]
+                  regex: kube_lease_renew_time
   
           # Disable some defaults that might be too heavy for RPIs or not needed yet
           kubeProxy:
