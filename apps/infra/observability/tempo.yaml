@@ -133,6 +133,18 @@ spec:
               operator: "Exists"
               effect: "NoSchedule"
 
+        # Trace receivers
+        traces:
+          otlp:
+            grpc:
+              enabled: true
+            http:
+              enabled: true
+
+        # Disable memcached (not needed for homelab with 48h retention)
+        memcached:
+          enabled: false
+
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
