@@ -23,8 +23,8 @@ spec:
             replicaZoneSoftAntiAffinity: true
             nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
             concurrentReplicaRebuildPerNodeLimit: 2
-            replicaRebuildConcurrentSyncLimit: 3
             replicaRebuildingBandwidthLimit: "120000000"
+            guaranteedInstanceManagerCPU: '{"v1":"0","v2":"0"}'
             replicaReplenishmentWaitInterval: 30
             defaultDataLocality: best-effort
             replicaAutoBalance: best-effort
@@ -33,6 +33,7 @@ spec:
             storageOverProvisioningPercentage: 200
             orphanResourceAutoDeletion: true
             orphanResourceAutoDeletionGracePeriod: 300
+            defaultBackupBlockSize: 2
           longhornManager:
             affinity: {}
 
