@@ -7,6 +7,8 @@ metadata:
     argocd.argoproj.io/sync-wave: "1"
     notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-infra: ""
     notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-infra: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
 spec:
   project: infra-security
   source: null
