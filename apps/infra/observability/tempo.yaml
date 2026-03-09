@@ -69,6 +69,8 @@ spec:
           config:
             compaction:
               block_retention: 48h
+          livenessProbe:
+            initialDelaySeconds: 120
           nodeSelector:
             node-class: homeserver
           tolerations:
