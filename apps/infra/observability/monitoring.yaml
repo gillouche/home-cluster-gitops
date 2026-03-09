@@ -20,7 +20,7 @@ spec:
           # Use existing storage class and SSD nodes
           prometheus:
             prometheusSpec:
-              replicas: 3
+              replicas: 2
               enableRemoteWriteReceiver: true
               retention: 3d
               retentionSize: 80GB
@@ -79,7 +79,7 @@ spec:
               
           alertmanager:
             alertmanagerSpec:
-              replicas: 3
+              replicas: 2
               alertmanagerConfigSelector:
                 matchLabels:
                   alertmanagerConfig: discord

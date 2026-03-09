@@ -23,7 +23,7 @@ spec:
     helm:
       values: |
         controller:
-          replicas: 3
+          replicas: 2
           nodeSelector:
             node-class: homeserver
           tolerations:

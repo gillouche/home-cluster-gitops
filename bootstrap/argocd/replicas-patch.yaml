@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: argocd-server
 spec:
-  replicas: 3
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -15,7 +15,7 @@ kind: Deployment
 metadata:
   name: argocd-repo-server
 spec:
-  replicas: 3
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -27,7 +27,7 @@ kind: Deployment
 metadata:
   name: argocd-redis-ha-haproxy
 spec:
-  replicas: 3
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:

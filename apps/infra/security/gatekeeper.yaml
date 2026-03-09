@@ -17,7 +17,7 @@ spec:
     targetRevision: 3.21.1
     helm:
       values: |
-        replicas: 3
+        replicas: 2
         strategy:
           type: RollingUpdate
           rollingUpdate:

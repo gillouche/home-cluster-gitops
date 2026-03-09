@@ -18,7 +18,7 @@ spec:
     helm:
       values: |
         deployment:
-          replicas: 3
+          replicas: 2
           rollingUpdate:
             maxUnavailable: 1
             maxSurge: 1
