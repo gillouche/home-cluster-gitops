@@ -90,7 +90,7 @@ spec:
             - key: "node-role.kubernetes.io/control-plane"
               operator: "Exists"
               effect: "NoSchedule"
-          affinity:
+          affinity: |
             podAntiAffinity:
               preferredDuringSchedulingIgnoredDuringExecution:
                 - weight: 100
