@@ -67,7 +67,6 @@ spec:
             - name: LOG_LEVEL
               value: "debug"
           securityContext:
-            runAsNonRoot: true
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]
