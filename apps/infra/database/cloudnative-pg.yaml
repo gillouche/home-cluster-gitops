@@ -14,10 +14,11 @@ spec:
       repoURL: https://cloudnative-pg.github.io/charts
       targetRevision: 0.27.1
       helm:
-        values: |
-          nodeSelector:
-            node-class: homeserver
-          # No custom values needed for basic operator
+        valueFiles:
+          - $values/resources/cloudnative-pg/values.yaml
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: cnpg-system

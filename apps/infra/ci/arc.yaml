@@ -21,13 +21,11 @@ spec:
       repoURL: "ghcr.io/actions/actions-runner-controller-charts"
       targetRevision: "0.13.1"
       helm:
-        values: |
-          metrics:
-            controllerManagerAddr: ":8080"
-          # Pin Controller to stable nodes
-          nodeSelector:
-            node-class: homeserver
-          githubConfigSecret: arc-github-creds
+        valueFiles:
+          - $values/resources/arc/values.yaml
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: arc-systems

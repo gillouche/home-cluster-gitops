@@ -1,0 +1,13 @@
+image:
+  registry: nexus.gillouche.homelab/docker-hosted
+  repository: overwatchd
+  tag: latest
+  pullPolicy: Always
+config:
+  argocdURL: "https://argocd.k3s.gillouche.homelab"
+  argocdInsecure: "true"
+  guildID: "1459504241080008737"
+  allowedUserIDs: "192318521311625218"
+  allowedChannelIDs: "1477640456090423348"
+secrets:
+  existingSecret: overwatchd-test-secret

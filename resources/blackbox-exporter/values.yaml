@@ -1,0 +1,16 @@
+nodeSelector:
+  node-class: homeserver
+config:
+  modules:
+    icmp:
+      prober: icmp
+      timeout: 5s
+    ssh_banner:
+      prober: tcp
+      tcp:
+        query_response:
+          - expect: "^SSH-2.0-"
+
+# single Probe CR instead of multiple ServiceMonitors
+serviceMonitor:
+  enabled: false

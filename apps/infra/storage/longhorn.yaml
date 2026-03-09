@@ -16,55 +16,11 @@ spec:
       repoURL: https://charts.longhorn.io
       targetRevision: 1.11.0
       helm:
-        values: |
-          defaultSettings:
-            defaultDataPath: "/mnt/ssd_nvme"
-            replicaSoftAntiAffinity: false
-            replicaZoneSoftAntiAffinity: true
-            nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
-            concurrentReplicaRebuildPerNodeLimit: 2
-            replicaRebuildingBandwidthLimit: "120000000"
-            guaranteedInstanceManagerCPU: '{"v1":"0","v2":"0"}'
-            replicaReplenishmentWaitInterval: 30
-            defaultDataLocality: best-effort
-            replicaAutoBalance: best-effort
-            createDefaultDiskLabeledNodes: false
-            storageReservedPercentageForDefaultDisk: 20
-            storageOverProvisioningPercentage: 200
-            orphanResourceAutoDeletion: true
-            orphanResourceAutoDeletionGracePeriod: 300
-            defaultBackupBlockSize: 2
-          longhornManager:
-            affinity: {}
-
-          longhornUI:
-            affinity:
-              nodeAffinity:
-                requiredDuringSchedulingIgnoredDuringExecution:
-                  nodeSelectorTerms:
-                    - matchExpressions:
-                        - key: node-class
-                          operator: In
-                          values: ["homeserver"]
-
-          persistence:
-            defaultClass: true
-            defaultClassReplicaCount: 2
-            defaultAllowVolumeExpansion: true
-          metrics:
-            serviceMonitor:
-              enabled: true
-              additionalLabels:
-                release: monitoring
-          service:
-            ui:
-              type: ClusterIP
-          ingress:
-            enabled: false
-            annotations:
-              traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
+        valueFiles:
+          - $values/resources/longhorn/values.yaml
     - repoURL: https://github.com/gillouche/home-cluster-gitops.git
       targetRevision: HEAD
+      ref: values
       path: resources/longhorn
   destination:
     server: https://kubernetes.default.svc

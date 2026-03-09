@@ -1,0 +1,59 @@
+deployment:
+  replicas: 2
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
+ports:
+  traefik:
+    port: 9999
+    expose:
+      default: false
+  web:
+    port: 9000
+    expose:
+      default: true
+    exposedPort: 9000
+    protocol: TCP
+    forwardedHeaders:
+      trustedIPs:
+        - 192.168.0.253
+        - 192.168.0.0/24
+        - 10.42.0.0/16
+        - 10.43.0.0/16
+  websecure:
+    port: 9443
+    expose:
+      default: false
+    exposedPort: 9443
+    protocol: TCP
+    forwardedHeaders:
+      trustedIPs:
+        - 192.168.0.0/24
+        - 10.42.0.0/16
+        - 10.43.0.0/16
+service:
+  enabled: true
+  type: LoadBalancer
+providers:
+  kubernetesIngress:
+    publishedService:
+      enabled: true
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/name
+                operator: In
+                values:
+                  - traefik
+          topologyKey: kubernetes.io/hostname
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: node-class
+              operator: In
+              values: ["homeserver"]

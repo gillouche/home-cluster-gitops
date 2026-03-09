@@ -1,0 +1,35 @@
+image:
+  tag: 2.4.0
+
+# Global RBAC
+rbac:
+  create: true
+
+# Controller Configuration
+controller:
+  # Enable health probe endpoint
+  extraArgs:
+    - --health-probe-bind-address=:8081
+  # Fix for root user in image
+  securityContext:
+    runAsNonRoot: false
+    runAsUser: 0
+  # Node Affinity
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-class
+                operator: In
+                values: ["homeserver"]
+
+# Webhook Configuration - Disabled due to certificate mounting issues
+# The Helm chart doesn't support custom certificate secrets easily
+# Webhook is optional - controller can manage SparkApplications without it
+webhook:
+  enable: false
+
+# Metrics integration
+metrics:
+  enable: true

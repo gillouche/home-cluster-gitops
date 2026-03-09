@@ -1,0 +1,8 @@
+nodeSelector:
+  node-class: homeserver
+configuration:
+  watcher:
+    # Watch secrets and configmaps
+    resources:
+      - secrets
+      - configmaps

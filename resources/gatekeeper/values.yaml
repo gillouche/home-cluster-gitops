@@ -1,0 +1,23 @@
+replicas: 2
+strategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 1
+    maxSurge: 1
+auditInterval: 60
+validatingWebhookConfiguration:
+  failurePolicy: Ignore
+mutatingWebhookConfiguration:
+  failurePolicy: Ignore
+controllerManager:
+  nodeSelector:
+    node-class: homeserver
+audit:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-class
+                operator: In
+                values: ["homeserver"]

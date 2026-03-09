@@ -16,80 +16,11 @@ spec:
       repoURL: https://downloads.apache.org/incubator/polaris/helm-chart
       targetRevision: 1.3.0-incubating
       helm:
-        values: |
-          nodeSelector:
-            node-class: homeserver
-          replicaCount: 2
-          
-          ingress:
-            enabled: true
-            className: traefik
-            annotations:
-              traefik.ingress.kubernetes.io/router.entrypoints: websecure
-              traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
-            hosts:
-              - host: polaris.k3s.gillouche.homelab
-                paths:
-                  - path: /
-                    pathType: Prefix
-            tls:
-              - secretName: polaris-tls
-                hosts:
-                  - polaris.k3s.gillouche.homelab
-
-          affinity:
-            nodeAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                nodeSelectorTerms:
-                  - matchExpressions:
-                      - key: node-class
-                        operator: In
-                        values: ["homeserver"]
-
-          # Persistence Configuration
-          persistence:
-            type: relational-jdbc
-            url: jdbc:postgresql://shared-db-rw.database.svc:5432/polaris
-            username: polaris
-            passwordFromSecret:
-              name: polaris-secrets
-              key: password
-            
-          # Storage Configuration (SeaweedFS)
-          defaultRealm:
-            storage:
-              type: s3
-              endpoint: http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333
-              accessKeyIdFromSecret:
-                name: lake-access-keys
-                key: lake_access_key
-              secretAccessKeyFromSecret:
-                name: lake-access-keys
-                key: lake_secret_key
-              
-          # Bootstrap Credentials (Inject deterministic root keys)
-          extraEnv:
-            - name: POLARIS_BOOTSTRAP_ROOT_CLIENT_ID
-              valueFrom:
-                secretKeyRef:
-                  name: polaris-secrets
-                  key: polaris_root_id
-            - name: POLARIS_BOOTSTRAP_ROOT_CLIENT_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: polaris-secrets
-                  key: polaris_root_secret
-            # Force Quarkus Datasource Configuration
-            - name: QUARKUS_DATASOURCE_JDBC_URL
-              value: jdbc:postgresql://shared-db-rw.database.svc:5432/polaris
-            - name: QUARKUS_DATASOURCE_USERNAME
-              value: polaris
-            - name: QUARKUS_DATASOURCE_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: polaris-secrets
-                  key: password
-              
+        valueFiles:
+          - $values/resources/polaris/values.yaml
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: data-lake

@@ -16,90 +16,11 @@ spec:
       repoURL: "ghcr.io/actions/actions-runner-controller-charts"
       targetRevision: "0.13.1"
       helm:
-        values: |
-          runnerScaleSetName: "overwatchd-runner"
-          runnerGroup: "Default"
-          githubConfigUrl: "https://github.com/gillouche/overwatchd"
-          githubConfigSecret: arc-github-creds
-          minRunners: 0
-          maxRunners: 3
-          controllerServiceAccount:
-            namespace: arc-systems
-            name: arc-controller-gha-rs-controller
-          # Pin the listener pod to the homeserver (avoid RPis)
-          listenerTemplate:
-            spec:
-              nodeSelector:
-                node-class: homeserver
-              containers:
-                - name: listener
-                  image: nexus.gillouche.homelab/ghcr-proxy/actions/gha-runner-scale-set-controller:0.13.1
-                  command: ["/ghalistener"]
-          # containerMode:
-          #   type: "dind"
-
-          template:
-            spec:
-              nodeSelector:
-                node-class: homeserver
-              topologySpreadConstraints:
-                - maxSkew: 1
-                  topologyKey: kubernetes.io/hostname
-                  whenUnsatisfiable: ScheduleAnyway
-                  labelSelector:
-                    matchLabels:
-                      app.kubernetes.io/name: overwatchd-runner
-              volumes:
-                - name: dind-sock
-                  emptyDir: {}
-                - name: dind-externals
-                  emptyDir: {}
-                - name: action-cache
-                  emptyDir:
-                    sizeLimit: 2Gi
-              initContainers:
-                - name: populate-action-cache
-                  image: nexus.gillouche.homelab/docker-hub/curlimages/curl:latest
-                  command: ["/bin/sh", "-c"]
-                  args:
-                    - |
-                      mkdir -p /cache
-                      echo "Action archive cache directory ready"
-                  volumeMounts:
-                    - name: action-cache
-                      mountPath: /cache
-              containers:
-                - name: runner
-                  image: nexus.gillouche.homelab/docker-hosted/base/actions-runner-homelab-nix:latest
-                  imagePullPolicy: Always
-                  command: ["/home/runner/run.sh"]
-                  env:
-                    - name: DOCKER_HOST
-                      value: unix:///var/run/docker.sock
-                    - name: SONAR_HOST_URL
-                      value: "http://sonarqube-sonarqube.sonarqube.svc:9000"
-                    - name: ACTIONS_RUNNER_ACTION_ARCHIVE_CACHE
-                      value: /home/runner/action-archive-cache
-                  volumeMounts:
-                    - name: dind-sock
-                      mountPath: /var/run
-                    - name: dind-externals
-                      mountPath: /etc/docker/certs.d
-                    - name: action-cache
-                      mountPath: /home/runner/action-archive-cache
-                - name: dind
-                  image: nexus.gillouche.homelab/docker-hub/library/docker:dind
-                  args: ["dockerd", "--host=unix:///var/run/docker.sock", "--group=$(DOCKER_GROUP_GID)"]
-                  env:
-                    - name: DOCKER_GROUP_GID
-                      value: "1001"
-                  securityContext:
-                    privileged: true
-                  volumeMounts:
-                    - name: dind-sock
-                      mountPath: /var/run
-                    - name: dind-externals
-                      mountPath: /etc/docker/certs.d
+        valueFiles:
+          - $values/resources/overwatchd-runner/values.yaml
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: arc-systems

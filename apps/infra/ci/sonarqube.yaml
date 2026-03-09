@@ -16,83 +16,12 @@ spec:
       repoURL: https://SonarSource.github.io/helm-chart-sonarqube
       targetRevision: 10.8.1
       helm:
-        values: |
-          edition: community
-
-          # Networking
-          ingress:
-            enabled: true
-            ingressClassName: traefik
-            hosts:
-              - name: sonar.k3s.gillouche.homelab
-                path: /
-            annotations:
-              traefik.ingress.kubernetes.io/router.entrypoints: web
-              traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
-            
-            # Prevent standalone secret creation (Gatekeeper violation)
-            httpProxySecret: ""
-
-          # Persistence
-          persistence:
-            enabled: true
-            storageClass: longhorn
-            accessMode: ReadWriteOnce
-            size: 20Gi
-          
-          # Config
-          sonarProperties:
-             sonar.forceAuthentication: true
-
-          # Database (External HA)
-          postgresql:
-            enabled: false # Disable embedded
-          
-          jdbcOverwrite:
-            enable: true
-            jdbcUrl: "jdbc:postgresql://shared-db-rw.database.svc:5432/sonarqube"
-            jdbcUsername: "sonarqube"
-            jdbcSecretName: "shared-db-sonarqube"
-            jdbcSecretPasswordKey: "password"
-            # We use extraEnv for password to avoid cleartext in values
-          
-          # Custom Secrets to avoid Helm generation
-          monitoringPasscodeSecretName: "sonarqube-secrets"
-          monitoringPasscodeSecretKey: "monitoring-passcode"
-          
-          extraEnv:
-            - name: SONAR_AUTH_JWTBASE64HS256SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: sonarqube-secrets
-                  key: jwtSecret
-            - name: SONAR_JDBC_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: shared-db-sonarqube
-                  key: password
-
-          # Resource Management
-          resources:
-            requests:
-              memory: 2Gi
-              cpu: 500m
-            limits:
-              memory: 4Gi
-              cpu: 2
-
-          # Scheduling
-          nodeSelector:
-            node-class: homeserver
-          
-          # Init Sysctl (Required for ES)
-          initSysctl:
-            enabled: true
-            vmMaxMapCount: 262144
-
+        valueFiles:
+          - $values/resources/sonarqube/values.yaml
     - repoURL: https://github.com/gillouche/home-cluster-gitops.git
       targetRevision: HEAD
       path: resources/sonarqube
+      ref: values
 
   destination:
     server: https://kubernetes.default.svc

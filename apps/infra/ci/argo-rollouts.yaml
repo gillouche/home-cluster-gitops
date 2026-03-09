@@ -16,32 +16,16 @@ spec:
       kind: CustomResourceDefinition
       jsonPointers:
         - /spec/preserveUnknownFields
-  source:
-    chart: argo-rollouts
-    repoURL: https://argoproj.github.io/argo-helm
-    targetRevision: 2.40.6
-    helm:
-      values: |
-        controller:
-          replicas: 2
-          nodeSelector:
-            node-class: homeserver
-          tolerations:
-            - key: "node-role.kubernetes.io/control-plane"
-              operator: "Exists"
-              effect: "NoSchedule"
-        dashboard:
-          enabled: true
-          nodeSelector:
-            node-class: homeserver
-          ingress:
-            enabled: true
-            ingressClassName: traefik
-            hosts:
-              - rollouts.k3s.gillouche.homelab
-            annotations:
-              traefik.ingress.kubernetes.io/router.entrypoints: web
-              traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
+  sources:
+    - chart: argo-rollouts
+      repoURL: https://argoproj.github.io/argo-helm
+      targetRevision: 2.40.6
+      helm:
+        valueFiles:
+          - $values/resources/argo-rollouts/values.yaml
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: argo-rollouts

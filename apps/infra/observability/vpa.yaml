@@ -11,23 +11,16 @@ metadata:
     - argoproj.io/resources-finalizer
 spec:
   project: infra-observability
-  source:
-    chart: vpa
-    repoURL: https://charts.fairwinds.com/stable
-    targetRevision: 4.10.2
-    helm:
-      values: |
-        recommender:
-          extraArgs:
-            v: "4"
-          nodeSelector:
-            node-class: homeserver
-        updater:
-          nodeSelector:
-            node-class: homeserver
-        admissionController:
-          nodeSelector:
-            node-class: homeserver
+  sources:
+    - chart: vpa
+      repoURL: https://charts.fairwinds.com/stable
+      targetRevision: 4.10.2
+      helm:
+        valueFiles:
+          - $values/resources/vpa/values.yaml
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: vpa

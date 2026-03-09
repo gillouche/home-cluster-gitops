@@ -1,0 +1,6 @@
+metrics:
+  controllerManagerAddr: ":8080"
+# Pin Controller to stable nodes
+nodeSelector:
+  node-class: homeserver
+githubConfigSecret: arc-github-creds

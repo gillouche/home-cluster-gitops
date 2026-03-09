@@ -1,0 +1,8 @@
+controller:
+  nodeSelector:
+    node-class: homeserver
+dashboard:
+  ingress:
+    enabled: false
+  nodeSelector:
+    node-class: homeserver

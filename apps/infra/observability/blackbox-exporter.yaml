@@ -16,25 +16,11 @@ spec:
       repoURL: https://prometheus-community.github.io/helm-charts
       targetRevision: 11.8.0
       helm:
-        values: |
-          nodeSelector:
-            node-class: homeserver
-          config:
-            modules:
-              icmp:
-                prober: icmp
-                timeout: 5s
-              ssh_banner:
-                prober: tcp
-                tcp:
-                  query_response:
-                    - expect: "^SSH-2.0-"
-          
-          # single Probe CR instead of multiple ServiceMonitors
-          serviceMonitor:
-            enabled: false
+        valueFiles:
+          - $values/resources/blackbox-exporter/values.yaml
     - repoURL: https://github.com/gillouche/home-cluster-gitops.git
       targetRevision: HEAD
+      ref: values
       path: resources/blackbox-exporter
   destination:
     server: https://kubernetes.default.svc

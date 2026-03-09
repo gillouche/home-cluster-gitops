@@ -11,146 +11,16 @@ metadata:
     - argoproj.io/resources-finalizer
 spec:
   project: infra-observability
-  source:
-    chart: tempo-distributed
-    repoURL: https://grafana.github.io/helm-charts
-    targetRevision: 1.61.3
-    helm:
-      values: |
-        # Global settings
-        global:
-          image:
-            registry: nexus.gillouche.homelab
-          extraEnv:
-            - name: AWS_ACCESS_KEY_ID
-              valueFrom:
-                secretKeyRef:
-                  name: tempo-access-keys
-                  key: tempo_access_key
-            - name: AWS_SECRET_ACCESS_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: tempo-access-keys
-                  key: tempo_secret_key
-
-        tempo:
-          image:
-            repository: docker-hub/grafana/tempo
-          livenessProbe:
-            initialDelaySeconds: 420
-          readinessProbe:
-            initialDelaySeconds: 60
-
-        # Storage configuration
-        storage:
-          trace:
-            backend: s3
-            s3:
-              bucket: tempo
-              endpoint: seaweedfs-s3.seaweedfs.svc.cluster.local:8333
-              insecure: true
-              forcepathstyle: true
-
-        # Metrics Generator
-        metricsGenerator:
-          enabled: true
-          replicas: 1
-          config:
-            storage:
-              remote_write:
-                - url: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090/api/v1/write
-                  send_exemplars: true
-          nodeSelector:
-            node-class: homeserver
-          tolerations:
-            - key: "node-role.kubernetes.io/control-plane"
-              operator: "Exists"
-              effect: "NoSchedule"
-
-        # Compactor
-        compactor:
-          replicas: 1
-          config:
-            compaction:
-              block_retention: 48h
-          nodeSelector:
-            node-class: homeserver
-          tolerations:
-            - key: "node-role.kubernetes.io/control-plane"
-              operator: "Exists"
-              effect: "NoSchedule"
-
-        # Ingester (HA with 2 replicas)
-        ingester:
-          replicas: 2
-          config:
-            replication_factor: 2
-          persistence:
-            enabled: true
-            size: 10Gi
-          nodeSelector:
-            node-class: homeserver
-          tolerations:
-            - key: "node-role.kubernetes.io/control-plane"
-              operator: "Exists"
-              effect: "NoSchedule"
-          affinity: |
-            podAntiAffinity:
-              preferredDuringSchedulingIgnoredDuringExecution:
-                - weight: 100
-                  podAffinityTerm:
-                    labelSelector:
-                      matchExpressions:
-                        - key: app.kubernetes.io/component
-                          operator: In
-                          values:
-                            - ingester
-                    topologyKey: "kubernetes.io/hostname"
-
-        # Distributor
-        distributor:
-          replicas: 1
-          nodeSelector:
-            node-class: homeserver
-          tolerations:
-            - key: "node-role.kubernetes.io/control-plane"
-              operator: "Exists"
-              effect: "NoSchedule"
-
-        # Querier
-        querier:
-          replicas: 1
-          nodeSelector:
-            node-class: homeserver
-          tolerations:
-            - key: "node-role.kubernetes.io/control-plane"
-              operator: "Exists"
-              effect: "NoSchedule"
-
-        # Query Frontend
-        queryFrontend:
-          replicas: 1
-          nodeSelector:
-            node-class: homeserver
-          tolerations:
-            - key: "node-role.kubernetes.io/control-plane"
-              operator: "Exists"
-              effect: "NoSchedule"
-
-        # Trace receivers
-        traces:
-          otlp:
-            grpc:
-              enabled: true
-            http:
-              enabled: true
-
-        # Disable memcached and its cache references
-        memcached:
-          enabled: false
-        cache:
-          caches: []
-
+  sources:
+    - chart: tempo-distributed
+      repoURL: https://grafana.github.io/helm-charts
+      targetRevision: 1.61.3
+      helm:
+        valueFiles:
+          - $values/resources/tempo/values.yaml
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

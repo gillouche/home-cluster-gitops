@@ -16,65 +16,11 @@ spec:
       repoURL: https://trinodb.github.io/charts
       targetRevision: 1.42.1
       helm:
-        values: |
-          imagePullSecrets: []
-          
-          ingress:
-            enabled: true
-            className: traefik
-            annotations:
-              traefik.ingress.kubernetes.io/router.entrypoints: websecure
-              traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
-            hosts:
-              - host: trino.k3s.gillouche.homelab
-                paths:
-                  - path: /
-                    pathType: Prefix
-            tls:
-              - secretName: trino-tls
-                hosts:
-                  - trino.k3s.gillouche.homelab
-
-          coordinator:
-            jvm:
-              maxHeapSize: "2G"
-            resources:
-              requests:
-                memory: "2.5Gi"
-                cpu: "500m"
-              limits:
-                memory: "3Gi"
-                cpu: "2"
-            nodeSelector:
-              node-class: homeserver
-
-          worker:
-            replicas: 2
-            jvm:
-              maxHeapSize: "4G"
-            resources:
-              requests:
-                memory: "4.5Gi"
-                cpu: "1"
-              limits:
-                memory: "6Gi"
-                cpu: "4"
-            nodeSelector:
-              node-class: homeserver
-          
-          # Catalog Configuration
-          additionalCatalogs:
-            iceberg.properties: |
-              connector.name=iceberg
-              iceberg.catalog.type=rest
-              iceberg.rest-catalog.uri=http://polaris:8181/api/catalog
-              iceberg.rest-catalog.warehouse=s3a://iceberg-data
-              # S3 Configuration
-              fs.native-s3.enabled=true
-              s3.endpoint=http://seaweedfs-s3.seaweedfs.svc.cluster.local:8333
-              s3.path-style-access=true
-              s3.region=us-east-1
-              
+        valueFiles:
+          - $values/resources/trino/values.yaml
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: data-lake

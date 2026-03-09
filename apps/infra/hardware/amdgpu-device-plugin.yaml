@@ -11,23 +11,16 @@ metadata:
     - argoproj.io/resources-finalizer
 spec:
   project: infra-base
-  source:
-    repoURL: https://github.com/ROCm/k8s-device-plugin
-    targetRevision: amd-gpu-helm-0.21.0
-    path: helm/amd-gpu
-    helm:
-      values: |
-        node_selector_enabled: true
-        nodeSelector:
-          kubernetes.io/accelerator: amd
-        tolerations:
-          - key: "node-role.kubernetes.io/control-plane"
-            operator: "Exists"
-          - key: "node-role.kubernetes.io/master"
-            operator: "Exists"
-        securityContext:
-          privileged: true
-          allowPrivilegeEscalation: true
+  sources:
+    - repoURL: https://github.com/ROCm/k8s-device-plugin
+      targetRevision: amd-gpu-helm-0.21.0
+      path: helm/amd-gpu
+      helm:
+        valueFiles:
+          - $values/resources/amdgpu-device-plugin/values.yaml
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      ref: values
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system

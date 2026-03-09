@@ -1,0 +1,258 @@
+# Use existing storage class and SSD nodes
+prometheus:
+  prometheusSpec:
+    replicas: 2
+    enableRemoteWriteReceiver: true
+    retention: 3d
+    retentionSize: 80GB
+    walCompression: true
+    terminationGracePeriodSeconds: 300
+    additionalArgs:
+      - name: storage.tsdb.min-block-duration
+        value: "2h"
+      - name: storage.tsdb.max-block-duration
+        value: "2h"
+    resources:
+      requests:
+        memory: 3Gi
+        cpu: 500m
+      limits:
+        memory: 6Gi
+        cpu: "2"
+    externalLabels:
+      namespace: monitoring
+    storageSpec:
+      volumeClaimTemplate:
+        metadata:
+          labels:
+            recurring-job-group.longhorn.io/default: ignored
+        spec:
+          storageClassName: longhorn
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 100Gi
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-class
+                  operator: In
+                  values: ["homeserver"]
+    tolerations:
+      - key: "node-role.kubernetes.io/control-plane"
+        operator: "Exists"
+        effect: "NoSchedule"
+    alertingEndpoints:
+      - namespace: monitoring
+        name: alertmanager-operated
+        port: http-web
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - prometheus.k3s.gillouche.homelab
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web
+      traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
+    pathType: Prefix
+
+alertmanager:
+  alertmanagerSpec:
+    replicas: 2
+    alertmanagerConfigSelector:
+      matchLabels:
+        alertmanagerConfig: discord
+    secrets:
+      - monitoring-discord-webhooks
+    podMetadata:
+      annotations:
+        rollout-restart: "2026-01-11T03:00:00Z"
+    storage:
+      volumeClaimTemplate:
+        metadata:
+          labels:
+            recurring-job-group.longhorn.io/default: ignored
+        spec:
+          storageClassName: longhorn
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 5Gi
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: node-class
+                  operator: In
+                  values: ["homeserver"]
+      podAntiAffinity:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 100
+            podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values: ["alertmanager"]
+              topologyKey: "kubernetes.io/hostname"
+
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by: ['alertname']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 1h
+      receiver: 'null'
+      routes: []
+    receivers:
+    - name: 'null'
+
+    templates:
+    - '/etc/alertmanager/config/*.tmpl'
+
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - alertmanager.k3s.gillouche.homelab
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web
+      traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
+    pathType: Prefix
+
+grafana:
+  deploymentStrategy:
+    type: Recreate
+  admin:
+    existingSecret: "monitoring-grafana"
+    userKey: "admin-user"
+    passwordKey: "admin-password"
+  persistence:
+    enabled: true
+    storageClassName: longhorn
+    size: 5Gi
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: node-class
+                operator: In
+                values: ["homeserver"]
+
+  sidecar:
+    dashboards:
+      enabled: true
+      label: grafana_dashboard
+      searchNamespace: ALL
+
+  ingress:
+    enabled: true
+    ingressClassName: traefik
+    hosts:
+      - grafana.k3s.gillouche.homelab
+    annotations:
+      traefik.ingress.kubernetes.io/router.entrypoints: web
+
+  # HostAliases for Authelia via Caddy (TLS)
+  hostAliases:
+    - ip: "192.168.0.252"
+      hostnames:
+        - "auth.k3s.gillouche.homelab"
+
+
+  # Grafana OIDC Config
+  grafana.ini:
+    server:
+      root_url: https://grafana.k3s.gillouche.homelab
+    auth.generic_oauth:
+      enabled: true
+      name: Authelia
+      icon: signin
+      client_id: grafana
+      client_secret: $__file{/etc/secrets/auth_generic_oauth/client_secret}
+      scopes: openid profile email groups
+      empty_scopes: false
+      auth_url: https://auth.k3s.gillouche.homelab/api/oidc/authorization
+      token_url: https://auth.k3s.gillouche.homelab/api/oidc/token
+      api_url: https://auth.k3s.gillouche.homelab/api/oidc/userinfo
+      tls_client_ca: /etc/secrets/homelab-root-ca/ca-bundle.pem
+      login_attribute_path: preferred_username
+      groups_attribute_path: groups
+      role_attribute_path: contains(groups[*], 'admins') && 'Admin' || 'Editor'
+
+  # Mount secret as file for security
+  extraSecretMounts:
+    - name: auth-generic-oauth-secret-mount
+      secretName: monitoring-grafana
+      defaultMode: 0440
+      mountPath: /etc/secrets/auth_generic_oauth
+      readOnly: true
+    - name: homelab-root-ca-volume
+      secretName: homelab-root-ca
+      defaultMode: 0440
+      mountPath: /etc/secrets/homelab-root-ca
+      readOnly: true
+
+  # Use default dashboards
+  dashboardProviders:
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+        - name: 'default'
+          orgId: 1
+          folder: ''
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/default
+
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      url: http://loki.monitoring.svc:3100
+      access: proxy
+      jsonData:
+        derivedFields:
+          - datasourceUid: tempo
+            matcherRegex: "traceID=(\\w+)"
+            name: TraceID
+            url: "$${__value.raw}"
+    - name: Tempo
+      type: tempo
+      url: http://tempo-query-frontend.monitoring.svc:3200
+      access: proxy
+      jsonData:
+        nodeApi:
+          enabled: true
+        serviceGraph:
+          datasourceUid: 'Prometheus'
+        tracesToLogs:
+          datasourceUid: 'Loki'
+
+
+# Replace standalone exporters
+nodeExporter:
+  enabled: true
+kube-state-metrics:
+  nodeSelector:
+    node-class: homeserver
+
+# Disable some defaults that might be too heavy for RPIs or not needed yet
+kubeProxy:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+
+# Ensure infrastructure components run on homeserver
+prometheusOperator:
+  nodeSelector:
+    node-class: homeserver
