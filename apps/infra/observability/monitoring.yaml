@@ -245,7 +245,7 @@ spec:
                       url: "$${__value.raw}"
               - name: Tempo
                 type: tempo
-                url: http://tempo.monitoring.svc:3200
+                url: http://tempo-query-frontend.monitoring.svc:3100
                 access: proxy
                 jsonData:
                   nodeApi:
