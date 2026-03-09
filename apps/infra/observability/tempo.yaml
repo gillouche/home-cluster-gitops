@@ -37,7 +37,7 @@ spec:
           image:
             repository: docker-hub/grafana/tempo
           livenessProbe:
-            initialDelaySeconds: 120
+            initialDelaySeconds: 420
           readinessProbe:
             initialDelaySeconds: 60
 
