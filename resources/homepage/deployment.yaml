@@ -38,7 +38,6 @@ spec:
                       values: ["homepage"]
                 topologyKey: "kubernetes.io/hostname"
       securityContext:
-        runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
       initContainers:
@@ -68,6 +67,7 @@ spec:
             - name: LOG_LEVEL
               value: "debug"
           securityContext:
+            runAsNonRoot: true
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]

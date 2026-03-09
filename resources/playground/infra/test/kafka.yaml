@@ -80,6 +80,7 @@ spec:
             timeoutSeconds: 5
             failureThreshold: 3
           securityContext:
+            runAsUser: 1000
             runAsNonRoot: true
             allowPrivilegeEscalation: false
             capabilities:

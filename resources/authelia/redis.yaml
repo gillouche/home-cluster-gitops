@@ -19,7 +19,6 @@ spec:
       nodeSelector:
         node-class: homeserver
       securityContext:
-        runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
       containers:

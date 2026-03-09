@@ -18,7 +18,6 @@ spec:
         environment: test
     spec:
       securityContext:
-        runAsNonRoot: true
         seccompProfile:
           type: RuntimeDefault
       nodeSelector:

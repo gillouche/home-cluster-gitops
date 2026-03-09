@@ -58,7 +58,6 @@ pod:
     container:
       runAsUser: 1000
       runAsGroup: 1000
-      readOnlyRootFilesystem: true
       allowPrivilegeEscalation: false
       capabilities:
         drop: ["ALL"]
