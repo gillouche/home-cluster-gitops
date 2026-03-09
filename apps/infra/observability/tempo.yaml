@@ -36,6 +36,10 @@ spec:
         tempo:
           image:
             repository: docker-hub/grafana/tempo
+          livenessProbe:
+            initialDelaySeconds: 120
+          readinessProbe:
+            initialDelaySeconds: 60
 
         # Storage configuration
         storage:
@@ -69,8 +73,6 @@ spec:
           config:
             compaction:
               block_retention: 48h
-          livenessProbe:
-            initialDelaySeconds: 120
           nodeSelector:
             node-class: homeserver
           tolerations:
