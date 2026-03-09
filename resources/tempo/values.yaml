@@ -64,6 +64,8 @@ compactor:
 # Ingester (HA with 2 replicas)
 ingester:
   replicas: 2
+  podDisruptionBudget:
+    minAvailable: 1
   config:
     replication_factor: 2
   persistence:

@@ -57,3 +57,6 @@ affinity:
             - key: node-class
               operator: In
               values: ["homeserver"]
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1

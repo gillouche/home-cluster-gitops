@@ -60,6 +60,20 @@ spec:
             limits:
               memory: "2Gi"
               cpu: "1"
+          livenessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            tcpSocket:
+              port: 9092
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
       initContainers:
         - name: fix-permissions
           image: nexus.gillouche.homelab/docker-hub/library/busybox:latest

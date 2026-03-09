@@ -44,6 +44,9 @@ prometheus:
       - key: "node-role.kubernetes.io/control-plane"
         operator: "Exists"
         effect: "NoSchedule"
+    podDisruptionBudget:
+      enabled: true
+      minAvailable: 1
     alertingEndpoints:
       - namespace: monitoring
         name: alertmanager-operated
@@ -61,6 +64,9 @@ prometheus:
 alertmanager:
   alertmanagerSpec:
     replicas: 2
+    podDisruptionBudget:
+      enabled: true
+      minAvailable: 1
     alertmanagerConfigSelector:
       matchLabels:
         alertmanagerConfig: discord
