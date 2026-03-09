@@ -19,8 +19,8 @@ spec:
         values: |
           defaultSettings:
             defaultDataPath: "/mnt/ssd_nvme"
-            replicaSoftAntiAffinity: false
-            replicaZoneSoftAntiAffinity: true
+            replicaSoftAntiAffinity: "disabled"
+            replicaZoneSoftAntiAffinity: "enabled"
             nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
             concurrentReplicaRebuildPerNodeLimit: 2
             replicaRebuildConcurrentSyncLimit: 3
