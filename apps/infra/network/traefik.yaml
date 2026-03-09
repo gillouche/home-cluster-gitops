@@ -28,7 +28,11 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    managedNamespaceMetadata:
+      labels:
+        goldilocks.fairwinds.com/enabled: "true"
     syncOptions:
+      - CreateNamespace=true
       - ServerSideApply=true
     retry:
       limit: 3

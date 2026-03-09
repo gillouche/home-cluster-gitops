@@ -7,6 +7,10 @@ chaosDaemon:
 
 dashboard:
   create: true
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
   ingress:
     enabled: true
     ingressClassName: traefik
@@ -52,6 +56,10 @@ controllerManager:
   # Default behavior: Chaos only in the namespace where the CR is defined
   # We will enforce this via Gatekeeper or simply usage conventions for now
   enableLeaderElection: true
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:

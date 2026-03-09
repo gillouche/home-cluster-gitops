@@ -132,6 +132,14 @@ alertmanager:
     pathType: Prefix
 
 grafana:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: ["ALL"]
   deploymentStrategy:
     type: Recreate
   admin:

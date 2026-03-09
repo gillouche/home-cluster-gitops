@@ -156,6 +156,7 @@ spec:
             initialDelaySeconds: 10
             periodSeconds: 20
           securityContext:
+            readOnlyRootFilesystem: true
             allowPrivilegeEscalation: false
             capabilities:
               drop: ["ALL"]

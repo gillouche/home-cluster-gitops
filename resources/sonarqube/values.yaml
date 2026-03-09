@@ -70,3 +70,14 @@ nodeSelector:
 initSysctl:
   enabled: true
   vmMaxMapCount: 262144
+
+# Security
+securityContext:
+  fsGroup: 0
+  seccompProfile:
+    type: RuntimeDefault
+containerSecurityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]

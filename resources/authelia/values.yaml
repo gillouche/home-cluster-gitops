@@ -52,9 +52,16 @@ pod:
       fsGroup: 1000
       runAsUser: 1000
       runAsGroup: 1000
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
     container:
       runAsUser: 1000
       runAsGroup: 1000
+      readOnlyRootFilesystem: true
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
   
   # Custom volumes for user database and OIDC client secrets
   # Note: OIDC client secrets are NOT auto-mounted by the chart, must be added manually

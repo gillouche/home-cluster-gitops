@@ -19,6 +19,9 @@ spec:
         app: kafka
         environment: prod
     spec:
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
       nodeSelector:
         workload.tier: infra
       containers:
@@ -76,6 +79,11 @@ spec:
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
+          securityContext:
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
       initContainers:
         - name: fix-permissions
           image: nexus.gillouche.homelab/docker-hub/library/busybox:latest
