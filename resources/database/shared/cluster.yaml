@@ -7,7 +7,7 @@ spec:
   enableSuperuserAccess: true
   superuserSecret:
     name: shared-db-superuser
-  instances: 3
+  instances: 2
   
   # Placement
   affinity:
