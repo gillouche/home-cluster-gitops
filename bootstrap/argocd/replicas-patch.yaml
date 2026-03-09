@@ -39,4 +39,4 @@ kind: StatefulSet
 metadata:
   name: argocd-redis-ha-server
 spec:
-  replicas: 3
+  replicas: 2
