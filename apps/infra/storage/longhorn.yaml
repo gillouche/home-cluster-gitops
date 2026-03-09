@@ -33,7 +33,6 @@ spec:
             storageOverProvisioningPercentage: 200
             orphanResourceAutoDeletion: true
             orphanResourceAutoDeletionGracePeriod: 300
-            engineReplicaTimeout: 30
             guaranteedInstanceManagerCPU: 0
           longhornManager:
             affinity: {}
