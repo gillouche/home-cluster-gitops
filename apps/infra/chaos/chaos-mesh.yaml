@@ -28,6 +28,11 @@ spec:
     server: https://kubernetes.default.svc
     namespace: chaos-mesh
   ignoreDifferences:
+    - group: apiextensions.k8s.io
+      kind: CustomResourceDefinition
+      jsonPointers:
+        - /status
+        - /spec/preserveUnknownFields
     - group: admissionregistration.k8s.io
       kind: MutatingWebhookConfiguration
       jqPathExpressions:
