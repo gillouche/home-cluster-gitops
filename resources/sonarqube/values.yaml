@@ -59,7 +59,7 @@ resources:
     memory: 2Gi
     cpu: 500m
   limits:
-    memory: 4Gi
+    memory: 6Gi
     cpu: 2
 
 # Scheduling

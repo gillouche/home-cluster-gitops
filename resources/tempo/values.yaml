@@ -62,7 +62,7 @@ compactor:
       cpu: 15m
       memory: 128Mi
     limits:
-      memory: 384Mi
+      memory: 512Mi
   config:
     compaction:
       block_retention: 48h

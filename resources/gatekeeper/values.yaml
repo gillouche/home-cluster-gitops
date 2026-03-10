@@ -10,9 +10,21 @@ validatingWebhookConfiguration:
 mutatingWebhookConfiguration:
   failurePolicy: Ignore
 controllerManager:
+  resources:
+    requests:
+      cpu: 15m
+      memory: 256Mi
+    limits:
+      memory: 768Mi
   nodeSelector:
     node-class: homeserver
 audit:
+  resources:
+    requests:
+      cpu: 15m
+      memory: 256Mi
+    limits:
+      memory: 768Mi
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:

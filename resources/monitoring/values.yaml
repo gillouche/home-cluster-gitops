@@ -138,13 +138,6 @@ grafana:
       memory: 400Mi
     limits:
       memory: 768Mi
-  sidecar:
-    resources:
-      requests:
-        cpu: 10m
-        memory: 128Mi
-      limits:
-        memory: 192Mi
   securityContext:
     runAsNonRoot: true
     seccompProfile:
@@ -173,6 +166,12 @@ grafana:
                 values: ["homeserver"]
 
   sidecar:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 128Mi
+      limits:
+        memory: 192Mi
     dashboards:
       enabled: true
       label: grafana_dashboard
