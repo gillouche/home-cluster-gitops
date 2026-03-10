@@ -4,9 +4,21 @@
 chaosDaemon:
   runtime: containerd
   socketPath: /run/k3s/containerd/containerd.sock
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 192Mi
 
 dashboard:
   create: true
+  resources:
+    requests:
+      cpu: 15m
+      memory: 192Mi
+    limits:
+      memory: 384Mi
   securityContext:
     seccompProfile:
       type: RuntimeDefault
@@ -41,6 +53,12 @@ prometheus:
 # DNS Server for DNSChaos
 dnsServer:
   create: true
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 192Mi
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
@@ -55,6 +73,12 @@ controllerManager:
   # Default behavior: Chaos only in the namespace where the CR is defined
   # We will enforce this via Gatekeeper or simply usage conventions for now
   enableLeaderElection: true
+  resources:
+    requests:
+      cpu: 25m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
   securityContext:
     seccompProfile:
       type: RuntimeDefault

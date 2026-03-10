@@ -13,6 +13,12 @@ loki:
     allowPrivilegeEscalation: false
     capabilities:
       drop: ["ALL"]
+  resources:
+    requests:
+      cpu: 25m
+      memory: 2Gi
+    limits:
+      memory: 3Gi
   persistence:
     enabled: true
     storageClassName: longhorn
@@ -53,6 +59,12 @@ loki:
 
 promtail:
   enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
   # Collects logs from all nodes automatically
   config:
     clients:

@@ -5,6 +5,12 @@ image:
 
 
 pod:
+  resources:
+    requests:
+      cpu: 15m
+      memory: 200Mi
+    limits:
+      memory: 384Mi
   replicas: 2
   strategy:
     type: RollingUpdate

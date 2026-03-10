@@ -132,6 +132,19 @@ alertmanager:
     pathType: Prefix
 
 grafana:
+  resources:
+    requests:
+      cpu: 15m
+      memory: 400Mi
+    limits:
+      memory: 768Mi
+  sidecar:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 128Mi
+      limits:
+        memory: 192Mi
   securityContext:
     runAsNonRoot: true
     seccompProfile:
@@ -254,7 +267,20 @@ grafana:
 # Replace standalone exporters
 nodeExporter:
   enabled: true
+prometheus-node-exporter:
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 192Mi
 kube-state-metrics:
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 192Mi
   nodeSelector:
     node-class: homeserver
 
@@ -268,5 +294,11 @@ kubeControllerManager:
 
 # Ensure infrastructure components run on homeserver
 prometheusOperator:
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 192Mi
   nodeSelector:
     node-class: homeserver

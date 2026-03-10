@@ -36,6 +36,12 @@ storage:
 metricsGenerator:
   enabled: true
   replicas: 1
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 192Mi
   config:
     storage:
       remote_write:
@@ -51,6 +57,12 @@ metricsGenerator:
 # Compactor
 compactor:
   replicas: 1
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 384Mi
   config:
     compaction:
       block_retention: 48h
@@ -64,6 +76,12 @@ compactor:
 # Ingester (HA with 2 replicas)
 ingester:
   replicas: 2
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 192Mi
   podDisruptionBudget:
     minAvailable: 1
   config:
@@ -93,6 +111,12 @@ ingester:
 # Distributor
 distributor:
   replicas: 1
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 192Mi
   nodeSelector:
     node-class: homeserver
   tolerations:
@@ -103,6 +127,12 @@ distributor:
 # Querier
 querier:
   replicas: 1
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
   nodeSelector:
     node-class: homeserver
   tolerations:
@@ -113,6 +143,12 @@ querier:
 # Query Frontend
 queryFrontend:
   replicas: 1
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
   nodeSelector:
     node-class: homeserver
   tolerations:

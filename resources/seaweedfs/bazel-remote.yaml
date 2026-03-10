@@ -21,6 +21,12 @@ spec:
           image: nexus.gillouche.homelab/docker-hub/buchgr/bazel-remote-cache:latest
           ports:
             - containerPort: 8080
+          resources:
+            requests:
+              cpu: 15m
+              memory: 512Mi
+            limits:
+              memory: 1Gi
           env:
             - name: BAZEL_REMOTE_DIR
               value: /data

@@ -57,6 +57,12 @@ affinity:
             - key: node-class
               operator: In
               values: ["homeserver"]
+resources:
+  requests:
+    cpu: 15m
+    memory: 200Mi
+  limits:
+    memory: 384Mi
 podDisruptionBudget:
   enabled: true
   minAvailable: 1

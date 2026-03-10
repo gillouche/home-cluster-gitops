@@ -58,6 +58,12 @@ spec:
           image: nexus.gillouche.homelab/ghcr-proxy/gethomepage/homepage:v1.10.1
           ports:
             - containerPort: 3000
+          resources:
+            requests:
+              cpu: 15m
+              memory: 200Mi
+            limits:
+              memory: 384Mi
           volumeMounts:
             - name: config
               mountPath: /app/config

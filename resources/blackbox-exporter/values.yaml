@@ -1,5 +1,11 @@
 nodeSelector:
   node-class: homeserver
+resources:
+  requests:
+    cpu: 15m
+    memory: 128Mi
+  limits:
+    memory: 128Mi
 config:
   modules:
     icmp:

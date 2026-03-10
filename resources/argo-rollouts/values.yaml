@@ -1,5 +1,11 @@
 controller:
   replicas: 2
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
   nodeSelector:
     node-class: homeserver
   tolerations:
@@ -8,6 +14,12 @@ controller:
       effect: "NoSchedule"
 dashboard:
   enabled: true
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
   nodeSelector:
     node-class: homeserver
   ingress:

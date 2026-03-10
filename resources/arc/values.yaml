@@ -4,6 +4,12 @@ metrics:
 nodeSelector:
   node-class: homeserver
 githubConfigSecret: arc-github-creds
+resources:
+  requests:
+    cpu: 15m
+    memory: 128Mi
+  limits:
+    memory: 256Mi
 
 podSecurityContext:
   runAsNonRoot: true

@@ -1,5 +1,11 @@
 master:
   replicas: 3
+  resources:
+    requests:
+      cpu: 15m
+      memory: 128Mi
+    limits:
+      memory: 192Mi
   podSecurityContext:
     seccompProfile:
       type: RuntimeDefault
@@ -52,6 +58,12 @@ master:
 
 volume:
   replicas: 2
+  resources:
+    requests:
+      cpu: 15m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
   podSecurityContext:
     seccompProfile:
       type: RuntimeDefault
@@ -101,6 +113,12 @@ volume:
 
 filer:
   replicas: 2
+  resources:
+    requests:
+      cpu: 15m
+      memory: 768Mi
+    limits:
+      memory: 1536Mi
   podSecurityContext:
     seccompProfile:
       type: RuntimeDefault
@@ -146,6 +164,12 @@ filer:
 s3:
   enabled: true
   replicas: 2
+  resources:
+    requests:
+      cpu: 15m
+      memory: 512Mi
+    limits:
+      memory: 1Gi
   podSecurityContext:
     seccompProfile:
       type: RuntimeDefault

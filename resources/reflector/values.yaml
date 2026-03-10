@@ -1,5 +1,11 @@
 nodeSelector:
   node-class: homeserver
+resources:
+  requests:
+    cpu: 15m
+    memory: 256Mi
+  limits:
+    memory: 512Mi
 configuration:
   watcher:
     # Watch secrets and configmaps

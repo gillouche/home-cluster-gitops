@@ -1,7 +1,19 @@
 controller:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
   nodeSelector:
     node-class: homeserver
 dashboard:
+  resources:
+    requests:
+      cpu: 25m
+      memory: 128Mi
+    limits:
+      memory: 256Mi
   ingress:
     enabled: false
   nodeSelector:
