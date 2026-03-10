@@ -4,9 +4,11 @@ defaultSettings:
   replicaZoneSoftAntiAffinity: true
   nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
   concurrentReplicaRebuildPerNodeLimit: 2
-  replicaRebuildingBandwidthLimit: "120000000"
-  guaranteedInstanceManagerCPU: '{"v1":"0","v2":"0"}'
-  replicaReplenishmentWaitInterval: 30
+  replicaRebuildingBandwidthLimit: 120000000
+  guaranteedInstanceManagerCPU:
+    v1: "0"
+    v2: "0"
+  replicaReplenishmentWaitInterval: 600
   defaultDataLocality: best-effort
   replicaAutoBalance: best-effort
   createDefaultDiskLabeledNodes: false
