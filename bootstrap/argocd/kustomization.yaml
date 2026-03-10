@@ -8,6 +8,7 @@ resources:
 patches:
   - path: affinity-patch.yaml
   - path: replicas-patch.yaml
+  - path: resources-patch.yaml
   - target:
       kind: Secret
       name: argocd-secret
