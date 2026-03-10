@@ -12,7 +12,7 @@ defaultSettings:
   createDefaultDiskLabeledNodes: false
   storageReservedPercentageForDefaultDisk: 20
   storageOverProvisioningPercentage: 200
-  orphanResourceAutoDeletion: true
+  orphanResourceAutoDeletion: "replica-data;instance"
   orphanResourceAutoDeletionGracePeriod: 300
   defaultBackupBlockSize: 2
 longhornManager:
