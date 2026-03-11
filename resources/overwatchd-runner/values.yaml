@@ -3,7 +3,7 @@ runnerGroup: "Default"
 githubConfigUrl: "https://github.com/gillouche/overwatchd"
 githubConfigSecret: arc-github-creds
 minRunners: 0
-maxRunners: 3
+maxRunners: 10
 controllerServiceAccount:
   namespace: arc-systems
   name: arc-controller-gha-rs-controller
