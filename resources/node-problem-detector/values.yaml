@@ -1,0 +1,17 @@
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    memory: 128Mi
+
+metrics:
+  serviceMonitor:
+    enabled: true
+    labels:
+      release: monitoring
+
+settings:
+  log_monitors:
+    - /config/kernel-monitor.json
+    - /config/docker-monitor.json

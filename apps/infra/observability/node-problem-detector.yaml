@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: node-problem-detector
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "11"
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-infra: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-infra: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-observability
+  sources:
+    - chart: node-problem-detector
+      repoURL: https://charts.deliveryhero.io/
+      targetRevision: 2.4.0
+      helm:
+        valueFiles:
+          - $values/resources/node-problem-detector/values.yaml
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      ref: values
+      path: resources/node-problem-detector
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m

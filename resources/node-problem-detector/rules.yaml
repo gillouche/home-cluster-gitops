@@ -1,0 +1,55 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: node-problem-detector-rules
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: node-problem-detector
+      rules:
+        - alert: NodeKernelDeadlock
+          expr: problem_gauge{type="KernelDeadlock"} == 1
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Kernel deadlock on {{ $labels.node }}"
+            description: "Node {{ $labels.node }} reports a kernel deadlock condition."
+
+        - alert: NodeReadonlyFilesystem
+          expr: problem_gauge{type="ReadonlyFilesystem"} == 1
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Read-only filesystem on {{ $labels.node }}"
+            description: "Node {{ $labels.node }} has a read-only filesystem. SD card or disk may be failing."
+
+        - alert: NodeContainerdUnhealthy
+          expr: problem_gauge{type="ContainerdUnHealthy"} == 1
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Containerd unhealthy on {{ $labels.node }}"
+            description: "Node {{ $labels.node }} containerd is reporting unhealthy. Pods may not start."
+
+        - alert: NodeOOMInLogs
+          expr: problem_counter{reason="OOMKilling"} > 0
+          for: 0m
+          labels:
+            severity: critical
+          annotations:
+            summary: "OOM kill in kernel logs on {{ $labels.node }}"
+            description: "Kernel OOM killer invoked on {{ $labels.node }}."
+
+        - alert: NodeFilesystemCorruption
+          expr: problem_gauge{type="FilesystemCorruptionProblem"} == 1
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Filesystem corruption on {{ $labels.node }}"
+            description: "Node {{ $labels.node }} reports filesystem corruption."

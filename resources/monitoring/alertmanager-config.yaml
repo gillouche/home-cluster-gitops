@@ -24,7 +24,7 @@ spec:
       - matchers:
           - name: alertname
             regex: true
-            value: ^(TargetDown|NodeSystemSaturation|NodeHighCPU|InstanceDown|KubeNodeNotReady|NodeOOMKillDetected)$
+            value: ^(TargetDown|NodeSystemSaturation|NodeHighCPU|InstanceDown|KubeNodeNotReady|NodeOOMKillDetected|NodeKernelDeadlock|NodeReadonlyFilesystem|NodeContainerdUnhealthy|NodeFilesystemCorruption|NodeOOMInLogs)$
         receiver: 'discord-critical'
 
       # -- Storage (Longhorn) --
