@@ -14,7 +14,7 @@ spec:
   sources:
     - chart: node-problem-detector
       repoURL: https://charts.deliveryhero.io/
-      targetRevision: 2.4.0
+      targetRevision: 2.3.14
       helm:
         valueFiles:
           - $values/resources/node-problem-detector/values.yaml
