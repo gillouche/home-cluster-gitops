@@ -27,24 +27,6 @@ spec:
             summary: "Node {{ $labels.node }} NotReady"
             description: "Kubernetes node {{ $labels.node }} is reporting NotReady status."
 
-        - alert: NodeDiskSpaceRunningOut
-          expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} * 100) < 15
-          for: 5m
-          labels:
-            severity: warning
-          annotations:
-            summary: "Low Disk Space on {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }}"
-            description: "Node {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }} has less than 15% disk space remaining."
-
-        - alert: NodeDiskSpaceCritical
-          expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} * 100) < 5
-          for: 5m
-          labels:
-            severity: critical
-          annotations:
-            summary: "CRITICAL Disk Space on {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }}"
-            description: "Node {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }} has less than 5% disk space remaining. IO failures imminent."
-
         - alert: NodeMemoryPressureCritical
           expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100) < 5
           for: 1m

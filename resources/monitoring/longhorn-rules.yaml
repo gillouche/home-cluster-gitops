@@ -81,15 +81,6 @@ spec:
         summary: "Longhorn storage node down"
         description: "One or more Longhorn storage nodes are not ready. Expected {{ with printf \"avg(longhorn_node_count_total)\" | query }}{{ . | first | value }}{{ end }} nodes."
 
-    - alert: LonghornDiskStorageWarning
-      expr: (longhorn_disk_usage_bytes / longhorn_disk_capacity_bytes) * 100 > 70
-      for: 5m
-      labels:
-        severity: warning
-      annotations:
-        summary: "Disk storage >70% on {{ $labels.node }}"
-        description: "Longhorn disk {{ $labels.disk }} on node {{ $labels.node }} is at {{ $value | printf \"%.1f\" }}% usage."
-
     - alert: LonghornStorageFull
       expr: (longhorn_node_storage_usage_bytes / longhorn_node_storage_capacity_bytes) > 0.90
       for: 5m

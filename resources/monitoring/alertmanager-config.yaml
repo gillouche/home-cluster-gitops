@@ -34,12 +34,11 @@ spec:
             value: ^ArgoCD.*$
         receiver: 'discord-critical'
 
-      # -- Storage (Longhorn) --
-      # Explicitly catch storage alerts first to avoid duplicates in Critical/Warning
+      # -- Storage (Longhorn + node filesystem + PVC) --
       - matchers:
           - name: alertname
             regex: true
-            value: ^(Longhorn.*|Volume.*)$
+            value: ^(Longhorn.*|Volume.*|Storage.*)$
         receiver: 'discord-storage'
 
       # -- Network --

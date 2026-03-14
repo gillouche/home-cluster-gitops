@@ -81,15 +81,6 @@ spec:
             summary: "Job {{ $labels.job_name }} failed"
             description: "Job {{ $labels.namespace }}/{{ $labels.job_name }} has failed."
 
-        - alert: KubePersistentVolumeFillingUp
-          expr: kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes > 0.85
-          for: 15m
-          labels:
-            severity: warning
-          annotations:
-            summary: "PVC {{ $labels.persistentvolumeclaim }} filling up"
-            description: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is at {{ $value | humanizePercentage }} capacity."
-
     - name: coredns
       rules:
         - alert: CoreDNSDown
