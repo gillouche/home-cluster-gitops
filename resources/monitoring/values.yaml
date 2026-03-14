@@ -115,13 +115,11 @@ alertmanager:
       repeat_interval: 1h
       receiver: 'null'
       routes: []
-    inhibitRules:
-    - sourceMatch:
-        - name: severity
-          value: critical
-      targetMatch:
-        - name: severity
-          value: warning
+    inhibit_rules:
+    - source_match:
+        severity: critical
+      target_match:
+        severity: warning
       equal: ['alertname', 'namespace', 'node']
     receivers:
     - name: 'null'
