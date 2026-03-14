@@ -287,6 +287,7 @@ kube-state-metrics:
 kubelet:
   serviceMonitor:
     honorTimestamps: false
+    trackTimestampsStaleness: false
     metricRelabelings:
       - action: drop
         sourceLabels: [__name__, le]
