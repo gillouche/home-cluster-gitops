@@ -62,3 +62,50 @@ spec:
           annotations:
             summary: "High series cardinality on {{ $labels.pod }}"
             description: "Prometheus {{ $labels.pod }} has {{ $value | humanize }} active series. High cardinality increases memory and compaction pressure."
+
+    - name: prometheus-operational-health
+      rules:
+        - alert: PrometheusScrapeErrors
+          expr: increase(prometheus_target_scrapes_exceeded_sample_limit_total[5m]) > 0
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Prometheus scrape sample limit exceeded on {{ $labels.pod }}"
+            description: "Prometheus {{ $labels.pod }} has targets exceeding scrape sample limits."
+
+        - alert: PrometheusRuleEvaluationFailures
+          expr: increase(prometheus_rule_evaluation_failures_total[5m]) > 0
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Prometheus rule evaluation failures on {{ $labels.pod }}"
+            description: "Prometheus {{ $labels.pod }} has rule evaluation failures. Some alerts may not fire correctly."
+
+        - alert: PrometheusTargetDown
+          expr: up{job=~"node-exporter|kubelet|kube-state-metrics|alertmanager"} == 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Critical target {{ $labels.job }} down on {{ $labels.instance }}"
+            description: "Prometheus cannot scrape {{ $labels.job }} at {{ $labels.instance }} for >5m."
+
+        - alert: PrometheusNotConnectedToAlertmanager
+          expr: prometheus_notifications_alertmanagers_discovered < 1
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Prometheus not connected to Alertmanager on {{ $labels.pod }}"
+            description: "Prometheus {{ $labels.pod }} has no discovered Alertmanager instances. Alerts will not be delivered."
+
+        - alert: PrometheusRemoteWriteErrors
+          expr: rate(prometheus_remote_storage_failed_samples_total[5m]) > 0
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Prometheus remote write errors on {{ $labels.pod }}"
+            description: "Prometheus {{ $labels.pod }} is failing to send samples via remote write."

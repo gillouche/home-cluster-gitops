@@ -9,11 +9,9 @@ spec:
   groups:
   - name: longhorn.rules
     rules:
-    # --- Volume Health ---
     - alert: LonghornVolumeFaulted
-      # Robustness: 0=Unknown, 1=Healthy, 2=Degraded, 3=Faulted
       expr: longhorn_volume_robustness == 3
-      for: 1m
+      for: 5m
       labels:
         severity: critical
       annotations:
@@ -22,30 +20,79 @@ spec:
 
     - alert: LonghornVolumeDegraded
       expr: longhorn_volume_robustness == 2
-      for: 1m
+      for: 5m
       labels:
         severity: warning
       annotations:
         summary: "Volume {{ $labels.volume }} Degraded"
         description: "Volume {{ $labels.volume }} is degraded. Replicas may be rebuilding or missing."
 
-    # --- Node Status ---
-    - alert: LonghornNodeDown
-      # condition="ready", status="false" (or check if metric is missing/0)
-      # Usually: longhorn_node_status{condition="ready"} == 0 means not ready
-      expr: longhorn_node_status{condition="ready"} == 0
+    - alert: LonghornVolumeRebuildStuck
+      expr: longhorn_volume_robustness == 2
+      for: 30m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Volume {{ $labels.volume }} rebuild stuck"
+        description: "Volume {{ $labels.volume }} has been degraded for >30m. Replica rebuild may be stuck."
+
+    - alert: LonghornVolumeReadOnly
+      expr: longhorn_volume_file_system_read_only == 1
       for: 1m
       labels:
         severity: critical
       annotations:
-        summary: "Longhorn Node {{ $labels.node }} Down"
-        description: "Storage node {{ $labels.node }} is reporting as Not Ready."
+        summary: "Volume {{ $labels.volume }} is read-only"
+        description: "Longhorn volume {{ $labels.volume }} filesystem has gone read-only. Data corruption risk."
 
-    # --- Storage Capacity ---
+    - alert: LonghornVolumeActualSpaceUsedWarning
+      expr: (longhorn_volume_actual_size_bytes / longhorn_volume_capacity_bytes) * 100 > 90
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Volume {{ $labels.volume }} space usage >90%"
+        description: "Volume {{ $labels.volume }} actual data usage is at {{ $value | printf \"%.1f\" }}% of capacity."
+
+    - alert: LonghornVolumeDetachedUnexpectedly
+      expr: (longhorn_volume_state == 0) and on(volume) (longhorn_volume_state offset 10m == 1)
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Volume {{ $labels.volume }} detached unexpectedly"
+        description: "Volume {{ $labels.volume }} was attached 10m ago but is now detached."
+
+    - alert: LonghornReplicaFailed
+      expr: count by (volume) (longhorn_volume_robustness == 3) > 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Longhorn replica failure on volume {{ $labels.volume }}"
+        description: "Volume {{ $labels.volume }} has entered faulted state indicating replica failures."
+
+    - alert: LonghornNodeDown
+      expr: (avg(longhorn_node_count_total) or on() vector(0)) - (count(longhorn_node_status{condition="ready"} == 1) or on() vector(0)) > 0
+      for: 5m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Longhorn storage node down"
+        description: "One or more Longhorn storage nodes are not ready. Expected {{ with printf \"avg(longhorn_node_count_total)\" | query }}{{ . | first | value }}{{ end }} nodes."
+
+    - alert: LonghornDiskStorageWarning
+      expr: (longhorn_disk_usage_bytes / longhorn_disk_capacity_bytes) * 100 > 70
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Disk storage >70% on {{ $labels.node }}"
+        description: "Longhorn disk {{ $labels.disk }} on node {{ $labels.node }} is at {{ $value | printf \"%.1f\" }}% usage."
+
     - alert: LonghornStorageFull
-      # Usage > 90%
       expr: (longhorn_node_storage_usage_bytes / longhorn_node_storage_capacity_bytes) > 0.90
-      for: 1m
+      for: 5m
       labels:
         severity: critical
       annotations:
@@ -53,11 +100,55 @@ spec:
         description: "Longhorn node {{ $labels.node }} is at {{ humanizePercentage $value }} capacity."
 
     - alert: LonghornStorageWarning
-      # Usage > 80%
       expr: (longhorn_node_storage_usage_bytes / longhorn_node_storage_capacity_bytes) > 0.80
-      for: 1m
+      for: 5m
       labels:
         severity: warning
       annotations:
         summary: "Storage Warning on {{ $labels.node }}"
         description: "Longhorn node {{ $labels.node }} is at {{ humanizePercentage $value }} capacity."
+
+    - alert: LonghornStorageOverProvisioned
+      expr: (longhorn_node_storage_reservation_bytes / longhorn_node_storage_capacity_bytes) > 0.95
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Storage over-provisioned on {{ $labels.node }}"
+        description: "Longhorn node {{ $labels.node }} reservation is at {{ humanizePercentage $value }} of physical capacity."
+
+    - alert: LonghornInstanceManagerCPUHigh
+      expr: (longhorn_instance_manager_cpu_usage_millicpu / longhorn_instance_manager_cpu_requests_millicpu) * 100 > 300
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Instance manager CPU high on {{ $labels.node }}"
+        description: "Longhorn instance manager on {{ $labels.node }} is consuming {{ $value | printf \"%.0f\" }}% of CPU request."
+
+    - alert: LonghornNodeCPUHigh
+      expr: (longhorn_node_cpu_usage_millicpu / longhorn_node_cpu_capacity_millicpu) * 100 > 90
+      for: 5m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Longhorn CPU high on {{ $labels.node }}"
+        description: "Longhorn node {{ $labels.node }} CPU usage is at {{ $value | printf \"%.1f\" }}%."
+
+    - alert: LonghornBackupStale
+      expr: (time() - longhorn_volume_last_backup_at > 86400) and longhorn_volume_last_backup_at > 0
+      for: 1h
+      labels:
+        severity: warning
+      annotations:
+        summary: "Backup stale for volume {{ $labels.volume }}"
+        description: "Volume {{ $labels.volume }} last backup is older than 24h."
+
+    - alert: LonghornNodeSchedulingDisabled
+      expr: longhorn_node_status{condition="schedulable"} == 0
+      for: 15m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Longhorn scheduling disabled on {{ $labels.node }}"
+        description: "Longhorn node {{ $labels.node }} has scheduling disabled for >15m."

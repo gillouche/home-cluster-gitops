@@ -9,30 +9,27 @@ spec:
   groups:
     - name: node-health
       rules:
-        # --- Kubelet & Node Availability ---
         - alert: InstanceDown
           expr: up{job="node-exporter"} == 0
-          for: 1m
+          for: 3m
           labels:
             severity: critical
           annotations:
             summary: "Instance {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }} down"
-            description: "Node {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }} has been unreachable for >1 minute."
+            description: "Node {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }} has been unreachable for >3 minutes."
 
         - alert: KubeNodeNotReady
           expr: kube_node_status_condition{condition="Ready",status="true"} == 0
-          for: 1m
+          for: 3m
           labels:
             severity: critical
           annotations:
             summary: "Node {{ $labels.node }} NotReady"
             description: "Kubernetes node {{ $labels.node }} is reporting NotReady status."
 
-        # --- Disk Space (Critical for preventing corruption on SD cards) ---
         - alert: NodeDiskSpaceRunningOut
-          # Warn if < 15% free
-          expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint=""} * 100) < 15
-          for: 1m
+          expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} * 100) < 15
+          for: 5m
           labels:
             severity: warning
           annotations:
@@ -40,18 +37,15 @@ spec:
             description: "Node {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }} has less than 15% disk space remaining."
 
         - alert: NodeDiskSpaceCritical
-          # Critical if < 5% free
-          expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint=""} * 100) < 5
-          for: 1m
+          expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"} * 100) < 5
+          for: 5m
           labels:
             severity: critical
           annotations:
             summary: "CRITICAL Disk Space on {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }}"
             description: "Node {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }} has less than 5% disk space remaining. IO failures imminent."
 
-        # --- Memory Saturation (Common cause of RPi freezes) ---
         - alert: NodeMemoryPressureCritical
-          # Alert if available memory < 5%
           expr: (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100) < 5
           for: 1m
           labels:
@@ -60,9 +54,7 @@ spec:
             summary: "Memory Critical on {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }}"
             description: "Node {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }} has less than 5% memory available. OOM Killer imminent."
 
-        # --- CPU Saturation ---
         - alert: NodeHighCPU
-          # 15m load average normalized by core count
           expr: node_load15 / count without (cpu, mode) (node_cpu_seconds_total{mode="idle"}) > 1.2
           for: 2m
           labels:
@@ -70,9 +62,8 @@ spec:
           annotations:
             summary: "High System Load on {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }}"
             description: "Node {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }} load average is > 120% of capacity."
-        # --- System Stability (Paranoid Debugging) ---
+
         - alert: NodeOOMKillDetected
-          # Detect kmsg 'OOM kill' events via node-exporter (requires --collector.vmstat)
           expr: increase(node_vmstat_oom_kill[5m]) > 0
           for: 0m
           labels:
@@ -82,7 +73,6 @@ spec:
             description: "Kernel OOM killer has triggered on {{ or $labels.node ($labels.instance | reReplaceAll \":\\\\d+$\" \"\") }}! Check logs immediately."
 
         - alert: NodeHighIOWait
-          # Critical for SD cards: if CPU is spending > 20% time waiting for IO
           expr: avg by (instance) (rate(node_cpu_seconds_total{mode="iowait"}[5m])) * 100 > 20
           for: 2m
           labels:
@@ -93,7 +83,7 @@ spec:
 
         - alert: NodeNetworkReceptionErrors
           expr: rate(node_network_receive_errs_total[2m]) > 0
-          for: 2m
+          for: 5m
           labels:
             severity: warning
           annotations:

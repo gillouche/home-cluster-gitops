@@ -21,9 +21,15 @@ data:
             with urllib.request.urlopen(url) as response:
                 data = json.loads(response.read().decode())
                 if data['status'] == 'success' and data['data']['result']:
-                    return data['data']['result'][0]['value'][1]
+                    return data['data']['result']
         except Exception as e:
             print(f"Error querying {query}: {e}")
+        return []
+
+    def query_prometheus_scalar(query):
+        results = query_prometheus(query)
+        if results:
+            return results[0]['value'][1]
         return "N/A"
 
     def format_bytes(size):
@@ -39,31 +45,62 @@ data:
         except:
             return size
 
+    def get_longhorn_health():
+        degraded = query_prometheus('count(longhorn_volume_robustness == 2) or vector(0)')
+        faulted = query_prometheus('count(longhorn_volume_robustness == 3) or vector(0)')
+        degraded_count = int(float(degraded[0]['value'][1])) if degraded else 0
+        faulted_count = int(float(faulted[0]['value'][1])) if faulted else 0
+        if faulted_count > 0:
+            return f"FAULTED: {faulted_count} | Degraded: {degraded_count}"
+        if degraded_count > 0:
+            return f"Degraded: {degraded_count}"
+        return "All Healthy"
+
+    def get_argocd_sync():
+        outofsync = query_prometheus('count(argocd_app_info{sync_status="OutOfSync"}) or vector(0)')
+        degraded = query_prometheus('count(argocd_app_info{health_status="Degraded"}) or vector(0)')
+        outofsync_count = int(float(outofsync[0]['value'][1])) if outofsync else 0
+        degraded_count = int(float(degraded[0]['value'][1])) if degraded else 0
+        parts = []
+        if outofsync_count > 0:
+            parts.append(f"OutOfSync: {outofsync_count}")
+        if degraded_count > 0:
+            parts.append(f"Degraded: {degraded_count}")
+        return " | ".join(parts) if parts else "All Synced & Healthy"
+
+    def get_active_alerts():
+        results = query_prometheus('count by (severity) (ALERTS{alertstate="firing",alertname!="Watchdog"})')
+        if not results:
+            return "None"
+        parts = []
+        for r in results:
+            severity = r['metric'].get('severity', 'unknown')
+            count = int(float(r['value'][1]))
+            if count > 0:
+                parts.append(f"{severity}: {count}")
+        return " | ".join(parts) if parts else "None"
+
+    def get_scrape_health():
+        down = query_prometheus('count(up == 0) or vector(0)')
+        down_count = int(float(down[0]['value'][1])) if down else 0
+        if down_count > 0:
+            return f"{down_count} targets down"
+        return "All targets up"
+
     def main():
         if not WEBHOOK_URL:
             print("No webhook URL provided")
             return
 
-        # Queries
-        # CPU: Avg usage AND Max usage
-        # Avg:
-        cpu_avg = query_prometheus('100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)')
-        # Max node:
-        cpu_max = query_prometheus('max(100 - (rate(node_cpu_seconds_total{mode="idle"}[5m]) * 100))')
-        
-        # Memory
-        mem_usage = query_prometheus('sum(node_memory_MemTotal_bytes) - sum(node_memory_MemAvailable_bytes)')
-        mem_total = query_prometheus('sum(node_memory_MemTotal_bytes)')
-        
-        # Status - count(kube_node_info) is often cleaner for node count
-        nodes_up = query_prometheus('count(kube_node_info)')
-        pods_running = query_prometheus('count(kube_pod_status_phase{phase="Running"})')
-        
-        # Storage (Longhorn)
-        pvc_usage = query_prometheus('sum(longhorn_node_storage_usage_bytes)')
-        pvc_total = query_prometheus('sum(longhorn_node_storage_capacity_bytes)')
+        cpu_avg = query_prometheus_scalar('100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)')
+        cpu_max = query_prometheus_scalar('max(100 - (rate(node_cpu_seconds_total{mode="idle"}[5m]) * 100))')
+        mem_usage = query_prometheus_scalar('sum(node_memory_MemTotal_bytes) - sum(node_memory_MemAvailable_bytes)')
+        mem_total = query_prometheus_scalar('sum(node_memory_MemTotal_bytes)')
+        nodes_up = query_prometheus_scalar('count(kube_node_info)')
+        pods_running = query_prometheus_scalar('count(kube_pod_status_phase{phase="Running"})')
+        pvc_usage = query_prometheus_scalar('sum(longhorn_node_storage_usage_bytes)')
+        pvc_total = query_prometheus_scalar('sum(longhorn_node_storage_capacity_bytes)')
 
-        # Formatting
         try:
             cpu_text = f"Avg: {float(cpu_avg):.1f}% | Max: {float(cpu_max):.1f}%"
         except: cpu_text = "N/A"
@@ -76,27 +113,34 @@ data:
         try:
             storage_percent = (float(pvc_usage) / float(pvc_total)) * 100
             storage_text = f"{format_bytes(pvc_usage)} / {format_bytes(pvc_total)} ({storage_percent:.1f}%)"
-        except: 
-            # Fallback if longhorn metrics specific query failed, try generic
+        except:
             storage_text = f"Used: {format_bytes(pvc_usage)}"
 
+        longhorn_health = get_longhorn_health()
+        argocd_sync = get_argocd_sync()
+        active_alerts = get_active_alerts()
+        scrape_health = get_scrape_health()
+
         embed = {
-            "title": f"ℹ️ Cluster Status Check - {datetime.now().strftime('%H:%M UTC')}",
-            "color": 3066993, # Green/Blue
+            "title": f"Cluster Status - {datetime.now().strftime('%H:%M UTC')}",
+            "color": 3066993,
             "fields": [
                 {"name": "Nodes", "value": str(nodes_up), "inline": True},
                 {"name": "Pods", "value": str(pods_running), "inline": True},
                 {"name": "CPU Load", "value": cpu_text, "inline": True},
                 {"name": "Memory", "value": mem_text, "inline": True},
-                {"name": "Storage (Longhorn)", "value": storage_text, "inline": True}
+                {"name": "Storage (Longhorn)", "value": storage_text, "inline": True},
+                {"name": "Volume Health", "value": longhorn_health, "inline": True},
+                {"name": "ArgoCD", "value": argocd_sync, "inline": True},
+                {"name": "Active Alerts", "value": active_alerts, "inline": True},
+                {"name": "Scrape Health", "value": scrape_health, "inline": True},
             ],
             "footer": {"text": "Hourly Heartbeat"}
         }
 
         payload = {"embeds": [embed]}
-        
+
         url = WEBHOOK_URL
-        # Handle file-based secret if needed (though we inject env var directly mostly)
         if os.path.isfile(url):
             with open(url, 'r') as f:
                 url = f.read().strip()

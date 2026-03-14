@@ -9,10 +9,7 @@ spec:
   groups:
     - name: pod-events
       rules:
-        # --- Pod Lifecycle Errors ---
-        
         - alert: KubePodCrashLooping
-          # Alert if a pod restarts more than 4 times in 10 minutes
           expr: rate(kube_pod_container_status_restarts_total[10m]) * 60 * 10 > 4
           for: 5m
           labels:
@@ -31,7 +28,7 @@ spec:
           annotations:
             summary: "Pod {{ $labels.pod }} Not Ready"
             description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} has been in non-running state for > 10m."
-            
+
         - alert: KubePodImagePullBackOff
           expr: kube_pod_container_status_waiting_reason{reason="ImagePullBackOff"} > 0
           for: 5m
@@ -41,3 +38,74 @@ spec:
           annotations:
             summary: "Pod {{ $labels.pod }} ImagePullBackOff"
             description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} failed to pull image."
+
+    - name: workload-availability
+      rules:
+        - alert: KubeDeploymentReplicasMismatch
+          expr: kube_deployment_status_replicas_available != kube_deployment_spec_replicas
+          for: 15m
+          labels:
+            severity: warning
+            category: pod-events
+          annotations:
+            summary: "Deployment {{ $labels.deployment }} replicas mismatch"
+            description: "Deployment {{ $labels.namespace }}/{{ $labels.deployment }} has {{ $value }} available replicas but expects {{ with printf \"kube_deployment_spec_replicas{namespace='%s',deployment='%s'}\" $labels.namespace $labels.deployment | query }}{{ . | first | value }}{{ end }}."
+
+        - alert: KubeStatefulSetReplicasMismatch
+          expr: kube_statefulset_status_replicas_ready != kube_statefulset_replicas
+          for: 15m
+          labels:
+            severity: warning
+            category: pod-events
+          annotations:
+            summary: "StatefulSet {{ $labels.statefulset }} replicas mismatch"
+            description: "StatefulSet {{ $labels.namespace }}/{{ $labels.statefulset }} has mismatched ready replicas for >15m."
+
+        - alert: KubeDaemonSetNotScheduled
+          expr: kube_daemonset_status_desired_number_scheduled - kube_daemonset_status_current_number_scheduled > 0
+          for: 15m
+          labels:
+            severity: warning
+            category: pod-events
+          annotations:
+            summary: "DaemonSet {{ $labels.daemonset }} scheduling mismatch"
+            description: "DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} has unscheduled pods for >15m."
+
+        - alert: KubeJobFailed
+          expr: kube_job_status_failed > 0
+          for: 15m
+          labels:
+            severity: warning
+            category: pod-events
+          annotations:
+            summary: "Job {{ $labels.job_name }} failed"
+            description: "Job {{ $labels.namespace }}/{{ $labels.job_name }} has failed."
+
+        - alert: KubePersistentVolumeFillingUp
+          expr: kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes > 0.85
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "PVC {{ $labels.persistentvolumeclaim }} filling up"
+            description: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} is at {{ $value | humanizePercentage }} capacity."
+
+    - name: coredns
+      rules:
+        - alert: CoreDNSDown
+          expr: up{job="coredns"} == 0
+          for: 3m
+          labels:
+            severity: critical
+          annotations:
+            summary: "CoreDNS instance down"
+            description: "CoreDNS instance at {{ $labels.instance }} has been unreachable for >3m. DNS resolution may fail."
+
+        - alert: CoreDNSHighErrorRate
+          expr: rate(coredns_dns_responses_total{rcode="SERVFAIL"}[5m]) / rate(coredns_dns_responses_total[5m]) > 0.01
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "CoreDNS high SERVFAIL rate"
+            description: "CoreDNS SERVFAIL rate is {{ $value | humanizePercentage }} for >10m."

@@ -8,9 +8,9 @@ metadata:
 spec:
   route:
     groupBy: ['alertname', 'job']
-    groupWait: 1s
-    groupInterval: 1m
-    repeatInterval: 5m
+    groupWait: 30s
+    groupInterval: 5m
+    repeatInterval: 1h
     receiver: 'discord-firing' # Default Fallback for anything not matched
     routes:
       - matchers:
@@ -25,6 +25,13 @@ spec:
           - name: alertname
             regex: true
             value: ^(TargetDown|NodeSystemSaturation|NodeHighCPU|InstanceDown|KubeNodeNotReady|NodeOOMKillDetected|NodeKernelDeadlock|NodeReadonlyFilesystem|NodeContainerdUnhealthy|NodeFilesystemCorruption|NodeOOMInLogs)$
+        receiver: 'discord-critical'
+
+      # -- ArgoCD --
+      - matchers:
+          - name: alertname
+            regex: true
+            value: ^ArgoCD.*$
         receiver: 'discord-critical'
 
       # -- Storage (Longhorn) --

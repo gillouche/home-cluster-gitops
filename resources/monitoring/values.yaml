@@ -14,10 +14,10 @@ prometheus:
         value: "2h"
     resources:
       requests:
-        memory: 3Gi
+        memory: 4Gi
         cpu: 500m
       limits:
-        memory: 6Gi
+        memory: 8Gi
         cpu: "2"
     externalLabels:
       namespace: monitoring
@@ -115,6 +115,14 @@ alertmanager:
       repeat_interval: 1h
       receiver: 'null'
       routes: []
+    inhibitRules:
+    - sourceMatch:
+        - name: severity
+          value: critical
+      targetMatch:
+        - name: severity
+          value: warning
+      equal: ['alertname', 'namespace', 'node']
     receivers:
     - name: 'null'
 
@@ -277,11 +285,14 @@ kube-state-metrics:
   resources:
     requests:
       cpu: 15m
-      memory: 128Mi
-    limits:
       memory: 192Mi
+    limits:
+      memory: 384Mi
   nodeSelector:
     node-class: homeserver
+  prometheus:
+    monitor:
+      honorTimestamps: false
 
 # Disable some defaults that might be too heavy for RPIs or not needed yet
 kubelet:
