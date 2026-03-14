@@ -284,6 +284,16 @@ kube-state-metrics:
     node-class: homeserver
 
 # Disable some defaults that might be too heavy for RPIs or not needed yet
+kubelet:
+  serviceMonitor:
+    metricRelabelings:
+      - action: drop
+        sourceLabels: [__name__]
+        regex: 'apiserver_.*'
+      - action: drop
+        sourceLabels: [__name__, le]
+        regex: (csi_operations|storage_operation_duration)_seconds_bucket;(0.25|2.5|15|25|120|600)(\.0)?
+
 kubeProxy:
   enabled: false
 kubeScheduler:
