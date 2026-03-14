@@ -16,6 +16,7 @@ defaultSettings:
   storageOverProvisioningPercentage: 200
   orphanResourceAutoDeletion: "replica-data;instance"
   orphanResourceAutoDeletionGracePeriod: 300
+  offlineReplicaRebuilding: false
   defaultBackupBlockSize: 2
 longhornManager:
   resources:
