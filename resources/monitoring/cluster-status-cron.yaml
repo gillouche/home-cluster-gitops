@@ -118,10 +118,13 @@ metadata:
   namespace: monitoring
 spec:
   schedule: "0 * * * *"
+  concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   jobTemplate:
     spec:
+      activeDeadlineSeconds: 120
+      backoffLimit: 2
       template:
         spec:
           containers:
@@ -138,7 +141,7 @@ spec:
             - name: script
               mountPath: /app/status_check.py
               subPath: status_check.py
-          restartPolicy: OnFailure
+          restartPolicy: Never
           volumes:
           - name: script
             configMap:
