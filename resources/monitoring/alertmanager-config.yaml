@@ -24,7 +24,7 @@ spec:
       - matchers:
           - name: alertname
             regex: true
-            value: ^(TargetDown|NodeSystemSaturation|NodeHighCPU|InstanceDown|KubeNodeNotReady|NodeOOMKillDetected|NodeKernelDeadlock|NodeReadonlyFilesystem|NodeContainerdUnhealthy|NodeFilesystemCorruption|NodeOOMInLogs)$
+            value: ^(TargetDown|NodeSystemSaturation|NodeHighCPU|InstanceDown|KubeNodeNotReady|NodeOOMKillDetected|NodeKernelDeadlock|NodeReadonlyFilesystem|NodeContainerdUnhealthy|NodeFilesystemCorruption|NodeOOMInLogs|KubePodCreateContainerError|KubeNodeManyPodsNotReady|KubeDaemonSetManyUnavailable|Patroni.*|ExternalService.*)$
         receiver: 'discord-critical'
 
       # -- ArgoCD --

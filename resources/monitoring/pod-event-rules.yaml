@@ -39,6 +39,26 @@ spec:
             summary: "Pod {{ $labels.pod }} ImagePullBackOff"
             description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} failed to pull image."
 
+        - alert: KubePodCreateContainerError
+          expr: kube_pod_container_status_waiting_reason{reason="CreateContainerError"} > 0
+          for: 10m
+          labels:
+            severity: critical
+            category: pod-events
+          annotations:
+            summary: "Pod {{ $labels.pod }} CreateContainerError"
+            description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} on {{ $labels.node }} has been stuck in CreateContainerError for >10m. Likely stale containerd state requiring node reboot."
+
+        - alert: KubeNodeManyPodsNotReady
+          expr: count by (node) (kube_pod_status_ready{condition="false"} == 1) > 5
+          for: 10m
+          labels:
+            severity: critical
+            category: pod-events
+          annotations:
+            summary: "Node {{ $labels.node }} has many non-ready pods"
+            description: "Node {{ $labels.node }} has {{ $value }} pods in non-ready state for >10m. Possible node-level issue."
+
     - name: workload-availability
       rules:
         - alert: KubeDeploymentReplicasMismatch
@@ -70,6 +90,26 @@ spec:
           annotations:
             summary: "DaemonSet {{ $labels.daemonset }} scheduling mismatch"
             description: "DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} has unscheduled pods for >15m."
+
+        - alert: KubeDaemonSetUnavailable
+          expr: kube_daemonset_status_number_unavailable > 0
+          for: 15m
+          labels:
+            severity: warning
+            category: pod-events
+          annotations:
+            summary: "DaemonSet {{ $labels.daemonset }} has unavailable pods"
+            description: "DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} has {{ $value }} unavailable pods for >15m."
+
+        - alert: KubeDaemonSetManyUnavailable
+          expr: kube_daemonset_status_number_unavailable / kube_daemonset_status_desired_number_scheduled > 0.3
+          for: 10m
+          labels:
+            severity: critical
+            category: pod-events
+          annotations:
+            summary: "DaemonSet {{ $labels.daemonset }} >30% unavailable"
+            description: "DaemonSet {{ $labels.namespace }}/{{ $labels.daemonset }} has {{ $value | humanizePercentage }} of pods unavailable for >10m. Widespread node-level issue."
 
         - alert: KubeJobFailed
           expr: kube_job_status_failed > 0

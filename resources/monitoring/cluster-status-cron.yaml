@@ -80,6 +80,28 @@ data:
                 parts.append(f"{severity}: {count}")
         return " | ".join(parts) if parts else "None"
 
+    def get_external_services():
+        services = {
+            "patroni-health": "Postgres",
+            "etcd-health": "Etcd",
+            "nexus-health": "Nexus",
+            "pihole-health": "Pi-hole",
+        }
+        issues = []
+        for job_suffix, name in services.items():
+            job = f"probe/monitoring/{job_suffix}"
+            total = query_prometheus(f'count(probe_success{{job="{job}"}}) or vector(0)')
+            up = query_prometheus(f'count(probe_success{{job="{job}"}} == 1) or vector(0)')
+            total_count = int(float(total[0]['value'][1])) if total else 0
+            up_count = int(float(up[0]['value'][1])) if up else 0
+            if total_count > 0 and up_count < total_count:
+                issues.append(f"{name}: {up_count}/{total_count}")
+        vip_down = query_prometheus('count(probe_success{job="probe/monitoring/vip-health"} == 0) or vector(0)')
+        vip_down_count = int(float(vip_down[0]['value'][1])) if vip_down else 0
+        if vip_down_count > 0:
+            issues.append(f"VIPs down: {vip_down_count}")
+        return " | ".join(issues) if issues else "All Healthy"
+
     def get_scrape_health():
         down = query_prometheus('count(up == 0) or vector(0)')
         down_count = int(float(down[0]['value'][1])) if down else 0
@@ -116,6 +138,7 @@ data:
         except:
             storage_text = f"Used: {format_bytes(pvc_usage)}"
 
+        external_services = get_external_services()
         longhorn_health = get_longhorn_health()
         argocd_sync = get_argocd_sync()
         active_alerts = get_active_alerts()
@@ -130,6 +153,7 @@ data:
                 {"name": "CPU Load", "value": cpu_text, "inline": True},
                 {"name": "Memory", "value": mem_text, "inline": True},
                 {"name": "Storage (Longhorn)", "value": storage_text, "inline": True},
+                {"name": "External Services", "value": external_services, "inline": True},
                 {"name": "Volume Health", "value": longhorn_health, "inline": True},
                 {"name": "ArgoCD", "value": argocd_sync, "inline": True},
                 {"name": "Active Alerts", "value": active_alerts, "inline": True},
