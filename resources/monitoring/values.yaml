@@ -51,6 +51,8 @@ prometheus:
       - namespace: monitoring
         name: alertmanager-operated
         port: http-web
+  serviceMonitor:
+    honorTimestamps: false
   ingress:
     enabled: true
     ingressClassName: traefik
