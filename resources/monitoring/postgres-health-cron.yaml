@@ -81,13 +81,14 @@ data:
             tl = r.get("timeline", 0)
             lag = r.get("lag", "unknown")
 
-            if state != "running":
-                issues.append(f"**{name}**: state=`{state}` (not running)")
+            healthy_states = ("running", "streaming", "in archive recovery")
+            if state not in healthy_states:
+                issues.append(f"**{name}**: state=`{state}`")
 
-            if state == "running" and tl and leader_tl and tl != leader_tl:
+            if state in healthy_states and tl and leader_tl and tl != leader_tl:
                 issues.append(f"**{name}**: timeline {tl} != leader timeline {leader_tl} (diverged)")
 
-            if state == "running" and lag != "unknown":
+            if state in healthy_states and lag != "unknown":
                 try:
                     lag_mb = int(lag) / (1024 * 1024)
                     if lag_mb > MAX_LAG_MB:
