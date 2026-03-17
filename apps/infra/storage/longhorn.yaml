@@ -46,6 +46,11 @@ spec:
       name: longhorn-ui
       jsonPointers:
         - /status
+    - group: longhorn.io
+      kind: Node
+      jqPathExpressions:
+        - .spec.disks | to_entries[] | .value | .diskUUID, .storageAvailable, .storageMaximum, .storageScheduled
+        - .status
   syncPolicy:
     automated:
       prune: true
@@ -54,6 +59,7 @@ spec:
       - CreateNamespace=true
       - SkipHooks=true
       - ServerSideApply=true
+      - RespectIgnoreDifferences=true
     retry:
       limit: 5
       backoff:
