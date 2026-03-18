@@ -50,14 +50,21 @@ spec:
             description: "Pod {{ $labels.namespace }}/{{ $labels.pod }} on {{ $labels.node }} has been stuck in CreateContainerError for >10m. Likely stale containerd state requiring node reboot."
 
         - alert: KubeNodeManyPodsNotReady
-          expr: count by (node) (kube_pod_status_ready{condition="false"} == 1 unless on(pod, namespace) kube_pod_status_phase{phase="Succeeded"} == 1) > 8
+          expr: |
+            count by (node) (
+              (kube_pod_status_ready{condition="false"} == 1)
+              * on(pod, namespace) group_left(node)
+              kube_pod_info
+              unless on(pod, namespace)
+              kube_pod_status_phase{phase="Succeeded"} == 1
+            ) > 5
           for: 15m
           labels:
             severity: critical
             category: pod-events
           annotations:
             summary: "Node {{ $labels.node }} has many non-ready pods"
-            description: "Node {{ $labels.node }} has {{ $value }} pods in non-ready state for >10m. Possible node-level issue."
+            description: "Node {{ $labels.node }} has {{ $value }} pods in non-ready state for >15m. Possible node-level issue."
 
     - name: workload-availability
       rules:
