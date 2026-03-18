@@ -73,13 +73,13 @@ spec:
         description: "Volume {{ $labels.volume }} has entered faulted state indicating replica failures."
 
     - alert: LonghornNodeDown
-      expr: (avg(longhorn_node_count_total) or on() vector(0)) - (count(longhorn_node_status{condition="ready"} == 1) or on() vector(0)) > 0
+      expr: longhorn_node_status{condition="ready"} == 0
       for: 5m
       labels:
         severity: critical
       annotations:
-        summary: "Longhorn storage node down"
-        description: "One or more Longhorn storage nodes are not ready. Expected {{ with printf \"avg(longhorn_node_count_total)\" | query }}{{ . | first | value }}{{ end }} nodes."
+        summary: "Longhorn node {{ $labels.node }} is down"
+        description: "Longhorn storage node {{ $labels.node }} is not ready for >5m."
 
     - alert: LonghornStorageFull
       expr: (longhorn_node_storage_usage_bytes / longhorn_node_storage_capacity_bytes) > 0.90
