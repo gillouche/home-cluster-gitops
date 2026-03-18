@@ -25,7 +25,7 @@ data:
     import /etc/coredns/custom/*.server
   NodeHosts: |
     192.168.0.76 rpi4b8g1
-    # 192.168.0.77 rpi4b8g2 - hardware failure, SD card dying
+    192.168.0.77 rpi4b8g2
     192.168.0.78 rpi4b8g3
     192.168.0.79 rpi4b8g4
     192.168.0.80 rpi5b8g1

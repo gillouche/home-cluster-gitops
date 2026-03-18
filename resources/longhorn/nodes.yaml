@@ -70,6 +70,17 @@ spec:
 apiVersion: longhorn.io/v1beta2
 kind: Node
 metadata:
+  name: rpi4b8g2
+  namespace: longhorn-system
+spec:
+  name: rpi4b8g2
+  allowScheduling: false
+  disks: {}
+  tags: []
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
   name: rpi4b8g3
   namespace: longhorn-system
 spec:
