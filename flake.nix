@@ -4,10 +4,9 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     flake-utils.url = "github:numtide/flake-utils";
-    attic.url = "github:zhaofengli/attic";
   };
 
-  outputs = { self, nixpkgs, flake-utils, attic }:
+  outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
@@ -23,10 +22,7 @@
             kubeseal
             popeye
             k9s
-            
-            # Attic (from flake input)
-            attic.packages.${system}.attic-client
-            attic.packages.${system}.attic-server
+
             
             # Python Tools
             python314
@@ -47,8 +43,6 @@
             echo "Kubectl:  $(kubectl version --client -o json | jq -r .clientVersion.gitVersion)"
             echo "ArgoCD:   $(argocd version --client --short)"
             echo "Kubeseal: $(kubeseal --version | awk '{print $NF}')"
-            echo "Attic:    $(attic --version)"
-            echo "AtticD:   $(atticd --version)"
             echo "Python:   $(python3 --version)"
           '';
         };
