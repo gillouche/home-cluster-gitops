@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn-replica-rebalancer-runner
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "6" # Depends on Controller (5)
+    notifications.argoproj.io/subscribe.on-sync-failed.webhook.discord-infra: ""
+    notifications.argoproj.io/subscribe.on-health-degraded.webhook.discord-infra: ""
+  finalizers:
+    - argoproj.io/resources-finalizer
+spec:
+  project: infra-ci
+  sources:
+    - chart: gha-runner-scale-set
+      repoURL: "ghcr.io/actions/actions-runner-controller-charts"
+      targetRevision: "0.13.1"
+      helm:
+        valueFiles:
+          - $values/resources/longhorn-replica-rebalancer-runner/values.yaml
+    - repoURL: https://github.com/gillouche/home-cluster-gitops.git
+      targetRevision: HEAD
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: arc-systems
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+  ignoreDifferences:
+    - group: ""
+      kind: ServiceAccount
+      jsonPointers:
+        - /metadata/finalizers
+    - group: rbac.authorization.k8s.io
+      kind: Role
+      jsonPointers:
+        - /metadata/finalizers
+    - group: rbac.authorization.k8s.io
+      kind: RoleBinding
+      jsonPointers:
+        - /metadata/finalizers
