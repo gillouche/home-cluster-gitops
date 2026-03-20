@@ -14,10 +14,10 @@ prometheus:
         value: "2h"
     resources:
       requests:
-        memory: 4Gi
+        memory: 6Gi
         cpu: 500m
       limits:
-        memory: 8Gi
+        memory: 12Gi
         cpu: "2"
     externalLabels:
       namespace: monitoring
