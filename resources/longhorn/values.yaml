@@ -60,6 +60,13 @@ metrics:
     enabled: true
     additionalLabels:
       release: monitoring
+    metricRelabelings:
+      - sourceLabels: [__name__]
+        regex: longhorn_rest_client_rate_limiter_latency_seconds_(bucket|sum|count)
+        action: drop
+      - sourceLabels: [__name__]
+        regex: longhorn_rest_client_request_latency_seconds_(bucket|sum|count)
+        action: drop
 service:
   ui:
     type: ClusterIP
