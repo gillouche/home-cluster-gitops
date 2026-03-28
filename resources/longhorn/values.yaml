@@ -3,7 +3,7 @@ defaultSettings:
   replicaSoftAntiAffinity: false
   replicaZoneSoftAntiAffinity: true
   nodeDownPodDeletionPolicy: delete-both-statefulset-and-deployment-pod
-  concurrentReplicaRebuildPerNodeLimit: 2
+  concurrentReplicaRebuildPerNodeLimit: 1
   replicaRebuildingBandwidthLimit: "120000000"
   guaranteedInstanceManagerCPU:
     v1: "0"

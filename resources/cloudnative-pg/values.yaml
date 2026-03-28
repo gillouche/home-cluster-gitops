@@ -1,3 +1,12 @@
 nodeSelector:
   node-class: homeserver
-# No custom values needed for basic operator
+affinity:
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        preference:
+          matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - homeserver2
