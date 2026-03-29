@@ -27,10 +27,27 @@ spec:
       jsonPointers:
         - /data/NodeHosts
         - /data/Corefile
+    - group: apps
+      kind: Deployment
+      name: coredns
+      jqPathExpressions:
+        - .spec.template.spec.containers[].image
+        - .spec.template.spec.volumes
+        - .spec.template.spec.containers[].volumeMounts
+        - .spec.template.spec.dnsPolicy
+        - .spec.template.spec.containers[].resources
+    - group: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: system:coredns
+      jsonPointers:
+        - /rules
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
+      - RespectIgnoreDifferences=true
     retry:
       limit: 3
       backoff:
