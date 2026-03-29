@@ -36,6 +36,7 @@ spec:
         - .spec.template.spec.containers[].volumeMounts
         - .spec.template.spec.dnsPolicy
         - .spec.template.spec.containers[].resources
+        - .spec.template.spec.tolerations
     - group: rbac.authorization.k8s.io
       kind: ClusterRole
       name: system:coredns
