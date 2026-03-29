@@ -15,10 +15,10 @@ dashboard:
   create: true
   resources:
     requests:
-      cpu: 15m
-      memory: 192Mi
-    limits:
+      cpu: 25m
       memory: 384Mi
+    limits:
+      memory: 768Mi
   securityContext:
     seccompProfile:
       type: RuntimeDefault
