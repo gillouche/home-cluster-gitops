@@ -18,6 +18,15 @@ controllerManager:
       memory: 768Mi
   nodeSelector:
     node-class: homeserver
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app
+                operator: In
+                values: ["gatekeeper"]
+          topologyKey: kubernetes.io/hostname
 audit:
   resources:
     requests:

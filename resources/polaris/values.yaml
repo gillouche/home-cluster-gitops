@@ -26,6 +26,14 @@ affinity:
             - key: node-class
               operator: In
               values: ["homeserver"]
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/name
+              operator: In
+              values: ["polaris"]
+        topologyKey: kubernetes.io/hostname
 
 # Persistence Configuration
 persistence:

@@ -40,6 +40,14 @@ prometheus:
                 - key: node-class
                   operator: In
                   values: ["homeserver"]
+      podAntiAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values: ["prometheus"]
+            topologyKey: kubernetes.io/hostname
     tolerations:
       - key: "node-role.kubernetes.io/control-plane"
         operator: "Exists"
@@ -97,15 +105,13 @@ alertmanager:
                   operator: In
                   values: ["homeserver"]
       podAntiAffinity:
-        preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 100
-            podAffinityTerm:
-              labelSelector:
-                matchExpressions:
-                  - key: app.kubernetes.io/name
-                    operator: In
-                    values: ["alertmanager"]
-              topologyKey: "kubernetes.io/hostname"
+        requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values: ["alertmanager"]
+            topologyKey: kubernetes.io/hostname
 
   config:
     global:

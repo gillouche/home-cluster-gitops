@@ -90,4 +90,12 @@ controllerManager:
               - key: node-class
                 operator: In
                 values: ["homeserver"]
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: In
+                values: ["controller-manager"]
+          topologyKey: kubernetes.io/hostname
   replicaCount: 2

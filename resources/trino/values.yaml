@@ -53,6 +53,15 @@ worker:
       cpu: "4"
   nodeSelector:
     node-class: homeserver
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: In
+                values: ["worker"]
+          topologyKey: kubernetes.io/hostname
 
 # Catalog Configuration
 additionalCatalogs:
