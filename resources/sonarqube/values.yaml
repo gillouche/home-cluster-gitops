@@ -74,6 +74,7 @@ initSysctl:
 # Security
 securityContext:
   fsGroup: 0
+  fsGroupChangePolicy: OnRootMismatch
   seccompProfile:
     type: RuntimeDefault
 containerSecurityContext:

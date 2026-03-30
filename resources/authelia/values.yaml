@@ -56,6 +56,7 @@ pod:
   securityContext:
     pod:
       fsGroup: 1000
+      fsGroupChangePolicy: OnRootMismatch
       runAsUser: 1000
       runAsGroup: 1000
       runAsNonRoot: true
