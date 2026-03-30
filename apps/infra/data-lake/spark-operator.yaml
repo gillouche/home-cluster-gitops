@@ -30,6 +30,7 @@ spec:
       jsonPointers:
         - /status
         - /spec/preserveUnknownFields
+        - /metadata/annotations
   syncPolicy:
     automated:
       prune: true
@@ -37,6 +38,7 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
+      - RespectIgnoreDifferences=true
     retry:
       limit: 3
       backoff:
