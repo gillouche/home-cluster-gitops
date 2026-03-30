@@ -10,11 +10,12 @@ defaultSettings:
     v2: "0"
   replicaReplenishmentWaitInterval: 1800
   failedReplicaAutoCleanupPeriod: 1440
+  defaultReplicaCount: 2
   defaultDataLocality: best-effort
   replicaAutoBalance: best-effort
   createDefaultDiskLabeledNodes: false
   storageReservedPercentageForDefaultDisk: 20
-  storageOverProvisioningPercentage: 200
+  storageOverProvisioningPercentage: 100
   orphanResourceAutoDeletion: "replica-data;instance"
   orphanResourceAutoDeletionGracePeriod: 300
   offlineReplicaRebuilding: false
