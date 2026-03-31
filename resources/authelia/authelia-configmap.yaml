@@ -76,7 +76,7 @@ data:
       ban_time: '5 minutes'
     storage:
       postgres:
-        address: 'tcp://192.168.0.247:15432'
+        address: 'tcp://shared-db-rw.database.svc:5432'
         timeout: '5 seconds'
         database: 'authelia'
         schema: 'public'
