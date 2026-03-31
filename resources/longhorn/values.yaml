@@ -8,8 +8,8 @@ defaultSettings:
   guaranteedInstanceManagerCPU:
     v1: "0"
     v2: "0"
-  replicaReplenishmentWaitInterval: 1800
-  failedReplicaAutoCleanupPeriod: 1440
+  replicaReplenishmentWaitInterval: 120
+  failedReplicaAutoCleanupPeriod: 60
   defaultReplicaCount: 2
   defaultDataLocality: best-effort
   replicaAutoBalance: best-effort
