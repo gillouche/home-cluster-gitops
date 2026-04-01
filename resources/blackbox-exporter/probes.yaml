@@ -33,52 +33,6 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: Probe
 metadata:
-  name: patroni-health
-  namespace: monitoring
-  labels:
-    release: monitoring
-spec:
-  jobName: patroni-health
-  prober:
-    url: blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc:9115
-  module: http_patroni
-  interval: 30s
-  scrapeTimeout: 10s
-  targets:
-    staticConfig:
-      static:
-        - http://192.168.0.87:8008/health
-        - http://192.168.0.88:8008/health
-        - http://192.168.0.89:8008/health
-      labels:
-        component: patroni
----
-apiVersion: monitoring.coreos.com/v1
-kind: Probe
-metadata:
-  name: etcd-health
-  namespace: monitoring
-  labels:
-    release: monitoring
-spec:
-  jobName: etcd-health
-  prober:
-    url: blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc:9115
-  module: http_patroni
-  interval: 30s
-  scrapeTimeout: 10s
-  targets:
-    staticConfig:
-      static:
-        - http://192.168.0.87:2379/health
-        - http://192.168.0.88:2379/health
-        - http://192.168.0.89:2379/health
-      labels:
-        component: etcd
----
-apiVersion: monitoring.coreos.com/v1
-kind: Probe
-metadata:
   name: nexus-health
   namespace: monitoring
   labels:
@@ -137,7 +91,6 @@ spec:
   targets:
     staticConfig:
       static:
-        - 192.168.0.247  # Postgres VIP
         - 192.168.0.248  # K3s LB VIP
         - 192.168.0.249  # K3s API VIP
         - 192.168.0.251  # Pi-hole DNS VIP
