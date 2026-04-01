@@ -17,4 +17,11 @@ patches:
         path: /metadata/annotations
         value:
           sealedsecrets.bitnami.com/managed: "true"
+  - target:
+      kind: ConfigMap
+      name: argocd-cmd-params-cm
+    patch: |
+      - op: add
+        path: /data/server.insecure
+        value: "true"
 
