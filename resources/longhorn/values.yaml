@@ -20,6 +20,7 @@ defaultSettings:
   orphanResourceAutoDeletionGracePeriod: 300
   offlineReplicaRebuilding: false
   defaultBackupBlockSize: 2
+  systemManagedComponentsNodeSelector: "node-class:homeserver"
 global:
   nodeSelector:
     node-class: homeserver
