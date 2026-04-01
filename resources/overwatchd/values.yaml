@@ -8,5 +8,7 @@ config:
   guildID: "1459504241080008737"
   allowedUserIDs: "192318521311625218"
   deniedChannelIDs: "1477640456090423348,1477647996337520660"
+nodeSelector:
+  node-class: homeserver
 secrets:
   existingSecret: overwatchd-secret
