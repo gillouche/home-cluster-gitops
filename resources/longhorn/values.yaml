@@ -80,5 +80,3 @@ service:
     type: ClusterIP
 ingress:
   enabled: false
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
