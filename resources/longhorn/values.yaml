@@ -21,6 +21,7 @@ defaultSettings:
   offlineReplicaRebuilding: false
   defaultBackupBlockSize: 2
   systemManagedComponentsNodeSelector: "node-class:homeserver"
+
 global:
   nodeSelector:
     node-class: homeserver
@@ -63,6 +64,7 @@ persistence:
   defaultClass: true
   defaultClassReplicaCount: 2
   defaultAllowVolumeExpansion: true
+
 metrics:
   serviceMonitor:
     enabled: true
@@ -75,9 +77,11 @@ metrics:
       - sourceLabels: [__name__]
         regex: longhorn_rest_client_request_latency_seconds_(bucket|sum|count)
         action: drop
+
 service:
   ui:
     type: ClusterIP
+
 ingress:
   enabled: false
   annotations:
