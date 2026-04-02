@@ -75,12 +75,8 @@ data:
       find_time: '2 minutes'
       ban_time: '5 minutes'
     storage:
-      postgres:
-        address: 'tcp://shared-db-rw.database.svc:5432'
-        timeout: '5 seconds'
-        database: 'authelia'
-        schema: 'public'
-        username: 'authelia'
+      local:
+        path: '/config/db.sqlite3'
     notifier:
       disable_startup_check: false
       filesystem:
