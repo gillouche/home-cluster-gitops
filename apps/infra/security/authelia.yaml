@@ -14,7 +14,7 @@ spec:
   sources:
     - chart: authelia
       repoURL: https://charts.authelia.com
-      targetRevision: 0.10.49
+      targetRevision: 0.10.50
       helm:
         valueFiles:
           - $values/resources/authelia/values.yaml
