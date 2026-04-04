@@ -319,6 +319,9 @@ kubeControllerManager:
 
 # Ensure infrastructure components run on homeserver
 prometheusOperator:
+  admissionWebhooks:
+    patch:
+      enabled: false
   resources:
     requests:
       cpu: 15m
