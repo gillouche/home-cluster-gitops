@@ -19,11 +19,4 @@ updater:
   nodeSelector:
     node-class: homeserver
 admissionController:
-  resources:
-    requests:
-      cpu: 50m
-      memory: 200Mi
-    limits:
-      memory: 256Mi
-  nodeSelector:
-    node-class: homeserver
+  enabled: false
