@@ -1,0 +1,27 @@
+nodeSelector:
+  node-class: homeserver
+
+resources:
+  requests:
+    cpu: 10m
+    memory: 64Mi
+  limits:
+    memory: 128Mi
+
+config:
+  datasourceSecret:
+    name: postgres-exporter-credentials
+    key: DATA_SOURCE_NAME
+  autoDiscoverDatabases: false
+  disableDefaultMetrics: false
+  disableSettingsMetrics: false
+  externalQueries:
+    enabled: true
+    configMapName: postgres-exporter-kine-queries
+    configMapKey: kine-queries.yaml
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  labels:
+    release: monitoring

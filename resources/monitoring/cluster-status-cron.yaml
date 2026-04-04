@@ -80,10 +80,43 @@ data:
                 parts.append(f"{severity}: {count}")
         return " | ".join(parts) if parts else "None"
 
+    def get_postgres_health():
+        pg_up = query_prometheus_scalar('pg_up')
+        try:
+            up = int(float(pg_up))
+        except:
+            up = -1
+        if up == 0:
+            return "DOWN"
+        if up < 0:
+            return "Exporter N/A"
+
+        connections = query_prometheus_scalar('pg_stat_activity_count')
+        max_conn = query_prometheus_scalar('pg_settings_max_connections')
+        db_size = query_prometheus_scalar('pg_database_size_bytes{datname="kubernetes"}')
+        kine_rows = query_prometheus_scalar('pg_kine_stats_total_rows')
+        kine_events = query_prometheus_scalar('pg_kine_stats_event_rows')
+        kine_size = query_prometheus_scalar('pg_kine_stats_table_size_bytes')
+
+        parts = []
+        try:
+            conn_pct = float(connections) / float(max_conn) * 100
+            parts.append(f"Conn: {int(float(connections))}/{int(float(max_conn))} ({conn_pct:.0f}%)")
+        except:
+            parts.append(f"Conn: {connections}/{max_conn}")
+        try:
+            parts.append(f"DB: {format_bytes(db_size)}")
+        except:
+            pass
+        try:
+            parts.append(f"Kine: {int(float(kine_rows))} rows ({int(float(kine_events))} events, {format_bytes(kine_size)})")
+        except:
+            pass
+        return " | ".join(parts) if parts else "UP"
+
     def get_external_services():
         services = {
-            "patroni-health": "Postgres",
-            "etcd-health": "Etcd",
+            "postgres-health": "Postgres",
             "nexus-health": "Nexus",
             "pihole-health": "Pi-hole",
         }
@@ -138,6 +171,7 @@ data:
         except:
             storage_text = f"Used: {format_bytes(pvc_usage)}"
 
+        postgres_health = get_postgres_health()
         external_services = get_external_services()
         longhorn_health = get_longhorn_health()
         argocd_sync = get_argocd_sync()
@@ -153,6 +187,7 @@ data:
                 {"name": "CPU Load", "value": cpu_text, "inline": True},
                 {"name": "Memory", "value": mem_text, "inline": True},
                 {"name": "Storage (Longhorn)", "value": storage_text, "inline": True},
+                {"name": "Postgres (K3s Datastore)", "value": postgres_health, "inline": False},
                 {"name": "External Services", "value": external_services, "inline": True},
                 {"name": "Volume Health", "value": longhorn_health, "inline": True},
                 {"name": "ArgoCD", "value": argocd_sync, "inline": True},

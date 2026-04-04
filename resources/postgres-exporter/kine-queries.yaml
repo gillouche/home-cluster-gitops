@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-exporter-kine-queries
+  namespace: monitoring
+data:
+  kine-queries.yaml: |
+    pg_kine_stats:
+      query: |
+        SELECT
+          count(*) AS total_rows,
+          count(*) FILTER (WHERE name LIKE '/registry/events/%') AS event_rows,
+          pg_total_relation_size('kine') AS table_size_bytes,
+          count(DISTINCT name) AS unique_keys
+        FROM kine
+      master: true
+      metrics:
+        - total_rows:
+            usage: "GAUGE"
+            description: "Total rows in kine table"
+        - event_rows:
+            usage: "GAUGE"
+            description: "Event rows in kine table"
+        - table_size_bytes:
+            usage: "GAUGE"
+            description: "Total size of kine table in bytes"
+        - unique_keys:
+            usage: "GAUGE"
+            description: "Unique keys in kine table"
+    pg_kine_oldest_event:
+      query: |
+        SELECT
+          EXTRACT(EPOCH FROM (now() - min(created_at)))::bigint AS oldest_event_age_seconds
+        FROM kine
+        WHERE name LIKE '/registry/events/%'
+      master: true
+      metrics:
+        - oldest_event_age_seconds:
+            usage: "GAUGE"
+            description: "Age of oldest event in kine table in seconds"

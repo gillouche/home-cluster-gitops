@@ -11,14 +11,25 @@ spec:
     rules:
     - alert: ExternalServicePostgresDown
       expr: probe_success{job="probe/monitoring/postgres-health"} == 0
-      for: 1m
+      for: 30s
       labels:
         severity: critical
       annotations:
-        summary: "Postgres datastore is down"
+        summary: "Postgres datastore is unreachable"
         description: >-
           Postgres on homeserver3 (192.168.0.89:5432) is unreachable.
-          K3s cluster cannot function without the datastore.
+          K3s control plane WILL fail without the datastore. Immediate action required.
+
+    - alert: ExternalServicePostgresHighLatency
+      expr: probe_duration_seconds{job="probe/monitoring/postgres-health"} > 1
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Postgres TCP probe latency is high"
+        description: >-
+          Postgres probe latency is {{ $value | printf "%.2f" }}s.
+          Network issues or Postgres overload may impact K3s control plane.
 
   - name: nexus
     rules:
