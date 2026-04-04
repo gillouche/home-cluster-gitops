@@ -22,7 +22,7 @@ spec:
           may be down or unreachable.
 
     - alert: PostgresConnectionsSaturated
-      expr: pg_stat_activity_count / on() pg_settings_max_connections * 100 > 80
+      expr: sum(pg_stat_activity_count) / on() pg_settings_max_connections * 100 > 80
       for: 5m
       labels:
         severity: warning
@@ -33,7 +33,7 @@ spec:
           K3s kine may start failing if connections are exhausted.
 
     - alert: PostgresConnectionsCritical
-      expr: pg_stat_activity_count / on() pg_settings_max_connections * 100 > 95
+      expr: sum(pg_stat_activity_count) / on() pg_settings_max_connections * 100 > 95
       for: 1m
       labels:
         severity: critical
