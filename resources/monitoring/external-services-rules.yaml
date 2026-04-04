@@ -7,6 +7,19 @@ metadata:
     release: monitoring
 spec:
   groups:
+  - name: postgres
+    rules:
+    - alert: ExternalServicePostgresDown
+      expr: probe_success{job="probe/monitoring/postgres-health"} == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Postgres datastore is down"
+        description: >-
+          Postgres on homeserver3 (192.168.0.89:5432) is unreachable.
+          K3s cluster cannot function without the datastore.
+
   - name: nexus
     rules:
     - alert: ExternalServiceNexusDown
