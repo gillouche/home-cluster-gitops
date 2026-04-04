@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: longhorn-webhook-patcher
+  namespace: longhorn-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: longhorn-webhook-patcher
+rules:
+- apiGroups: ["admissionregistration.k8s.io"]
+  resources: ["validatingwebhookconfigurations", "mutatingwebhookconfigurations"]
+  resourceNames: ["longhorn-webhook-validator", "longhorn-webhook-mutator"]
+  verbs: ["get", "patch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: longhorn-webhook-patcher
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: longhorn-webhook-patcher
+subjects:
+- kind: ServiceAccount
+  name: longhorn-webhook-patcher
+  namespace: longhorn-system
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: longhorn-webhook-patcher
+  namespace: longhorn-system
+spec:
+  schedule: "*/5 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 60
+      backoffLimit: 1
+      template:
+        spec:
+          serviceAccountName: longhorn-webhook-patcher
+          restartPolicy: Never
+          nodeSelector:
+            node-class: homeserver
+          containers:
+          - name: patcher
+            image: nexus.gillouche.homelab/docker-hub/bitnami/kubectl:1.35
+            command:
+            - sh
+            - -c
+            - |
+              set -e
+              for wh in longhorn-webhook-validator longhorn-webhook-mutator; do
+                TYPE="validatingwebhookconfigurations"
+                if echo "$wh" | grep -q mutator; then
+                  TYPE="mutatingwebhookconfigurations"
+                fi
+                CURRENT=$(kubectl get "$TYPE" "$wh" -o jsonpath='{.webhooks[0].failurePolicy}' 2>/dev/null || echo "missing")
+                if [ "$CURRENT" = "Fail" ]; then
+                  kubectl patch "$TYPE" "$wh" --type='json' \
+                    -p='[{"op":"replace","path":"/webhooks/0/failurePolicy","value":"Ignore"}]'
+                  echo "Patched $wh from Fail to Ignore"
+                elif [ "$CURRENT" = "Ignore" ]; then
+                  echo "$wh already Ignore"
+                else
+                  echo "$wh not found or unexpected state: $CURRENT"
+                fi
+              done

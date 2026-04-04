@@ -1,6 +1,7 @@
-# Chaos Mesh Helm Values
+webhook:
+  FailurePolicy: Ignore
+  timeoutSeconds: 5
 
-# Use containerd runtime for K3s
 chaosDaemon:
   runtime: containerd
   socketPath: /run/k3s/containerd/containerd.sock

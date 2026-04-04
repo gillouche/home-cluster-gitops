@@ -1,3 +1,9 @@
+webhook:
+  mutating:
+    failurePolicy: Ignore
+  validating:
+    failurePolicy: Ignore
+
 nodeSelector:
   node-class: homeserver
 affinity:
