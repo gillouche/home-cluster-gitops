@@ -12,16 +12,26 @@ config:
   datasourceSecret:
     name: postgres-exporter-credentials
     key: DATA_SOURCE_NAME
-  autoDiscoverDatabases: false
+  disableCollectorDatabase: false
+  disableCollectorBgwriter: false
   disableDefaultMetrics: false
   disableSettingsMetrics: false
-  externalQueries:
-    enabled: true
-    configMapName: postgres-exporter-kine-queries
-    configMapKey: kine-queries.yaml
+  extraArgs:
+    - "--extend.query-path=/etc/postgres-exporter/kine-queries.yaml"
 
 serviceMonitor:
   enabled: true
   interval: 30s
   labels:
     release: monitoring
+
+extraVolumes:
+  - name: kine-queries
+    configMap:
+      name: postgres-exporter-kine-queries
+
+extraVolumeMounts:
+  - name: kine-queries
+    mountPath: /etc/postgres-exporter/kine-queries.yaml
+    subPath: kine-queries.yaml
+    readOnly: true
