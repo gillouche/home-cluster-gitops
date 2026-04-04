@@ -49,7 +49,7 @@ spec:
             node-class: homeserver
           containers:
           - name: patcher
-            image: nexus.gillouche.homelab/docker-hub/bitnami/kubectl:1.35
+            image: nexus.gillouche.homelab/docker-hub/alpine/kubectl:1.35.3
             command:
             - sh
             - -c
