@@ -35,7 +35,6 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - ServerSideApply=true
-      - SkipHooks=true
     retry:
       limit: -1
       backoff:
