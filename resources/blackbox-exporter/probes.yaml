@@ -160,7 +160,6 @@ spec:
       static:
         - http://authelia.security.svc/api/health
         - http://argocd-server.argocd.svc/healthz
-        - http://traefik.kube-system.svc:9000/ping
         - http://loki.monitoring.svc:3100/ready
         - http://monitoring-grafana.monitoring.svc/api/health
         - http://sonarqube-sonarqube.sonarqube.svc:9000/api/system/status
