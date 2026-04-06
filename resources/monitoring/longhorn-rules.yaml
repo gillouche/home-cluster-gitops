@@ -55,13 +55,13 @@ spec:
         description: "Volume {{ $labels.volume }} actual data usage is at {{ $value | printf \"%.1f\" }}% of capacity."
 
     - alert: LonghornVolumeDetachedUnexpectedly
-      expr: (longhorn_volume_state == 0) and on(volume) (longhorn_volume_state offset 10m == 1)
-      for: 5m
+      expr: longhorn_volume_state == 0 and longhorn_volume_robustness == 1
+      for: 15m
       labels:
         severity: warning
       annotations:
         summary: "Volume {{ $labels.volume }} detached unexpectedly"
-        description: "Volume {{ $labels.volume }} was attached 10m ago but is now detached."
+        description: "Volume {{ $labels.volume }} is detached but was healthy. May indicate a scheduling or node issue."
 
     - alert: LonghornReplicaFailed
       expr: count by (volume) (longhorn_volume_robustness == 3) > 0
