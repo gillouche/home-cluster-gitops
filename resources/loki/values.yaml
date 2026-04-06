@@ -32,6 +32,15 @@ loki:
               - key: node-class
                 operator: In
                 values: ["homeserver"]
+  extraVolumes:
+    - name: alerting-rules
+      configMap:
+        name: loki-alerting-rules
+  extraVolumeMounts:
+    - name: alerting-rules
+      mountPath: /data/loki/rules/fake/rules.yaml
+      subPath: rules.yaml
+      readOnly: true
   config:
     table_manager:
       retention_deletes_enabled: true
@@ -41,7 +50,7 @@ loki:
         type: local
         local:
           directory: /data/loki/rules
-      rule_path: /data/loki/rules
+      rule_path: /data/loki/rules-tmp
       alertmanager_url: http://alertmanager-operated.monitoring.svc:9093
       ring:
         kvstore:

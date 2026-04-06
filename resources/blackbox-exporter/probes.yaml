@@ -140,3 +140,50 @@ spec:
         - 192.168.0.89:5432
       labels:
         component: postgres
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: k3s-internal-services
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  jobName: k3s-internal-services
+  prober:
+    url: blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc:9115
+  module: http_2xx
+  interval: 30s
+  scrapeTimeout: 10s
+  targets:
+    staticConfig:
+      static:
+        - http://authelia.security.svc:9091/api/health
+        - http://argocd-server.argocd.svc/healthz
+        - http://traefik.traefik.svc:9000/ping
+        - http://loki.monitoring.svc:3100/ready
+        - http://monitoring-grafana.monitoring.svc/api/health
+        - http://sonarqube-sonarqube.sonarqube.svc:9000/api/system/status
+      labels:
+        component: k3s-internal
+---
+apiVersion: monitoring.coreos.com/v1
+kind: Probe
+metadata:
+  name: argocd-dex-health
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  jobName: argocd-dex-health
+  prober:
+    url: blackbox-exporter-prometheus-blackbox-exporter.monitoring.svc:9115
+  module: http_2xx
+  interval: 30s
+  scrapeTimeout: 10s
+  targets:
+    staticConfig:
+      static:
+        - http://argocd-dex-server.argocd.svc:5556/healthz/ready
+      labels:
+        component: argocd-dex

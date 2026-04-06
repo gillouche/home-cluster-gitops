@@ -135,6 +135,34 @@ data:
             issues.append(f"VIPs down: {vip_down_count}")
         return " | ".join(issues) if issues else "All Healthy"
 
+    def get_internal_services():
+        job = "probe/monitoring/k3s-internal-services"
+        results = query_prometheus(f'probe_success{{job="{job}"}}')
+        if not results:
+            return "No probes"
+        down = []
+        for r in results:
+            if float(r['value'][1]) == 0:
+                instance = r['metric'].get('instance', '?')
+                svc = instance.split('//')[1].split('/')[0].split('.')[0] if '//' in instance else instance
+                down.append(svc)
+        if down:
+            return f"DOWN: {', '.join(down)}"
+        return "All Healthy"
+
+    def get_pod_restarts():
+        results = query_prometheus('sort_desc(topk(5, increase(kube_pod_container_status_restarts_total[1h]) > 3))')
+        if not results:
+            return "None"
+        parts = []
+        for r in results[:5]:
+            ns = r['metric'].get('namespace', '?')
+            pod = r['metric'].get('pod', '?')
+            count = int(float(r['value'][1]))
+            short_pod = pod[:30] + "..." if len(pod) > 30 else pod
+            parts.append(f"{ns}/{short_pod}: {count}")
+        return "\n".join(parts) if parts else "None"
+
     def get_scrape_health():
         down = query_prometheus('count(up == 0) or vector(0)')
         down_count = int(float(down[0]['value'][1])) if down else 0
@@ -172,10 +200,12 @@ data:
             storage_text = f"Used: {format_bytes(pvc_usage)}"
 
         postgres_health = get_postgres_health()
+        internal_services = get_internal_services()
         external_services = get_external_services()
         longhorn_health = get_longhorn_health()
         argocd_sync = get_argocd_sync()
         active_alerts = get_active_alerts()
+        pod_restarts = get_pod_restarts()
         scrape_health = get_scrape_health()
 
         embed = {
@@ -188,10 +218,12 @@ data:
                 {"name": "Memory", "value": mem_text, "inline": True},
                 {"name": "Storage (Longhorn)", "value": storage_text, "inline": True},
                 {"name": "Postgres (K3s Datastore)", "value": postgres_health, "inline": False},
+                {"name": "Internal Services", "value": internal_services, "inline": True},
                 {"name": "External Services", "value": external_services, "inline": True},
                 {"name": "Volume Health", "value": longhorn_health, "inline": True},
                 {"name": "ArgoCD", "value": argocd_sync, "inline": True},
                 {"name": "Active Alerts", "value": active_alerts, "inline": True},
+                {"name": "Pod Restarts (1h)", "value": pod_restarts, "inline": False},
                 {"name": "Scrape Health", "value": scrape_health, "inline": True},
             ],
             "footer": {"text": "Hourly Heartbeat"}
