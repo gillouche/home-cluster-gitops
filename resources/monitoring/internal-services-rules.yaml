@@ -20,17 +20,6 @@ spec:
           K3s internal service {{ $labels.instance }} has failed health checks for >2m.
           The service may be misconfigured, crashed, or have RBAC issues.
 
-    - alert: ArgocdDexDown
-      expr: probe_success{job="argocd-dex-health"} == 0
-      for: 2m
-      labels:
-        severity: critical
-      annotations:
-        summary: "ArgoCD Dex OIDC server is down"
-        description: >-
-          ArgoCD Dex server is not responding. OIDC/Authelia login to ArgoCD will fail.
-          Check dex pod logs for RBAC or TLS errors.
-
     - alert: InternalServiceHighLatency
       expr: probe_duration_seconds{job="k3s-internal-services"} > 5
       for: 5m
