@@ -10,7 +10,7 @@ spec:
   - name: k3s-internal-services
     rules:
     - alert: InternalServiceDown
-      expr: probe_success{job="probe/monitoring/k3s-internal-services"} == 0
+      expr: probe_success{job="k3s-internal-services"} == 0
       for: 2m
       labels:
         severity: critical
@@ -21,7 +21,7 @@ spec:
           The service may be misconfigured, crashed, or have RBAC issues.
 
     - alert: ArgocdDexDown
-      expr: probe_success{job="probe/monitoring/argocd-dex-health"} == 0
+      expr: probe_success{job="argocd-dex-health"} == 0
       for: 2m
       labels:
         severity: critical
@@ -32,7 +32,7 @@ spec:
           Check dex pod logs for RBAC or TLS errors.
 
     - alert: InternalServiceHighLatency
-      expr: probe_duration_seconds{job="probe/monitoring/k3s-internal-services"} > 5
+      expr: probe_duration_seconds{job="k3s-internal-services"} > 5
       for: 5m
       labels:
         severity: warning

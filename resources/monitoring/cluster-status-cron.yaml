@@ -147,22 +147,21 @@ data:
             "pihole-health": "Pi-hole",
         }
         issues = []
-        for job_suffix, name in services.items():
-            job = f"probe/monitoring/{job_suffix}"
+        for job, name in services.items():
             total = query_prometheus(f'count(probe_success{{job="{job}"}}) or vector(0)')
             up = query_prometheus(f'count(probe_success{{job="{job}"}} == 1) or vector(0)')
             total_count = int(float(total[0]['value'][1])) if total else 0
             up_count = int(float(up[0]['value'][1])) if up else 0
             if total_count > 0 and up_count < total_count:
                 issues.append(f"{name}: {up_count}/{total_count}")
-        vip_down = query_prometheus('count(probe_success{job="probe/monitoring/vip-health"} == 0) or vector(0)')
+        vip_down = query_prometheus('count(probe_success{job="vip-health"} == 0) or vector(0)')
         vip_down_count = int(float(vip_down[0]['value'][1])) if vip_down else 0
         if vip_down_count > 0:
             issues.append(f"VIPs down: {vip_down_count}")
         return " | ".join(issues) if issues else "All Healthy"
 
     def get_internal_services():
-        job = "probe/monitoring/k3s-internal-services"
+        job = "k3s-internal-services"
         results = query_prometheus(f'probe_success{{job="{job}"}}')
         if not results:
             return "No probes"
@@ -188,13 +187,6 @@ data:
             short_pod = pod[:30] + "..." if len(pod) > 30 else pod
             parts.append(f"{ns}/{short_pod}: {count}")
         return "\n".join(parts) if parts else "None"
-
-    def get_scrape_health():
-        down = query_prometheus('count(up == 0) or vector(0)')
-        down_count = int(float(down[0]['value'][1])) if down else 0
-        if down_count > 0:
-            return f"{down_count} targets down"
-        return "All targets up"
 
     def main():
         if not WEBHOOK_URL:
@@ -233,7 +225,6 @@ data:
         active_alerts = get_active_alerts()
         runner_status = get_runner_status()
         pod_restarts = get_pod_restarts()
-        scrape_health = get_scrape_health()
 
         embed = {
             "title": f"Cluster Status - {datetime.now().strftime('%H:%M UTC')}",
@@ -252,7 +243,6 @@ data:
                 {"name": "Runners", "value": runner_status, "inline": True},
                 {"name": "Active Alerts", "value": active_alerts, "inline": False},
                 {"name": "Pod Restarts (1h)", "value": pod_restarts, "inline": False},
-                {"name": "Scrape Health", "value": scrape_health, "inline": True},
             ],
             "footer": {"text": "Hourly Heartbeat"}
         }

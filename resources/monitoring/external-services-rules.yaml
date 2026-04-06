@@ -10,7 +10,7 @@ spec:
   - name: postgres
     rules:
     - alert: ExternalServicePostgresDown
-      expr: probe_success{job="probe/monitoring/postgres-health"} == 0
+      expr: probe_success{job="postgres-health"} == 0
       for: 30s
       labels:
         severity: critical
@@ -21,7 +21,7 @@ spec:
           K3s control plane WILL fail without the datastore. Immediate action required.
 
     - alert: ExternalServicePostgresHighLatency
-      expr: probe_duration_seconds{job="probe/monitoring/postgres-health"} > 1
+      expr: probe_duration_seconds{job="postgres-health"} > 1
       for: 2m
       labels:
         severity: warning
@@ -34,7 +34,7 @@ spec:
   - name: nexus
     rules:
     - alert: ExternalServiceNexusDown
-      expr: probe_success{job="probe/monitoring/nexus-health"} == 0
+      expr: probe_success{job="nexus-health"} == 0
       for: 5m
       labels:
         severity: critical
@@ -45,7 +45,7 @@ spec:
   - name: pihole
     rules:
     - alert: ExternalServicePiholeDown
-      expr: probe_success{job="probe/monitoring/pihole-health"} == 0
+      expr: probe_success{job="pihole-health"} == 0
       for: 3m
       labels:
         severity: warning
@@ -54,7 +54,7 @@ spec:
         description: "Pi-hole admin at {{ $labels.instance }} has been unreachable for >3m."
 
     - alert: ExternalServicePiholeAllDown
-      expr: count(probe_success{job="probe/monitoring/pihole-health"} == 1) == 0
+      expr: count(probe_success{job="pihole-health"} == 1) == 0
       for: 1m
       labels:
         severity: critical
@@ -65,7 +65,7 @@ spec:
   - name: vips
     rules:
     - alert: ExternalServiceVIPDown
-      expr: probe_success{job="probe/monitoring/vip-health"} == 0
+      expr: probe_success{job="vip-health"} == 0
       for: 2m
       labels:
         severity: critical
@@ -76,7 +76,7 @@ spec:
   - name: firefly
     rules:
     - alert: ExternalServiceFireflyDown
-      expr: probe_success{job="probe/monitoring/firefly-health"} == 0
+      expr: probe_success{job="firefly-health"} == 0
       for: 10m
       labels:
         severity: warning
