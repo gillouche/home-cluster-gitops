@@ -65,13 +65,19 @@ data:
 
     def get_node_breakdown():
         lines = []
-        nodes = query_prometheus('kube_node_info')
-        for n in sorted(nodes, key=lambda x: x['metric'].get('node', '')):
-            name = n['metric'].get('node', '?')
-            cpu = query_scalar(f'100 - (avg by(instance)(rate(node_cpu_seconds_total{{mode="idle",instance=~"{name}.*"}}[5m])) * 100)')
-            mem_used = query_scalar(f'node_memory_MemTotal_bytes{{instance=~"{name}.*"}} - node_memory_MemAvailable_bytes{{instance=~"{name}.*"}}')
-            mem_total = query_scalar(f'node_memory_MemTotal_bytes{{instance=~"{name}.*"}}')
-            disk_pct = query_scalar(f'100 - (node_filesystem_avail_bytes{{instance=~"{name}.*",mountpoint="/",fstype!="tmpfs"}} / node_filesystem_size_bytes{{instance=~"{name}.*",mountpoint="/",fstype!="tmpfs"}} * 100)')
+        node_map = {}
+        uname = query_prometheus('node_uname_info')
+        for u in uname:
+            nodename = u['metric'].get('nodename', '')
+            instance = u['metric'].get('instance', '')
+            if nodename and instance:
+                node_map[nodename] = instance
+        for name in sorted(node_map.keys()):
+            inst = node_map[name]
+            cpu = query_scalar(f'100 - (avg(rate(node_cpu_seconds_total{{mode="idle",instance="{inst}"}}[5m])) * 100)')
+            mem_used = query_scalar(f'node_memory_MemTotal_bytes{{instance="{inst}"}} - node_memory_MemAvailable_bytes{{instance="{inst}"}}')
+            mem_total = query_scalar(f'node_memory_MemTotal_bytes{{instance="{inst}"}}')
+            disk_pct = query_scalar(f'100 - (node_filesystem_avail_bytes{{instance="{inst}",mountpoint="/",fstype!="tmpfs"}} / node_filesystem_size_bytes{{instance="{inst}",mountpoint="/",fstype!="tmpfs"}} * 100)')
             try:
                 cpu_str = f"{float(cpu):.0f}%"
             except:
