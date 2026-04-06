@@ -69,7 +69,7 @@ data:
         return " | ".join(parts) if parts else "All Synced & Healthy"
 
     def get_active_alerts():
-        results = query_prometheus('count by (severity) (ALERTS{alertstate="firing",alertname!="Watchdog"})')
+        results = query_prometheus('count by (severity) (ALERTS{alertstate="firing",alertname!="Watchdog",alertname!="InfoInhibitor"})')
         if not results:
             return "None"
         parts = []
@@ -78,7 +78,33 @@ data:
             count = int(float(r['value'][1]))
             if count > 0:
                 parts.append(f"{severity}: {count}")
-        return " | ".join(parts) if parts else "None"
+        summary = " | ".join(parts) if parts else "None"
+        top = query_prometheus('topk(3, count by (alertname) (ALERTS{alertstate="firing",alertname!="Watchdog",alertname!="InfoInhibitor"}))')
+        if top:
+            names = [r['metric'].get('alertname', '?') for r in top[:3]]
+            summary += f"\nTop: {', '.join(names)}"
+        return summary
+
+    def get_runner_status():
+        results = query_prometheus('kube_pod_info{namespace="arc-systems"}')
+        listeners = []
+        for r in results:
+            pod = r['metric'].get('pod', '')
+            if 'listener' in pod and 'controller' not in pod:
+                listeners.append(pod)
+        if not listeners:
+            return "No listeners"
+        restarts = query_prometheus('kube_pod_container_status_restarts_total{namespace="arc-systems",container="listener"}')
+        restart_map = {}
+        for r in restarts:
+            pod = r['metric'].get('pod', '')
+            count = int(float(r['value'][1]))
+            if count > 0:
+                restart_map[pod] = count
+        issues = [f"{p}: {c} restarts" for p, c in restart_map.items()]
+        if issues:
+            return f"{len(listeners)} listeners | Issues: {'; '.join(issues)}"
+        return f"{len(listeners)} listeners | All stable"
 
     def get_postgres_health():
         pg_up = query_prometheus_scalar('pg_up')
@@ -205,6 +231,7 @@ data:
         longhorn_health = get_longhorn_health()
         argocd_sync = get_argocd_sync()
         active_alerts = get_active_alerts()
+        runner_status = get_runner_status()
         pod_restarts = get_pod_restarts()
         scrape_health = get_scrape_health()
 
@@ -222,7 +249,8 @@ data:
                 {"name": "External Services", "value": external_services, "inline": True},
                 {"name": "Volume Health", "value": longhorn_health, "inline": True},
                 {"name": "ArgoCD", "value": argocd_sync, "inline": True},
-                {"name": "Active Alerts", "value": active_alerts, "inline": True},
+                {"name": "Runners", "value": runner_status, "inline": True},
+                {"name": "Active Alerts", "value": active_alerts, "inline": False},
                 {"name": "Pod Restarts (1h)", "value": pod_restarts, "inline": False},
                 {"name": "Scrape Health", "value": scrape_health, "inline": True},
             ],

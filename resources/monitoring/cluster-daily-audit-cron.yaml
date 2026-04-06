@@ -1,0 +1,280 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-daily-audit-script
+  namespace: monitoring
+data:
+  daily_audit.py: |
+    import os
+    import json
+    import urllib.request
+    import urllib.parse
+    from datetime import datetime
+
+    WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL")
+    PROMETHEUS_URL = "http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090"
+
+    def query_prometheus(query):
+        params = urllib.parse.urlencode({'query': query})
+        url = f"{PROMETHEUS_URL}/api/v1/query?{params}"
+        try:
+            with urllib.request.urlopen(url, timeout=15) as response:
+                data = json.loads(response.read().decode())
+                if data['status'] == 'success' and data['data']['result']:
+                    return data['data']['result']
+        except Exception as e:
+            print(f"Error querying {query}: {e}")
+        return []
+
+    def query_scalar(query):
+        results = query_prometheus(query)
+        if results:
+            return results[0]['value'][1]
+        return "N/A"
+
+    def fmt_bytes(size):
+        try:
+            size = float(size)
+            for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB']:
+                if size < 1024:
+                    return f"{size:.1f} {unit}"
+                size /= 1024
+        except:
+            pass
+        return str(size)
+
+    def send_embed(embeds):
+        url = WEBHOOK_URL
+        if os.path.isfile(url):
+            with open(url, 'r') as f:
+                url = f.read().strip()
+        payload = {"embeds": embeds}
+        req = urllib.request.Request(url, data=json.dumps(payload).encode(),
+            headers={'Content-Type': 'application/json', 'User-Agent': 'ClusterDailyAudit'})
+        try:
+            urllib.request.urlopen(req)
+            print("Sent successfully")
+        except Exception as e:
+            print(f"Error sending: {e}")
+
+    def get_24h_resource_trends():
+        lines = []
+        cpu_now = query_scalar('100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100)')
+        cpu_24h = query_scalar('100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[5m] offset 24h)) * 100)')
+        mem_now = query_scalar('(sum(node_memory_MemTotal_bytes) - sum(node_memory_MemAvailable_bytes)) / sum(node_memory_MemTotal_bytes) * 100')
+        mem_24h = query_scalar('(sum(node_memory_MemTotal_bytes offset 24h) - sum(node_memory_MemAvailable_bytes offset 24h)) / sum(node_memory_MemTotal_bytes offset 24h) * 100')
+        storage_now = query_scalar('sum(longhorn_node_storage_usage_bytes) / sum(longhorn_node_storage_capacity_bytes) * 100')
+        storage_24h = query_scalar('sum(longhorn_node_storage_usage_bytes offset 24h) / sum(longhorn_node_storage_capacity_bytes offset 24h) * 100')
+        try:
+            cn = float(cpu_now); c24 = float(cpu_24h)
+            delta = cn - c24
+            arrow = "+" if delta >= 0 else ""
+            lines.append(f"CPU: {cn:.1f}% ({arrow}{delta:.1f}% vs 24h ago)")
+        except:
+            lines.append(f"CPU: {cpu_now}")
+        try:
+            mn = float(mem_now); m24 = float(mem_24h)
+            delta = mn - m24
+            arrow = "+" if delta >= 0 else ""
+            lines.append(f"Memory: {mn:.1f}% ({arrow}{delta:.1f}%)")
+        except:
+            lines.append(f"Memory: {mem_now}")
+        try:
+            sn = float(storage_now); s24 = float(storage_24h)
+            delta = sn - s24
+            arrow = "+" if delta >= 0 else ""
+            lines.append(f"Storage: {sn:.1f}% ({arrow}{delta:.1f}%)")
+        except:
+            lines.append(f"Storage: {storage_now}")
+        return "\n".join(lines)
+
+    def get_kine_24h():
+        rows_now = query_scalar('pg_kine_stats_total_rows')
+        rows_24h = query_scalar('pg_kine_stats_total_rows offset 24h')
+        size_now = query_scalar('pg_kine_stats_table_size_bytes')
+        size_24h = query_scalar('pg_kine_stats_table_size_bytes offset 24h')
+        events_now = query_scalar('pg_kine_stats_event_rows')
+        parts = []
+        try:
+            rn = int(float(rows_now)); r24 = int(float(rows_24h))
+            delta = rn - r24
+            parts.append(f"Rows: {rn:,} ({'+' if delta >= 0 else ''}{delta:,} in 24h)")
+        except:
+            parts.append(f"Rows: {rows_now}")
+        try:
+            sn = float(size_now); s24 = float(size_24h)
+            delta = sn - s24
+            parts.append(f"Size: {fmt_bytes(sn)} ({'+' if delta >= 0 else ''}{fmt_bytes(delta)} in 24h)")
+        except:
+            pass
+        try:
+            parts.append(f"Events: {int(float(events_now)):,}")
+        except:
+            pass
+        return "\n".join(parts) if parts else "N/A"
+
+    def get_top_resource_pods():
+        lines = []
+        cpu_results = query_prometheus('topk(5, sum by (namespace, pod) (rate(container_cpu_usage_seconds_total{container!=""}[5m])) * 1000)')
+        for r in cpu_results[:5]:
+            ns = r['metric'].get('namespace', '?')
+            pod = r['metric'].get('pod', '?')
+            millicpu = float(r['value'][1])
+            short = f"{ns}/{pod}"[:40]
+            lines.append(f"`{short}` {millicpu:.0f}m")
+        return "\n".join(lines) if lines else "N/A"
+
+    def get_top_memory_pods():
+        lines = []
+        mem_results = query_prometheus('topk(5, sum by (namespace, pod) (container_memory_working_set_bytes{container!=""}))')
+        for r in mem_results[:5]:
+            ns = r['metric'].get('namespace', '?')
+            pod = r['metric'].get('pod', '?')
+            mem = float(r['value'][1])
+            short = f"{ns}/{pod}"[:40]
+            lines.append(f"`{short}` {fmt_bytes(mem)}")
+        return "\n".join(lines) if lines else "N/A"
+
+    def get_pvc_usage():
+        lines = []
+        results = query_prometheus('sort_desc(kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes * 100)')
+        for r in results[:10]:
+            pvc = r['metric'].get('persistentvolumeclaim', '?')
+            ns = r['metric'].get('namespace', '?')
+            pct = float(r['value'][1])
+            used = query_scalar(f'kubelet_volume_stats_used_bytes{{namespace="{ns}",persistentvolumeclaim="{pvc}"}}')
+            cap = query_scalar(f'kubelet_volume_stats_capacity_bytes{{namespace="{ns}",persistentvolumeclaim="{pvc}"}}')
+            short_pvc = pvc[:30]
+            try:
+                lines.append(f"`{short_pvc}` {fmt_bytes(used)}/{fmt_bytes(cap)} ({pct:.0f}%)")
+            except:
+                lines.append(f"`{short_pvc}` {pct:.0f}%")
+        return "\n".join(lines) if lines else "N/A"
+
+    def get_node_uptime():
+        lines = []
+        results = query_prometheus('(time() - node_boot_time_seconds) / 86400')
+        for r in sorted(results, key=lambda x: x['metric'].get('instance', '')):
+            instance = r['metric'].get('instance', '?').split(':')[0]
+            days = float(r['value'][1])
+            lines.append(f"`{instance:<16}` {days:.1f} days")
+        return "\n".join(lines) if lines else "N/A"
+
+    def get_alert_summary_24h():
+        results = query_prometheus('count by (alertname) (count_over_time(ALERTS{alertstate="firing",alertname!="Watchdog",alertname!="InfoInhibitor"}[24h]))')
+        if not results:
+            return "No alerts in 24h"
+        alerts = []
+        for r in results:
+            name = r['metric'].get('alertname', '?')
+            count = int(float(r['value'][1]))
+            alerts.append((count, name))
+        alerts.sort(reverse=True)
+        lines = []
+        for count, name in alerts[:10]:
+            lines.append(f"{name}: {count} samples")
+        return "\n".join(lines) if lines else "None"
+
+    def get_argocd_24h():
+        total = query_scalar('count(argocd_app_info)')
+        synced = query_scalar('count(argocd_app_info{sync_status="Synced"}) or vector(0)')
+        healthy = query_scalar('count(argocd_app_info{health_status="Healthy"}) or vector(0)')
+        sync_failures = query_prometheus('count by (name) (increase(argocd_app_sync_total{phase="Error"}[24h]) > 0)')
+        parts = []
+        try:
+            parts.append(f"Apps: {int(float(total))} | Synced: {int(float(synced))} | Healthy: {int(float(healthy))}")
+        except:
+            parts.append(f"Apps: {total}")
+        if sync_failures:
+            failed_names = [r['metric'].get('name', '?') for r in sync_failures[:5]]
+            parts.append(f"Sync failures (24h): {', '.join(failed_names)}")
+        else:
+            parts.append("No sync failures in 24h")
+        return "\n".join(parts) if parts else "N/A"
+
+    def get_image_pull_errors():
+        results = query_prometheus('count by (namespace) (increase(kube_pod_container_status_waiting_reason{reason="ErrImagePull"}[24h]) > 0)')
+        if not results:
+            results = query_prometheus('count by (namespace) (increase(kube_pod_container_status_waiting_reason{reason="ImagePullBackOff"}[24h]) > 0)')
+        if not results:
+            return "None"
+        lines = []
+        for r in results:
+            ns = r['metric'].get('namespace', '?')
+            count = int(float(r['value'][1]))
+            lines.append(f"{ns}: {count} pods")
+        return "\n".join(lines) if lines else "None"
+
+    def main():
+        if not WEBHOOK_URL:
+            print("No webhook URL provided")
+            return
+
+        now = datetime.now().strftime('%Y-%m-%d %H:%M UTC')
+
+        embed1 = {
+            "title": f"Daily Cluster Audit - {now}",
+            "color": 15844367,
+            "fields": [
+                {"name": "24h Resource Trends", "value": get_24h_resource_trends(), "inline": False},
+                {"name": "Kine (24h)", "value": get_kine_24h(), "inline": False},
+                {"name": "ArgoCD (24h)", "value": get_argocd_24h(), "inline": False},
+                {"name": "Alert History (24h)", "value": get_alert_summary_24h(), "inline": False},
+            ],
+            "footer": {"text": "Daily Audit (1/2)"}
+        }
+
+        embed2 = {
+            "title": f"Capacity & Resources - {now}",
+            "color": 15844367,
+            "fields": [
+                {"name": "Top 5 CPU Pods", "value": get_top_resource_pods(), "inline": False},
+                {"name": "Top 5 Memory Pods", "value": get_top_memory_pods(), "inline": False},
+                {"name": "PVC Usage (Top 10)", "value": get_pvc_usage(), "inline": False},
+                {"name": "Node Uptime", "value": get_node_uptime(), "inline": False},
+                {"name": "Image Pull Errors (24h)", "value": get_image_pull_errors(), "inline": True},
+            ],
+            "footer": {"text": "Daily Audit (2/2)"}
+        }
+
+        send_embed([embed1])
+        send_embed([embed2])
+
+    if __name__ == "__main__":
+        main()
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cluster-daily-audit-reporter
+  namespace: monitoring
+spec:
+  schedule: "0 7 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 180
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+          - name: reporter
+            image: nexus.gillouche.homelab/docker-hub/library/python:3.14.3-slim-trixie
+            command: ["python", "/app/daily_audit.py"]
+            env:
+            - name: DISCORD_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: monitoring-discord-webhooks
+                  key: info-alerts
+            volumeMounts:
+            - name: script
+              mountPath: /app/daily_audit.py
+              subPath: daily_audit.py
+          restartPolicy: Never
+          volumes:
+          - name: script
+            configMap:
+              name: cluster-daily-audit-script

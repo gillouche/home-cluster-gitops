@@ -1,0 +1,312 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-deep-dive-script
+  namespace: monitoring
+data:
+  deep_dive.py: |
+    import os
+    import json
+    import urllib.request
+    import urllib.parse
+    from datetime import datetime
+
+    WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL")
+    PROMETHEUS_URL = "http://monitoring-kube-prometheus-prometheus.monitoring.svc:9090"
+
+    def query_prometheus(query):
+        params = urllib.parse.urlencode({'query': query})
+        url = f"{PROMETHEUS_URL}/api/v1/query?{params}"
+        try:
+            with urllib.request.urlopen(url, timeout=15) as response:
+                data = json.loads(response.read().decode())
+                if data['status'] == 'success' and data['data']['result']:
+                    return data['data']['result']
+        except Exception as e:
+            print(f"Error querying {query}: {e}")
+        return []
+
+    def query_scalar(query):
+        results = query_prometheus(query)
+        if results:
+            return results[0]['value'][1]
+        return "N/A"
+
+    def fmt_bytes(size):
+        try:
+            size = float(size)
+            for unit in ['B', 'KiB', 'MiB', 'GiB', 'TiB']:
+                if size < 1024:
+                    return f"{size:.1f} {unit}"
+                size /= 1024
+        except:
+            pass
+        return str(size)
+
+    def fmt_pct(val, total):
+        try:
+            return f"{float(val)/float(total)*100:.1f}%"
+        except:
+            return "N/A"
+
+    def send_embed(embeds):
+        url = WEBHOOK_URL
+        if os.path.isfile(url):
+            with open(url, 'r') as f:
+                url = f.read().strip()
+        payload = {"embeds": embeds}
+        req = urllib.request.Request(url, data=json.dumps(payload).encode(),
+            headers={'Content-Type': 'application/json', 'User-Agent': 'ClusterDeepDive'})
+        try:
+            urllib.request.urlopen(req)
+            print("Sent successfully")
+        except Exception as e:
+            print(f"Error sending: {e}")
+
+    def get_node_breakdown():
+        lines = []
+        nodes = query_prometheus('kube_node_info')
+        for n in sorted(nodes, key=lambda x: x['metric'].get('node', '')):
+            name = n['metric'].get('node', '?')
+            cpu = query_scalar(f'100 - (avg by(instance)(rate(node_cpu_seconds_total{{mode="idle",instance=~"{name}.*"}}[5m])) * 100)')
+            mem_used = query_scalar(f'node_memory_MemTotal_bytes{{instance=~"{name}.*"}} - node_memory_MemAvailable_bytes{{instance=~"{name}.*"}}')
+            mem_total = query_scalar(f'node_memory_MemTotal_bytes{{instance=~"{name}.*"}}')
+            disk_pct = query_scalar(f'100 - (node_filesystem_avail_bytes{{instance=~"{name}.*",mountpoint="/",fstype!="tmpfs"}} / node_filesystem_size_bytes{{instance=~"{name}.*",mountpoint="/",fstype!="tmpfs"}} * 100)')
+            try:
+                cpu_str = f"{float(cpu):.0f}%"
+            except:
+                cpu_str = "?"
+            try:
+                mem_str = f"{fmt_bytes(mem_used)}/{fmt_bytes(mem_total)}"
+            except:
+                mem_str = "?"
+            try:
+                disk_str = f"{float(disk_pct):.0f}%"
+            except:
+                disk_str = "?"
+            short = name[:12]
+            lines.append(f"`{short:<12}` CPU:{cpu_str:>4} Mem:{mem_str} Disk:{disk_str}")
+        return "\n".join(lines) if lines else "No data"
+
+    def get_kine_details():
+        rows = query_scalar('pg_kine_stats_total_rows')
+        events = query_scalar('pg_kine_stats_event_rows')
+        size = query_scalar('pg_kine_stats_table_size_bytes')
+        keys = query_scalar('pg_kine_stats_unique_keys')
+        rows_1h = query_scalar('pg_kine_stats_total_rows - pg_kine_stats_total_rows offset 1h')
+        events_1h = query_scalar('pg_kine_stats_event_rows - pg_kine_stats_event_rows offset 1h')
+        size_1h = query_scalar('pg_kine_stats_table_size_bytes - pg_kine_stats_table_size_bytes offset 1h')
+        parts = []
+        try:
+            parts.append(f"Rows: {int(float(rows)):,} ({int(float(keys)):,} unique)")
+        except:
+            parts.append(f"Rows: {rows}")
+        try:
+            parts.append(f"Events: {int(float(events)):,}")
+        except:
+            pass
+        try:
+            parts.append(f"Size: {fmt_bytes(size)}")
+        except:
+            pass
+        try:
+            r1h = int(float(rows_1h))
+            e1h = int(float(events_1h))
+            s1h = fmt_bytes(size_1h)
+            direction = "+" if r1h >= 0 else ""
+            parts.append(f"1h delta: {direction}{r1h:,} rows, {direction}{e1h:,} events, {direction}{s1h}")
+        except:
+            pass
+        try:
+            stale = int(float(rows)) - int(float(keys))
+            parts.append(f"Stale rows: {stale:,} (compaction target)")
+        except:
+            pass
+        return "\n".join(parts) if parts else "N/A"
+
+    def get_api_server_health():
+        p50 = query_scalar('histogram_quantile(0.50, sum(rate(apiserver_request_duration_seconds_bucket{verb!="WATCH"}[5m])) by (le))')
+        p99 = query_scalar('histogram_quantile(0.99, sum(rate(apiserver_request_duration_seconds_bucket{verb!="WATCH"}[5m])) by (le))')
+        err_rate = query_scalar('sum(rate(apiserver_request_total{code=~"5.."}[5m])) / sum(rate(apiserver_request_total[5m])) * 100')
+        webhook_fails = query_scalar('sum(increase(apiserver_admission_webhook_fail_open_count[1h])) or vector(0)')
+        parts = []
+        try:
+            parts.append(f"Latency p50: {float(p50)*1000:.0f}ms | p99: {float(p99)*1000:.0f}ms")
+        except:
+            parts.append(f"Latency: N/A")
+        try:
+            parts.append(f"5xx rate: {float(err_rate):.2f}%")
+        except:
+            pass
+        try:
+            wf = int(float(webhook_fails))
+            if wf > 0:
+                parts.append(f"Webhook failures (1h): {wf}")
+            else:
+                parts.append("Webhook failures: None")
+        except:
+            pass
+        return "\n".join(parts) if parts else "N/A"
+
+    def get_runner_status():
+        lines = []
+        results = query_prometheus('kube_pod_info{namespace="arc-systems"}')
+        listeners = {}
+        for r in results:
+            pod = r['metric'].get('pod', '')
+            if 'listener' in pod and 'controller' not in pod:
+                runner_name = pod.rsplit('-', 2)[0] if pod.count('-') > 2 else pod
+                node = r['metric'].get('node', '?')
+                listeners[runner_name] = node
+        if not listeners:
+            return "No listeners found"
+        for name, node in sorted(listeners.items()):
+            short = name.replace('-listener', '')[:25]
+            lines.append(f"`{short}` on {node}")
+        restarts = query_prometheus('kube_pod_container_status_restarts_total{namespace="arc-systems",container="listener"}')
+        for r in restarts:
+            count = int(float(r['value'][1]))
+            if count > 0:
+                pod = r['metric'].get('pod', '?')
+                lines.append(f"  {pod}: {count} restarts")
+        return "\n".join(lines) if lines else "No listeners"
+
+    def get_longhorn_details():
+        total_vols = query_scalar('count(longhorn_volume_state)')
+        attached = query_scalar('count(longhorn_volume_state == 1) or vector(0)')
+        detached = query_scalar('count(longhorn_volume_state == 0) or vector(0)')
+        degraded = query_scalar('count(longhorn_volume_robustness == 2) or vector(0)')
+        faulted = query_scalar('count(longhorn_volume_robustness == 3) or vector(0)')
+        parts = []
+        try:
+            parts.append(f"Volumes: {int(float(total_vols))} (attached: {int(float(attached))}, detached: {int(float(detached))})")
+        except:
+            parts.append(f"Volumes: {total_vols}")
+        try:
+            d = int(float(degraded))
+            f = int(float(faulted))
+            if f > 0:
+                parts.append(f"FAULTED: {f} | Degraded: {d}")
+            elif d > 0:
+                parts.append(f"Degraded: {d}")
+            else:
+                parts.append("Replicas: All healthy")
+        except:
+            pass
+        nodes = query_prometheus('longhorn_node_storage_usage_bytes')
+        for n in sorted(nodes, key=lambda x: x['metric'].get('node', '')):
+            node = n['metric'].get('node', '?')[:12]
+            used = n['value'][1]
+            cap = query_scalar(f'longhorn_node_storage_capacity_bytes{{node="{n["metric"].get("node", "")}"}}')
+            try:
+                parts.append(f"`{node}` {fmt_bytes(used)} / {fmt_bytes(cap)} ({fmt_pct(used, cap)})")
+            except:
+                pass
+        return "\n".join(parts) if parts else "N/A"
+
+    def get_top_alerts():
+        results = query_prometheus('count by (alertname, severity) (ALERTS{alertstate="firing",alertname!="Watchdog",alertname!="InfoInhibitor"})')
+        if not results:
+            return "None firing"
+        alerts = []
+        for r in results:
+            name = r['metric'].get('alertname', '?')
+            sev = r['metric'].get('severity', '?')
+            count = int(float(r['value'][1]))
+            alerts.append((sev, name, count))
+        alerts.sort(key=lambda x: {'critical': 0, 'warning': 1, 'info': 2}.get(x[0], 3))
+        lines = []
+        for sev, name, count in alerts[:10]:
+            icon = {"critical": "!!", "warning": "!", "info": "i"}.get(sev, "?")
+            lines.append(f"[{icon}] {name} ({count}x)")
+        return "\n".join(lines) if lines else "None"
+
+    def get_webhook_summary():
+        results = query_prometheus('count by (name) (increase(apiserver_admission_webhook_rejection_count[6h]) > 0)')
+        if not results:
+            fail_open = query_scalar('sum(increase(apiserver_admission_webhook_fail_open_count[6h])) or vector(0)')
+            try:
+                fo = int(float(fail_open))
+                if fo > 0:
+                    return f"No rejections, but {fo} fail-open events"
+            except:
+                pass
+            return "Clean"
+        lines = []
+        for r in results:
+            name = r['metric'].get('name', '?')[:30]
+            count = int(float(r['value'][1]))
+            lines.append(f"{name}: {count} rejections")
+        return "\n".join(lines[:5]) if lines else "Clean"
+
+    def main():
+        if not WEBHOOK_URL:
+            print("No webhook URL provided")
+            return
+
+        now = datetime.now().strftime('%H:%M UTC')
+
+        embed1 = {
+            "title": f"Infrastructure Deep Dive - {now}",
+            "color": 3447003,
+            "fields": [
+                {"name": "Per-Node Resources", "value": get_node_breakdown(), "inline": False},
+                {"name": "K3s API Server", "value": get_api_server_health(), "inline": False},
+                {"name": "Kine (K3s Datastore)", "value": get_kine_details(), "inline": False},
+            ],
+            "footer": {"text": "6-Hourly Deep Dive (1/2)"}
+        }
+
+        embed2 = {
+            "title": f"Services & Storage - {now}",
+            "color": 3447003,
+            "fields": [
+                {"name": "Longhorn Storage", "value": get_longhorn_details(), "inline": False},
+                {"name": "GitHub Actions Runners", "value": get_runner_status(), "inline": False},
+                {"name": "Webhook Health (6h)", "value": get_webhook_summary(), "inline": False},
+                {"name": "Top Firing Alerts", "value": get_top_alerts(), "inline": False},
+            ],
+            "footer": {"text": "6-Hourly Deep Dive (2/2)"}
+        }
+
+        send_embed([embed1])
+        send_embed([embed2])
+
+    if __name__ == "__main__":
+        main()
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cluster-deep-dive-reporter
+  namespace: monitoring
+spec:
+  schedule: "30 */6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 180
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+          - name: reporter
+            image: nexus.gillouche.homelab/docker-hub/library/python:3.14.3-slim-trixie
+            command: ["python", "/app/deep_dive.py"]
+            env:
+            - name: DISCORD_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: monitoring-discord-webhooks
+                  key: info-alerts
+            volumeMounts:
+            - name: script
+              mountPath: /app/deep_dive.py
+              subPath: deep_dive.py
+          restartPolicy: Never
+          volumes:
+          - name: script
+            configMap:
+              name: cluster-deep-dive-script
