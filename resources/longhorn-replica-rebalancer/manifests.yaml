@@ -35,7 +35,7 @@ metadata:
   name: longhorn-replica-rebalancer
   namespace: longhorn-system
 spec:
-  schedule: "*/30 * * * *"
+  schedule: "*/15 * * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
