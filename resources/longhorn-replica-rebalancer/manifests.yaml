@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: longhorn-replica-rebalancer
+  namespace: longhorn-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: longhorn-replica-rebalancer
+rules:
+- apiGroups: ["longhorn.io"]
+  resources: ["nodes", "volumes", "replicas"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["longhorn.io"]
+  resources: ["replicas"]
+  verbs: ["delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: longhorn-replica-rebalancer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: longhorn-replica-rebalancer
+subjects:
+- kind: ServiceAccount
+  name: longhorn-replica-rebalancer
+  namespace: longhorn-system
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: longhorn-replica-rebalancer
+  namespace: longhorn-system
+spec:
+  schedule: "0 */6 * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 3600
+      backoffLimit: 0
+      template:
+        spec:
+          serviceAccountName: longhorn-replica-rebalancer
+          restartPolicy: Never
+          nodeSelector:
+            node-class: homeserver
+          containers:
+          - name: rebalancer
+            image: nexus.gillouche.homelab/docker-hosted/longhorn-replica-rebalancer:latest
+            env:
+            - name: DRY_RUN
+              value: "true"
+            - name: MAX_REBALANCES_PER_RUN
+              value: "1"
+            - name: REBUILD_TIMEOUT_SECONDS
+              value: "1800"
+            - name: POLL_INTERVAL_SECONDS
+              value: "30"
+            - name: LOG_LEVEL
+              value: "INFO"
+            - name: LONGHORN_NAMESPACE
+              value: "longhorn-system"
+            resources:
+              requests:
+                cpu: 10m
+                memory: 64Mi
+              limits:
+                memory: 128Mi
