@@ -35,7 +35,7 @@ metadata:
   name: longhorn-replica-rebalancer
   namespace: longhorn-system
 spec:
-  schedule: "0 */2 * * *"
+  schedule: "*/30 * * * *"
   concurrencyPolicy: Forbid
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
@@ -54,7 +54,7 @@ spec:
             image: nexus.gillouche.homelab/docker-hosted/longhorn-replica-rebalancer:latest
             env:
             - name: DRY_RUN
-              value: "true"
+              value: "false"
             - name: MAX_REBALANCES_PER_RUN
               value: "1"
             - name: REBUILD_TIMEOUT_SECONDS
