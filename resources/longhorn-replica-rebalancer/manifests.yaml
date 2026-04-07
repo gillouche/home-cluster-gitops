@@ -65,6 +65,11 @@ spec:
               value: "INFO"
             - name: LONGHORN_NAMESPACE
               value: "longhorn-system"
+            - name: DISCORD_WEBHOOK_URL
+              valueFrom:
+                secretKeyRef:
+                  name: longhorn-rebalancer-discord-webhook
+                  key: storage-issues
             resources:
               requests:
                 cpu: 10m
