@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: longhorn-stale-replica-cleanup
+  namespace: longhorn-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: longhorn-stale-replica-cleanup
+rules:
+- apiGroups: ["longhorn.io"]
+  resources: ["replicas"]
+  verbs: ["get", "list", "delete"]
+- apiGroups: ["longhorn.io"]
+  resources: ["volumes"]
+  verbs: ["get", "list"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: longhorn-stale-replica-cleanup
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: longhorn-stale-replica-cleanup
+subjects:
+- kind: ServiceAccount
+  name: longhorn-stale-replica-cleanup
+  namespace: longhorn-system
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: longhorn-stale-replica-cleanup
+  namespace: longhorn-system
+spec:
+  schedule: "*/10 * * * *"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 300
+      backoffLimit: 0
+      template:
+        spec:
+          serviceAccountName: longhorn-stale-replica-cleanup
+          restartPolicy: Never
+          nodeSelector:
+            node-class: homeserver
+          containers:
+          - name: cleanup
+            image: nexus.gillouche.homelab/docker-hub/alpine/kubectl:1.35.3
+            command:
+            - sh
+            - -c
+            - |
+              set -e
+
+              STOPPED=$(kubectl get replicas.longhorn.io -n longhorn-system --no-headers \
+                -o custom-columns='NAME:.metadata.name,STATE:.status.currentState' \
+                | grep stopped | awk '{print $1}')
+
+              COUNT=$(echo "$STOPPED" | grep -c . || echo 0)
+
+              if [ "$COUNT" -eq 0 ] || [ -z "$STOPPED" ]; then
+                echo "No stopped replicas found"
+                exit 0
+              fi
+
+              echo "Found $COUNT stopped replicas"
+
+              RUNNING=$(kubectl get replicas.longhorn.io -n longhorn-system --no-headers \
+                -o custom-columns='NAME:.metadata.name,STATE:.status.currentState' \
+                | grep running | wc -l)
+
+              if [ "$RUNNING" -lt 2 ]; then
+                echo "Only $RUNNING running replicas — cluster may be unhealthy, skipping cleanup"
+                exit 0
+              fi
+
+              DELETED=0
+              for replica in $STOPPED; do
+                VOL=$(kubectl get replicas.longhorn.io -n longhorn-system "$replica" \
+                  -o jsonpath='{.spec.volumeName}' 2>/dev/null)
+
+                VOL_RUNNING=$(kubectl get replicas.longhorn.io -n longhorn-system --no-headers \
+                  -o custom-columns='NAME:.metadata.name,VOL:.spec.volumeName,STATE:.status.currentState' \
+                  | grep "$VOL" | grep running | wc -l)
+
+                if [ "$VOL_RUNNING" -ge 2 ]; then
+                  kubectl delete replicas.longhorn.io -n longhorn-system "$replica" --wait=false
+                  DELETED=$((DELETED + 1))
+                else
+                  echo "Skipping $replica (volume $VOL has only $VOL_RUNNING running replicas)"
+                fi
+
+                if [ "$DELETED" -ge 50 ]; then
+                  echo "Deleted $DELETED replicas this run, stopping to avoid overload"
+                  break
+                fi
+              done
+
+              echo "Cleaned up $DELETED stopped replicas ($(echo "$STOPPED" | wc -l) total stopped)"
