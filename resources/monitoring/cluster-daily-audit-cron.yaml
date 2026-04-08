@@ -137,13 +137,13 @@ data:
 
     def get_pvc_usage():
         lines = []
-        results = query_prometheus('sort_desc(kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes * 100)')
+        results = query_prometheus('sort_desc(max by (namespace, persistentvolumeclaim) (kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes * 100))')
         for r in results[:10]:
             pvc = r['metric'].get('persistentvolumeclaim', '?')
             ns = r['metric'].get('namespace', '?')
             pct = float(r['value'][1])
-            used = query_scalar(f'kubelet_volume_stats_used_bytes{{namespace="{ns}",persistentvolumeclaim="{pvc}"}}')
-            cap = query_scalar(f'kubelet_volume_stats_capacity_bytes{{namespace="{ns}",persistentvolumeclaim="{pvc}"}}')
+            used = query_scalar(f'max(kubelet_volume_stats_used_bytes{{namespace="{ns}",persistentvolumeclaim="{pvc}"}})')
+            cap = query_scalar(f'max(kubelet_volume_stats_capacity_bytes{{namespace="{ns}",persistentvolumeclaim="{pvc}"}})')
             short_pvc = pvc[:30]
             try:
                 lines.append(f"`{short_pvc}` {fmt_bytes(used)}/{fmt_bytes(cap)} ({pct:.0f}%)")
@@ -153,11 +153,19 @@ data:
 
     def get_node_uptime():
         lines = []
+        node_map = {}
+        uname = query_prometheus('node_uname_info')
+        for u in uname:
+            instance = u['metric'].get('instance', '')
+            nodename = u['metric'].get('nodename', '')
+            if instance and nodename:
+                node_map[instance] = nodename
         results = query_prometheus('(time() - node_boot_time_seconds) / 86400')
-        for r in sorted(results, key=lambda x: x['metric'].get('instance', '')):
-            instance = r['metric'].get('instance', '?').split(':')[0]
+        for r in sorted(results, key=lambda x: node_map.get(x['metric'].get('instance', ''), x['metric'].get('instance', ''))):
+            instance = r['metric'].get('instance', '?')
+            name = node_map.get(instance, instance.split(':')[0])
             days = float(r['value'][1])
-            lines.append(f"`{instance:<16}` {days:.1f} days")
+            lines.append(f"`{name:<16}` {days:.1f} days")
         return "\n".join(lines) if lines else "N/A"
 
     def get_alert_summary_24h():
