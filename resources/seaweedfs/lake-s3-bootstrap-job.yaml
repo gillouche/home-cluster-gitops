@@ -14,7 +14,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: bootstrap
-          image: nexus.gillouche.homelab/docker-hub/chrislusf/seaweedfs:4.18
+          image: nexus.gillouche.homelab/docker-hub/chrislusf/seaweedfs:4.19
           env:
             - name: S3_ACCESS_KEY
               valueFrom:
