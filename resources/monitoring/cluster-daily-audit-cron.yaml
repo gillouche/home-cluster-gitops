@@ -104,7 +104,8 @@ data:
         try:
             sn = float(size_now); s24 = float(size_24h)
             delta = sn - s24
-            parts.append(f"Size: {fmt_bytes(sn)} ({'+' if delta >= 0 else ''}{fmt_bytes(delta)} in 24h)")
+            sign = "+" if delta >= 0 else "-"
+            parts.append(f"Size: {fmt_bytes(sn)} ({sign}{fmt_bytes(abs(delta))} in 24h)")
         except:
             pass
         try:

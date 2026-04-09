@@ -118,9 +118,12 @@ data:
         try:
             r1h = int(float(rows_1h))
             e1h = int(float(events_1h))
-            s1h = fmt_bytes(size_1h)
-            direction = "+" if r1h >= 0 else ""
-            parts.append(f"1h delta: {direction}{r1h:,} rows, {direction}{e1h:,} events, {direction}{s1h}")
+            s1h_raw = float(size_1h)
+            s1h_sign = "+" if s1h_raw >= 0 else "-"
+            s1h_fmt = fmt_bytes(abs(s1h_raw))
+            r_sign = "+" if r1h >= 0 else ""
+            e_sign = "+" if e1h >= 0 else ""
+            parts.append(f"1h delta: {r_sign}{r1h:,} rows, {e_sign}{e1h:,} events, {s1h_sign}{s1h_fmt}")
         except:
             pass
         try:
