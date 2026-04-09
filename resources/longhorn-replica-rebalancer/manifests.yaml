@@ -52,6 +52,7 @@ spec:
           containers:
           - name: rebalancer
             image: nexus.gillouche.homelab/docker-hosted/longhorn-replica-rebalancer:latest
+            imagePullPolicy: Always
             env:
             - name: DRY_RUN
               value: "false"
