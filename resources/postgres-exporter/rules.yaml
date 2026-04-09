@@ -114,23 +114,23 @@ spec:
           API performance. Run compaction immediately.
 
     - alert: KineEventStorm
-      expr: pg_kine_stats_event_rows > 50000
-      for: 5m
+      expr: pg_kine_stats_event_rows > 80000
+      for: 15m
       labels:
         severity: warning
       annotations:
-        summary: "Kine event count exceeds 50k rows"
+        summary: "Kine event count exceeds 80k rows"
         description: >-
           {{ $value | printf "%.0f" }} event rows in kine. This indicates
           event compaction is not keeping up or a storm of k8s events.
 
     - alert: KineRowCountHigh
-      expr: pg_kine_stats_total_rows > 100000
-      for: 10m
+      expr: pg_kine_stats_total_rows > 200000
+      for: 15m
       labels:
         severity: warning
       annotations:
-        summary: "Kine total row count exceeds 100k"
+        summary: "Kine total row count exceeds 200k"
         description: >-
           {{ $value | printf "%.0f" }} total rows in kine table. Compaction
           should keep this well below this threshold.
