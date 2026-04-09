@@ -35,7 +35,7 @@ spec:
               echo "=== Data Lake S3 Bootstrap ==="
               echo "Waiting for SeaweedFS master..."
               for i in $(seq 1 30); do
-                if weed shell -master=$MASTER -filer= <<< "cluster.check" >/dev/null 2>&1; then
+                if echo "cluster.check" | weed shell -master=$MASTER -filer= >/dev/null 2>&1; then
                   echo "Master is ready."
                   break
                 fi
