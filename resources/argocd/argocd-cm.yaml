@@ -10,6 +10,40 @@ data:
   accounts.overwatchd: apiKey
   exec.enabled: "true"
   url: https://argocd.k3s.gillouche.homelab
+  resource.customizations.health.postgresql.cnpg.io_Cluster: |
+    hs = {}
+    if obj.status == nil then
+      hs.status = "Progressing"
+      hs.message = "Waiting for cluster status"
+      return hs
+    end
+    if obj.status.conditions ~= nil then
+      for _, condition in ipairs(obj.status.conditions) do
+        if condition.type == "Ready" then
+          if condition.status == "True" then
+            hs.status = "Healthy"
+            hs.message = condition.message or "Cluster is ready"
+            return hs
+          end
+        end
+      end
+    end
+    if obj.status.phase ~= nil then
+      if obj.status.phase == "Cluster in healthy state" then
+        hs.status = "Healthy"
+        hs.message = obj.status.phaseReason or "Cluster is healthy"
+      elseif obj.status.phase == "Failed" or obj.status.phase == "Cluster in an unrecoverable state" then
+        hs.status = "Degraded"
+        hs.message = obj.status.phaseReason or "Cluster failed"
+      else
+        hs.status = "Progressing"
+        hs.message = obj.status.phaseReason or obj.status.phase
+      end
+    else
+      hs.status = "Progressing"
+      hs.message = "Waiting for cluster phase"
+    end
+    return hs
   oidc.config: |
     name: Authelia
     issuer: https://auth.k3s.gillouche.homelab
