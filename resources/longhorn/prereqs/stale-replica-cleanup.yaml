@@ -18,6 +18,13 @@ rules:
 - apiGroups: [""]
   resources: ["persistentvolumes"]
   verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  resourceNames: ["longhorn-watchdog-state"]
+  verbs: ["get", "update", "patch"]
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["create"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -70,6 +77,25 @@ spec:
 
               BATCH_LIMIT=500
               REBUILD_LOOP_THRESHOLD=10
+              STATE_CM="longhorn-watchdog-state"
+              STATE_NS="longhorn-system"
+
+              get_state() {
+                kubectl get configmap "$STATE_CM" -n "$STATE_NS" -o jsonpath="{.data.$1}" 2>/dev/null || echo ""
+              }
+
+              save_state() {
+                kubectl get configmap "$STATE_CM" -n "$STATE_NS" >/dev/null 2>&1 || \
+                  kubectl create configmap "$STATE_CM" -n "$STATE_NS" --from-literal=placeholder=init 2>/dev/null
+                kubectl patch configmap "$STATE_CM" -n "$STATE_NS" \
+                  --type merge -p "{\"data\":{\"$1\":\"$2\"}}" 2>/dev/null || true
+              }
+
+              clear_state() {
+                kubectl get configmap "$STATE_CM" -n "$STATE_NS" >/dev/null 2>&1 && \
+                  kubectl patch configmap "$STATE_CM" -n "$STATE_NS" \
+                    --type merge -p "{\"data\":{\"$1\":null}}" 2>/dev/null || true
+              }
 
               send_discord() {
                 LEVEL="$1"
@@ -132,6 +158,20 @@ spec:
               DEGRADED_VOLS=$(kubectl get volumes.longhorn.io -n longhorn-system --no-headers \
                 -o custom-columns='NAME:.metadata.name,ROBUSTNESS:.status.robustness' \
                 | awk '$2 == "degraded" {print $1}')
+              ALL_VOLS=$(kubectl get volumes.longhorn.io -n longhorn-system --no-headers \
+                -o custom-columns='NAME:.metadata.name,ROBUSTNESS:.status.robustness' \
+                | awk '{print $1}')
+              for vol in $ALL_VOLS; do
+                STATE_KEY=$(echo "$vol" | tr '-' '_')
+                IS_DEGRADED=$(echo "$DEGRADED_VOLS" | grep -c "^${vol}$" || echo 0)
+                if [ "$IS_DEGRADED" -eq 0 ]; then
+                  PREV=$(get_state "$STATE_KEY")
+                  if [ -n "$PREV" ]; then
+                    echo "Volume $vol recovered from degraded"
+                    clear_state "$STATE_KEY"
+                  fi
+                fi
+              done
               if [ -n "$DEGRADED_VOLS" ]; then
                 for vol in $DEGRADED_VOLS; do
                   PVC=$(kubectl get pv "$vol" -o jsonpath='{.spec.claimRef.namespace}/{.spec.claimRef.name}' 2>/dev/null || echo "unknown")
@@ -143,7 +183,14 @@ spec:
                   if [ "$VOL_STOPPED" -ge "$REBUILD_LOOP_THRESHOLD" ]; then
                     send_discord "critical" "Volume $vol in rebuild loop: $VOL_STOPPED stopped, $VOL_RUNNING running (PVC: $PVC). Check for error replicas blocking rebuild."
                   else
-                    send_discord "warning" "Volume $vol degraded: $VOL_RUNNING running, $VOL_STOPPED stopped (PVC: $PVC)"
+                    STATE_KEY=$(echo "$vol" | tr '-' '_')
+                    PREV=$(get_state "$STATE_KEY")
+                    if [ -z "$PREV" ]; then
+                      echo "Volume $vol degraded (first seen, grace period)"
+                      save_state "$STATE_KEY" "degraded"
+                    else
+                      send_discord "warning" "Volume $vol degraded: $VOL_RUNNING running, $VOL_STOPPED stopped (PVC: $PVC)"
+                    fi
                   fi
                 done
               fi
