@@ -138,10 +138,17 @@ data:
 
     def get_pvc_usage():
         lines = []
+        seen = set()
         results = query_prometheus('sort_desc(max by (namespace, persistentvolumeclaim) (kubelet_volume_stats_used_bytes / kubelet_volume_stats_capacity_bytes * 100))')
-        for r in results[:10]:
+        for r in results:
             pvc = r['metric'].get('persistentvolumeclaim', '?')
             ns = r['metric'].get('namespace', '?')
+            key = (ns, pvc)
+            if key in seen:
+                continue
+            seen.add(key)
+            if len(lines) >= 10:
+                break
             pct = float(r['value'][1])
             used = query_scalar(f'max(kubelet_volume_stats_used_bytes{{namespace="{ns}",persistentvolumeclaim="{pvc}"}})')
             cap = query_scalar(f'max(kubelet_volume_stats_capacity_bytes{{namespace="{ns}",persistentvolumeclaim="{pvc}"}})')

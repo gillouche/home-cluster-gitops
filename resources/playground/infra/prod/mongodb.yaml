@@ -20,7 +20,7 @@ spec:
         environment: prod
     spec:
       nodeSelector:
-        workload.tier: infra
+        kubernetes.io/hostname: rpi5b16g3ssd
       containers:
         - name: mongodb
           image: nexus.gillouche.homelab/docker-hub/library/mongo:8

@@ -23,7 +23,7 @@ spec:
         seccompProfile:
           type: RuntimeDefault
       nodeSelector:
-        workload.tier: infra
+        kubernetes.io/hostname: rpi5b16g2ssd
       containers:
         - name: kafka
           image: nexus.gillouche.homelab/docker-hub/apache/kafka:4.1.1

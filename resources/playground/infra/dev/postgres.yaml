@@ -20,7 +20,7 @@ spec:
         environment: dev
     spec:
       nodeSelector:
-        workload.tier: infra
+        kubernetes.io/hostname: rpi5b16g1ssd
       containers:
         - name: postgres
           image: nexus.gillouche.homelab/docker-hub/library/postgres:18.3-alpine
