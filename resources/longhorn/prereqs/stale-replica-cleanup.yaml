@@ -94,9 +94,9 @@ spec:
               ALL_REPLICAS=$(kubectl get replicas.longhorn.io -n longhorn-system --no-headers \
                 -o custom-columns='NAME:.metadata.name,VOL:.spec.volumeName,STATE:.status.currentState,NODE:.spec.nodeID')
 
-              TOTAL_RUNNING=$(echo "$ALL_REPLICAS" | grep -c "running" || echo 0)
-              TOTAL_ERROR=$(echo "$ALL_REPLICAS" | grep -c "error" || echo 0)
-              TOTAL_STOPPED=$(echo "$ALL_REPLICAS" | grep -c "stopped" || echo 0)
+              TOTAL_RUNNING=$(echo "$ALL_REPLICAS" | awk '$3 == "running"' | wc -l | tr -d ' ')
+              TOTAL_ERROR=$(echo "$ALL_REPLICAS" | awk '$3 == "error"' | wc -l | tr -d ' ')
+              TOTAL_STOPPED=$(echo "$ALL_REPLICAS" | awk '$3 == "stopped"' | wc -l | tr -d ' ')
 
               echo "Cluster: $TOTAL_RUNNING running, $TOTAL_ERROR error, $TOTAL_STOPPED stopped"
 
