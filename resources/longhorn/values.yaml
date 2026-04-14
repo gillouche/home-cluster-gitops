@@ -61,7 +61,7 @@ longhornUI:
                 values: ["homeserver"]
 
 persistence:
-  defaultClass: true
+  defaultClass: false
   defaultClassReplicaCount: 2
   defaultAllowVolumeExpansion: true
 
