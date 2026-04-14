@@ -78,12 +78,12 @@ spec:
                   echo "[DISCORD $LEVEL] $MSG"
                   return
                 fi
-                ICON="ℹ️"
+                ICON="INFO"
                 case "$LEVEL" in
-                  warning) ICON="⚠️" ;;
-                  critical) ICON="🔴" ;;
+                  warning) ICON="WARNING" ;;
+                  critical) ICON="CRITICAL" ;;
                 esac
-                PAYLOAD=$(printf '{"content":"%s **Longhorn Watchdog** — %s"}' "$ICON" "$MSG")
+                PAYLOAD="{\"content\":\"**[$ICON] Longhorn Watchdog** - $MSG\"}"
                 wget -qO- --post-data="$PAYLOAD" \
                   --header="Content-Type: application/json" \
                   "$DISCORD_WEBHOOK_URL" 2>/dev/null || true
@@ -91,14 +91,14 @@ spec:
 
               echo "=== Longhorn Health Watchdog ==="
 
-              REPLICAS_JSON=$(kubectl get replicas.longhorn.io -n longhorn-system -o json)
-              VOLUMES_JSON=$(kubectl get volumes.longhorn.io -n longhorn-system -o json)
+              ALL_REPLICAS=$(kubectl get replicas.longhorn.io -n longhorn-system --no-headers \
+                -o custom-columns='NAME:.metadata.name,VOL:.spec.volumeName,STATE:.status.currentState,NODE:.spec.nodeID')
 
-              TOTAL_RUNNING=$(echo "$REPLICAS_JSON" | jq '[.items[] | select(.status.currentState == "running")] | length')
-              TOTAL_ERROR=$(echo "$REPLICAS_JSON" | jq '[.items[] | select(.status.currentState == "error")] | length')
-              TOTAL_STOPPED=$(echo "$REPLICAS_JSON" | jq '[.items[] | select(.status.currentState == "stopped")] | length')
+              TOTAL_RUNNING=$(echo "$ALL_REPLICAS" | grep -c "running" || echo 0)
+              TOTAL_ERROR=$(echo "$ALL_REPLICAS" | grep -c "error" || echo 0)
+              TOTAL_STOPPED=$(echo "$ALL_REPLICAS" | grep -c "stopped" || echo 0)
 
-              echo "Cluster: $TOTAL_RUNNING running, $TOTAL_ERROR error, $TOTAL_STOPPED stopped replicas"
+              echo "Cluster: $TOTAL_RUNNING running, $TOTAL_ERROR error, $TOTAL_STOPPED stopped"
 
               if [ "$TOTAL_RUNNING" -lt 2 ]; then
                 echo "SAFETY: Only $TOTAL_RUNNING running replicas cluster-wide, skipping all cleanup"
@@ -109,67 +109,72 @@ spec:
               ERROR_DELETED=0
               if [ "$TOTAL_ERROR" -gt 0 ]; then
                 echo "Found $TOTAL_ERROR error-state replicas"
-                ERROR_REPLICAS=$(echo "$REPLICAS_JSON" | jq -r '.items[] | select(.status.currentState == "error") | .metadata.name')
-                ERROR_NODES=$(echo "$REPLICAS_JSON" | jq -r '[.items[] | select(.status.currentState == "error") | .spec.nodeID] | unique | join(", ")')
-                for replica in $ERROR_REPLICAS; do
+                ERROR_NAMES=$(echo "$ALL_REPLICAS" | awk '$3 == "error" {print $1}')
+                ERROR_NODES=$(echo "$ALL_REPLICAS" | awk '$3 == "error" {print $4}' | sort -u | tr '\n' ',' | sed 's/,$//')
+                for replica in $ERROR_NAMES; do
                   kubectl delete replicas.longhorn.io -n longhorn-system "$replica" --wait=false 2>/dev/null || true
                   ERROR_DELETED=$((ERROR_DELETED + 1))
                 done
-                echo "Deleted $ERROR_DELETED error replicas"
+                echo "Deleted $ERROR_DELETED error replicas on nodes: $ERROR_NODES"
                 send_discord "warning" "Deleted $ERROR_DELETED error-state replicas (nodes: $ERROR_NODES). These were blocking the rebuild queue."
               fi
 
-              FAULTED=$(echo "$VOLUMES_JSON" | jq -r '.items[] | select(.status.robustness == "faulted") | .metadata.name')
-              if [ -n "$FAULTED" ]; then
-                for vol in $FAULTED; do
+              FAULTED_VOLS=$(kubectl get volumes.longhorn.io -n longhorn-system --no-headers \
+                -o custom-columns='NAME:.metadata.name,ROBUSTNESS:.status.robustness' \
+                | awk '$2 == "faulted" {print $1}')
+              if [ -n "$FAULTED_VOLS" ]; then
+                for vol in $FAULTED_VOLS; do
                   PVC=$(kubectl get pv "$vol" -o jsonpath='{.spec.claimRef.namespace}/{.spec.claimRef.name}' 2>/dev/null || echo "unknown")
                   send_discord "critical" "Volume $vol is FAULTED (PVC: $PVC). Manual intervention required."
                 done
               fi
 
-              DEGRADED=$(echo "$VOLUMES_JSON" | jq -r '.items[] | select(.status.robustness == "degraded") | .metadata.name')
-              if [ -n "$DEGRADED" ]; then
-                for vol in $DEGRADED; do
+              DEGRADED_VOLS=$(kubectl get volumes.longhorn.io -n longhorn-system --no-headers \
+                -o custom-columns='NAME:.metadata.name,ROBUSTNESS:.status.robustness' \
+                | awk '$2 == "degraded" {print $1}')
+              if [ -n "$DEGRADED_VOLS" ]; then
+                for vol in $DEGRADED_VOLS; do
                   PVC=$(kubectl get pv "$vol" -o jsonpath='{.spec.claimRef.namespace}/{.spec.claimRef.name}' 2>/dev/null || echo "unknown")
-                  VOL_STOPPED=$(echo "$REPLICAS_JSON" | jq --arg v "$vol" '[.items[] | select(.spec.volumeName == $v and .status.currentState == "stopped")] | length')
-                  VOL_RUNNING=$(echo "$REPLICAS_JSON" | jq --arg v "$vol" '[.items[] | select(.spec.volumeName == $v and .status.currentState == "running")] | length')
+                  VOL_STOPPED=$(echo "$ALL_REPLICAS" | awk -v v="$vol" '$2 == v && $3 == "stopped"' | wc -l)
+                  VOL_RUNNING=$(echo "$ALL_REPLICAS" | awk -v v="$vol" '$2 == v && $3 == "running"' | wc -l)
+                  VOL_STOPPED=$(echo "$VOL_STOPPED" | tr -d ' ')
+                  VOL_RUNNING=$(echo "$VOL_RUNNING" | tr -d ' ')
 
                   if [ "$VOL_STOPPED" -ge "$REBUILD_LOOP_THRESHOLD" ]; then
-                    send_discord "critical" "Volume $vol in rebuild loop: $VOL_STOPPED stopped replicas, only $VOL_RUNNING running (PVC: $PVC). Check for error replicas blocking rebuild queue."
+                    send_discord "critical" "Volume $vol in rebuild loop: $VOL_STOPPED stopped, $VOL_RUNNING running (PVC: $PVC). Check for error replicas blocking rebuild."
                   else
-                    send_discord "warning" "Volume $vol degraded: $VOL_RUNNING running, $VOL_STOPPED stopped replicas (PVC: $PVC)"
+                    send_discord "warning" "Volume $vol degraded: $VOL_RUNNING running, $VOL_STOPPED stopped (PVC: $PVC)"
                   fi
                 done
               fi
 
               SAFE_DELETED=0
               if [ "$TOTAL_STOPPED" -gt 0 ]; then
-                SAFE_TO_DELETE=$(echo "$REPLICAS_JSON" | jq -r '
-                  [.items[] | {name: .metadata.name, vol: .spec.volumeName, state: .status.currentState}]
-                  | group_by(.vol)
-                  | .[]
-                  | (map(select(.state == "running")) | length) as $running
-                  | select($running >= 2)
-                  | map(select(.state == "stopped"))
-                  | .[].name
-                ')
-
-                for replica in $SAFE_TO_DELETE; do
-                  if [ "$SAFE_DELETED" -ge "$BATCH_LIMIT" ]; then
-                    echo "Batch limit $BATCH_LIMIT reached, stopping"
-                    break
+                VOLUMES_WITH_STOPPED=$(echo "$ALL_REPLICAS" | awk '$3 == "stopped" {print $2}' | sort -u)
+                for vol in $VOLUMES_WITH_STOPPED; do
+                  VOL_RUNNING=$(echo "$ALL_REPLICAS" | awk -v v="$vol" '$2 == v && $3 == "running"' | wc -l)
+                  VOL_RUNNING=$(echo "$VOL_RUNNING" | tr -d ' ')
+                  if [ "$VOL_RUNNING" -ge 2 ]; then
+                    STOPPED_NAMES=$(echo "$ALL_REPLICAS" | awk -v v="$vol" '$2 == v && $3 == "stopped" {print $1}')
+                    for replica in $STOPPED_NAMES; do
+                      if [ "$SAFE_DELETED" -ge "$BATCH_LIMIT" ]; then
+                        echo "Batch limit $BATCH_LIMIT reached"
+                        break 2
+                      fi
+                      kubectl delete replicas.longhorn.io -n longhorn-system "$replica" --wait=false 2>/dev/null || true
+                      SAFE_DELETED=$((SAFE_DELETED + 1))
+                    done
                   fi
-                  kubectl delete replicas.longhorn.io -n longhorn-system "$replica" --wait=false 2>/dev/null || true
-                  SAFE_DELETED=$((SAFE_DELETED + 1))
                 done
               fi
 
               ORPHAN_DELETED=0
-              ORPHAN_REPLICAS=$(echo "$REPLICAS_JSON" | jq -r '.items[] | select(.spec.nodeID == "" and .status.currentState == "stopped") | .metadata.name')
+              ORPHAN_REPLICAS=$(echo "$ALL_REPLICAS" | awk '$3 == "stopped" && ($4 == "" || $4 == "<none>") {print $1}')
               if [ -n "$ORPHAN_REPLICAS" ]; then
                 for replica in $ORPHAN_REPLICAS; do
-                  VOL=$(echo "$REPLICAS_JSON" | jq -r --arg r "$replica" '.items[] | select(.metadata.name == $r) | .spec.volumeName')
-                  VOL_RUNNING=$(echo "$REPLICAS_JSON" | jq --arg v "$VOL" '[.items[] | select(.spec.volumeName == $v and .status.currentState == "running")] | length')
+                  VOL=$(echo "$ALL_REPLICAS" | awk -v r="$replica" '$1 == r {print $2}')
+                  VOL_RUNNING=$(echo "$ALL_REPLICAS" | awk -v v="$VOL" '$2 == v && $3 == "running"' | wc -l)
+                  VOL_RUNNING=$(echo "$VOL_RUNNING" | tr -d ' ')
                   if [ "$VOL_RUNNING" -ge 2 ]; then
                     kubectl delete replicas.longhorn.io -n longhorn-system "$replica" --wait=false 2>/dev/null || true
                     ORPHAN_DELETED=$((ORPHAN_DELETED + 1))
