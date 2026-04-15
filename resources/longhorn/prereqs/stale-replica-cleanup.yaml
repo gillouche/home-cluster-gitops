@@ -180,8 +180,11 @@ spec:
                   VOL_STOPPED=$(echo "$VOL_STOPPED" | tr -d ' ')
                   VOL_RUNNING=$(echo "$VOL_RUNNING" | tr -d ' ')
 
+                  DESIRED=$(kubectl get volumes.longhorn.io -n longhorn-system "$vol" -o jsonpath='{.spec.numberOfReplicas}' 2>/dev/null || echo 0)
                   if [ "$VOL_STOPPED" -ge "$REBUILD_LOOP_THRESHOLD" ]; then
                     send_discord "critical" "Volume $vol in rebuild loop: $VOL_STOPPED stopped, $VOL_RUNNING running (PVC: $PVC). Check for error replicas blocking rebuild."
+                  elif [ "$VOL_STOPPED" -eq 0 ] && [ "$VOL_RUNNING" -ge "$DESIRED" ]; then
+                    echo "Volume $vol degraded but rebuilding ($VOL_RUNNING running, 0 stopped), suppressing alert"
                   else
                     STATE_KEY=$(echo "$vol" | tr '-' '_')
                     PREV=$(get_state "$STATE_KEY")
