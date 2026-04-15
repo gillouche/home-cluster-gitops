@@ -104,12 +104,19 @@ spec:
                   echo "[DISCORD $LEVEL] $MSG"
                   return
                 fi
+                COLOR=3066993
                 ICON="INFO"
+                TITLE="Longhorn Storage"
                 case "$LEVEL" in
-                  warning) ICON="WARNING" ;;
-                  critical) ICON="CRITICAL" ;;
+                  warning) COLOR=15844367; ICON="WARNING"; TITLE="Longhorn Warning" ;;
+                  critical) COLOR=15158332; ICON="CRITICAL"; TITLE="Longhorn Critical" ;;
+                  info) COLOR=3447003; ICON="INFO"; TITLE="Longhorn Info" ;;
                 esac
-                PAYLOAD="{\"content\":\"**[$ICON] Longhorn Watchdog** - $MSG\"}"
+                SAFE_MSG=$(printf '%s' "$MSG" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | tr '\n' ' ')
+                PAYLOAD=$(cat <<EOFPAYLOAD
+              {"embeds":[{"title":"$TITLE","description":"$SAFE_MSG","color":$COLOR,"footer":{"text":"Longhorn Watchdog"}}]}
+              EOFPAYLOAD
+                )
                 wget -qO- --post-data="$PAYLOAD" \
                   --header="Content-Type: application/json" \
                   "$DISCORD_WEBHOOK_URL" 2>/dev/null || true
@@ -128,7 +135,7 @@ spec:
 
               if [ "$TOTAL_RUNNING" -lt 2 ]; then
                 echo "SAFETY: Only $TOTAL_RUNNING running replicas cluster-wide, skipping all cleanup"
-                send_discord "critical" "Only $TOTAL_RUNNING running replicas cluster-wide. Cluster storage may be unhealthy."
+                send_discord "critical" "Only **$TOTAL_RUNNING** running replicas cluster-wide. Cluster storage may be unhealthy.\n\n**Replicas:** $TOTAL_RUNNING running, $TOTAL_ERROR error, $TOTAL_STOPPED stopped\n**Action:** All cleanup skipped (safety threshold)"
                 exit 0
               fi
 
@@ -142,7 +149,7 @@ spec:
                   ERROR_DELETED=$((ERROR_DELETED + 1))
                 done
                 echo "Deleted $ERROR_DELETED error replicas on nodes: $ERROR_NODES"
-                send_discord "warning" "Deleted $ERROR_DELETED error-state replicas (nodes: $ERROR_NODES). These were blocking the rebuild queue."
+                send_discord "warning" "Deleted **$ERROR_DELETED** error-state replicas\n\n**Nodes:** \`$ERROR_NODES\`\n**Impact:** These were blocking the rebuild queue"
               fi
 
               FAULTED_VOLS=$(kubectl get volumes.longhorn.io -n longhorn-system --no-headers \
@@ -151,7 +158,7 @@ spec:
               if [ -n "$FAULTED_VOLS" ]; then
                 for vol in $FAULTED_VOLS; do
                   PVC=$(kubectl get pv "$vol" -o jsonpath='{.spec.claimRef.namespace}/{.spec.claimRef.name}' 2>/dev/null || echo "unknown")
-                  send_discord "critical" "Volume $vol is FAULTED (PVC: $PVC). Manual intervention required."
+                  send_discord "critical" "Volume is **FAULTED** - manual intervention required\n\n**PVC:** \`$PVC\`\n**Volume:** \`$vol\`"
                 done
               fi
 
@@ -182,7 +189,7 @@ spec:
 
                   DESIRED=$(kubectl get volumes.longhorn.io -n longhorn-system "$vol" -o jsonpath='{.spec.numberOfReplicas}' 2>/dev/null || echo 0)
                   if [ "$VOL_STOPPED" -ge "$REBUILD_LOOP_THRESHOLD" ]; then
-                    send_discord "critical" "Volume $vol in rebuild loop: $VOL_STOPPED stopped, $VOL_RUNNING running (PVC: $PVC). Check for error replicas blocking rebuild."
+                    send_discord "critical" "Volume stuck in rebuild loop\n\n**PVC:** \`$PVC\`\n**Replicas:** $VOL_RUNNING running, $VOL_STOPPED stopped\n**Action:** Check for error replicas blocking rebuild"
                   elif [ "$VOL_STOPPED" -eq 0 ] && [ "$VOL_RUNNING" -ge "$DESIRED" ]; then
                     echo "Volume $vol degraded but rebuilding ($VOL_RUNNING running, 0 stopped), suppressing alert"
                   else
@@ -192,7 +199,7 @@ spec:
                       echo "Volume $vol degraded (first seen, grace period)"
                       save_state "$STATE_KEY" "degraded"
                     else
-                      send_discord "warning" "Volume $vol degraded: $VOL_RUNNING running, $VOL_STOPPED stopped (PVC: $PVC)"
+                      send_discord "warning" "Volume degraded\n\n**PVC:** \`$PVC\`\n**Replicas:** $VOL_RUNNING running, $VOL_STOPPED stopped"
                     fi
                   fi
                 done
@@ -218,6 +225,24 @@ spec:
                 done
               fi
 
+              EXCESS_DELETED=0
+              for vol in $ALL_VOLS; do
+                DESIRED=$(kubectl get volumes.longhorn.io -n longhorn-system "$vol" -o jsonpath='{.spec.numberOfReplicas}' 2>/dev/null || echo 0)
+                VOL_RUNNING_NAMES=$(echo "$ALL_REPLICAS" | awk -v v="$vol" '$2 == v && $3 == "running" {print $1}')
+                VOL_RUNNING_COUNT=$(echo "$VOL_RUNNING_NAMES" | grep -c . || echo 0)
+                if [ "$VOL_RUNNING_COUNT" -gt "$DESIRED" ]; then
+                  EXCESS=$((VOL_RUNNING_COUNT - DESIRED))
+                  EXCESS_NAMES=$(echo "$VOL_RUNNING_NAMES" | tail -n "$EXCESS")
+                  PVC=$(kubectl get pv "$vol" -o jsonpath='{.spec.claimRef.namespace}/{.spec.claimRef.name}' 2>/dev/null || echo "unknown")
+                  echo "Volume $vol has $VOL_RUNNING_COUNT running replicas but spec says $DESIRED, removing $EXCESS excess"
+                  for replica in $EXCESS_NAMES; do
+                    kubectl delete replicas.longhorn.io -n longhorn-system "$replica" --wait=false 2>/dev/null || true
+                    EXCESS_DELETED=$((EXCESS_DELETED + 1))
+                  done
+                  send_discord "info" "Cleaned up excess replicas\n\n**PVC:** \`$PVC\`\n**Found:** $VOL_RUNNING_COUNT running (expected $DESIRED)\n**Deleted:** $EXCESS excess replicas"
+                fi
+              done
+
               ORPHAN_DELETED=0
               ORPHAN_REPLICAS=$(echo "$ALL_REPLICAS" | awk '$3 == "stopped" && ($4 == "" || $4 == "<none>") {print $1}')
               if [ -n "$ORPHAN_REPLICAS" ]; then
@@ -232,10 +257,10 @@ spec:
                 done
               fi
 
-              echo "Summary: error=$ERROR_DELETED stopped=$SAFE_DELETED orphan=$ORPHAN_DELETED deleted"
-              TOTAL_DELETED=$((ERROR_DELETED + SAFE_DELETED + ORPHAN_DELETED))
+              echo "Summary: error=$ERROR_DELETED stopped=$SAFE_DELETED orphan=$ORPHAN_DELETED excess=$EXCESS_DELETED deleted"
+              TOTAL_DELETED=$((ERROR_DELETED + SAFE_DELETED + ORPHAN_DELETED + EXCESS_DELETED))
               if [ "$TOTAL_DELETED" -gt 50 ]; then
-                send_discord "info" "Cleanup: deleted $ERROR_DELETED error, $SAFE_DELETED stopped, $ORPHAN_DELETED orphan replicas"
+                send_discord "info" "Batch cleanup completed\n\n**Error:** $ERROR_DELETED deleted\n**Stopped:** $SAFE_DELETED deleted\n**Orphan:** $ORPHAN_DELETED deleted\n**Excess:** $EXCESS_DELETED deleted\n**Total:** $TOTAL_DELETED replicas removed"
               fi
 
               echo "=== Watchdog complete ==="
