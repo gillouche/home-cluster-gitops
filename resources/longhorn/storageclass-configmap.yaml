@@ -27,7 +27,7 @@ data:
       backupTargetName: "default"
       backupCompressionMethod: "lz4"
       backupBlockSize: "2097152"
-      replicaAutoBalance: "ignored"
+      replicaAutoBalance: "best-effort"
       replicaSoftAntiAffinity: "ignored"
       replicaZoneSoftAntiAffinity: "ignored"
       replicaDiskSoftAntiAffinity: "ignored"
