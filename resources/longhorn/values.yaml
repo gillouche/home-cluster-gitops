@@ -12,7 +12,7 @@ defaultSettings:
   failedReplicaAutoCleanupPeriod: 5
   defaultReplicaCount: 2
   defaultDataLocality: best-effort
-  replicaAutoBalance: least-effort
+  replicaAutoBalance: best-effort
   createDefaultDiskLabeledNodes: false
   storageReservedPercentageForDefaultDisk: 20
   storageOverProvisioningPercentage: 100
