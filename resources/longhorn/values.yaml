@@ -15,7 +15,7 @@ defaultSettings:
   replicaAutoBalance: best-effort
   createDefaultDiskLabeledNodes: false
   storageReservedPercentageForDefaultDisk: 20
-  storageOverProvisioningPercentage: 200
+  storageOverProvisioningPercentage: 100
   orphanResourceAutoDeletion: "replica-data;instance"
   orphanResourceAutoDeletionGracePeriod: 300
   offlineReplicaRebuilding: false
