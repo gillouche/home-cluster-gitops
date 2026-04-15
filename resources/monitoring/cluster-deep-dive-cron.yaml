@@ -181,9 +181,9 @@ data:
         return "\n".join(lines) if lines else "No listeners"
 
     def get_longhorn_details():
-        total_vols = query_scalar('count(longhorn_volume_state)')
-        attached = query_scalar('count(longhorn_volume_state == 1) or vector(0)')
-        detached = query_scalar('count(longhorn_volume_state == 0) or vector(0)')
+        total_vols = query_scalar('count(max by (volume) (longhorn_volume_state))')
+        attached = query_scalar('count(max by (volume) (longhorn_volume_state) == 1) or vector(0)')
+        detached = query_scalar('count(max by (volume) (longhorn_volume_state) == 2) or vector(0)')
         degraded = query_scalar('count(longhorn_volume_robustness == 2) or vector(0)')
         faulted = query_scalar('count(longhorn_volume_robustness == 3) or vector(0)')
         parts = []
@@ -298,7 +298,7 @@ spec:
     spec:
       activeDeadlineSeconds: 180
       ttlSecondsAfterFinished: 300
-      backoffLimit: 2
+      backoffLimit: 0
       template:
         spec:
           containers:

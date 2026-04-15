@@ -278,7 +278,7 @@ spec:
     spec:
       activeDeadlineSeconds: 120
       ttlSecondsAfterFinished: 300
-      backoffLimit: 2
+      backoffLimit: 0
       template:
         spec:
           containers:

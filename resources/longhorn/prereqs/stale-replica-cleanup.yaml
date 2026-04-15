@@ -112,7 +112,7 @@ spec:
                   critical) COLOR=15158332; ICON="CRITICAL"; TITLE="Longhorn Critical" ;;
                   info) COLOR=3447003; ICON="INFO"; TITLE="Longhorn Info" ;;
                 esac
-                SAFE_MSG=$(printf '%s' "$MSG" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g' | tr '\n' ' ')
+                SAFE_MSG=$(printf '%s' "$MSG" | sed 's/"/\\"/g; s/\t/\\t/g' | tr '\n' ' ')
                 PAYLOAD=$(cat <<EOFPAYLOAD
               {"embeds":[{"title":"$TITLE","description":"$SAFE_MSG","color":$COLOR,"footer":{"text":"Longhorn Watchdog"}}]}
               EOFPAYLOAD
@@ -227,7 +227,10 @@ spec:
 
               EXCESS_DELETED=0
               for vol in $ALL_VOLS; do
-                DESIRED=$(kubectl get volumes.longhorn.io -n longhorn-system "$vol" -o jsonpath='{.spec.numberOfReplicas}' 2>/dev/null || echo 0)
+                DESIRED=$(kubectl get volumes.longhorn.io -n longhorn-system "$vol" -o jsonpath='{.spec.numberOfReplicas}' 2>/dev/null)
+                if [ -z "$DESIRED" ] || [ "$DESIRED" -lt 1 ] 2>/dev/null; then
+                  continue
+                fi
                 VOL_RUNNING_NAMES=$(echo "$ALL_REPLICAS" | awk -v v="$vol" '$2 == v && $3 == "running" {print $1}')
                 VOL_RUNNING_COUNT=$(echo "$VOL_RUNNING_NAMES" | grep -c . || echo 0)
                 if [ "$VOL_RUNNING_COUNT" -gt "$DESIRED" ]; then
