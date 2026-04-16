@@ -147,16 +147,18 @@ data:
             if key in seen:
                 continue
             seen.add(key)
-            if len(lines) >= 10:
-                break
             pct = float(r['value'][1])
             used = query_scalar(f'max(kubelet_volume_stats_used_bytes{{namespace="{ns}",persistentvolumeclaim="{pvc}"}})')
             cap = query_scalar(f'max(kubelet_volume_stats_capacity_bytes{{namespace="{ns}",persistentvolumeclaim="{pvc}"}})')
             short_pvc = pvc[:30]
             try:
-                lines.append(f"`{short_pvc}` {fmt_bytes(used)}/{fmt_bytes(cap)} ({pct:.0f}%)")
+                line = f"`{short_pvc}` {fmt_bytes(used)}/{fmt_bytes(cap)} ({pct:.0f}%)"
             except:
-                lines.append(f"`{short_pvc}` {pct:.0f}%")
+                line = f"`{short_pvc}` {pct:.0f}%"
+            if line not in lines:
+                lines.append(line)
+            if len(lines) >= 10:
+                break
         return "\n".join(lines) if lines else "N/A"
 
     def get_node_uptime():
