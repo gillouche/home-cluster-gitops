@@ -14,7 +14,7 @@ listenerTemplate:
       node-class: homeserver
     containers:
       - name: listener
-        image: nexus.gillouche.homelab/ghcr-proxy/actions/gha-runner-scale-set-controller:0.14.0
+        image: nexus.gillouche.homelab/ghcr-proxy/actions/gha-runner-scale-set-controller:0.14.1
         command: ["/ghalistener"]
 # containerMode:
 #   type: "dind"
