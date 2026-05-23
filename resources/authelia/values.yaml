@@ -15,8 +15,8 @@ pod:
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: "1"
-      maxSurge: "1"
+      maxUnavailable: "100%"
+      maxSurge: "100%"
   kind: Deployment
 
   selectors:
