@@ -41,6 +41,38 @@ pod:
                       - authelia
               topologyKey: "kubernetes.io/hostname"
 
+  # Block startup until authelia-redis is reachable. Prevents the "password
+  # incorrect" symptom when Authelia comes up before Redis can serve sessions
+  # (the actual error in logs is dial tcp: lookup authelia-redis: i/o timeout).
+  initContainers:
+    - name: wait-for-redis
+      image: nexus.gillouche.homelab/docker-hub/library/busybox:latest
+      command:
+        - sh
+        - -c
+        - |
+          until nc -z -w 2 authelia-redis 6379; do
+            echo "waiting for authelia-redis:6379..."
+            sleep 2
+          done
+          echo "authelia-redis reachable"
+      securityContext:
+        runAsUser: 1000
+        runAsGroup: 1000
+        runAsNonRoot: true
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop: ["ALL"]
+        seccompProfile:
+          type: RuntimeDefault
+      resources:
+        requests:
+          cpu: 5m
+          memory: 16Mi
+        limits:
+          memory: 32Mi
+
   env:
     - name: AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE
       value: /secrets/authelia-secrets/jwt_secret
