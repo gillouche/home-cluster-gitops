@@ -52,9 +52,21 @@ loki:
       subPath: rules.yaml
       readOnly: true
   config:
+    # table_manager only deletes index entries — with the boltdb-shipper schema,
+    # chunks under /data/loki/chunks must be removed by the compactor or the PV
+    # fills up. retention here has never actually freed chunk storage.
     table_manager:
-      retention_deletes_enabled: true
-      retention_period: 7d
+      retention_deletes_enabled: false
+      retention_period: 0s
+    compactor:
+      working_directory: /data/loki/boltdb-shipper-compactor
+      shared_store: filesystem
+      compaction_interval: 10m
+      retention_enabled: true
+      retention_delete_delay: 2h
+      retention_delete_worker_count: 150
+    limits_config:
+      retention_period: 168h
     ruler:
       storage:
         type: local
