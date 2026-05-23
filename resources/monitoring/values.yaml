@@ -1,3 +1,13 @@
+# Use the chart's CRD upgrade Job so CRDs are server-side-applied via a
+# kubectl hook. ArgoCD's apply path hits the K8s 256KB annotation limit on
+# kube-prometheus-stack's huge CRDs (prometheuses, alertmanagers, etc.),
+# even with ServerSideApply set at the app level.
+crds:
+  enabled: true
+  upgradeJob:
+    enabled: true
+    forceConflicts: true
+
 # Use existing storage class and SSD nodes
 prometheus:
   prometheusSpec:
