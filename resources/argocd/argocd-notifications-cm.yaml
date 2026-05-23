@@ -127,7 +127,7 @@ data:
       triggers:
         - on-sync-failed-infra
         - on-health-degraded-infra
-  
+
     - recipients:
         - discord-playground
       triggers:

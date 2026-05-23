@@ -32,19 +32,19 @@ def update_yaml_block(file_path, key, indent, new_content):
     and replacing the following indented block.
     """
     key_marker = f"{indent}{key}: |"
-    
+
     with open(file_path, 'r') as f:
         lines = f.readlines()
 
     new_lines = []
     in_block = False
     block_replaced = False
-    
+
     for line in lines:
         if not block_replaced and line.rstrip() == key_marker.rstrip():
             new_lines.append(line)
             # Insert new content with proper indentation
-            block_indent = indent + "  " 
+            block_indent = indent + "  "
             for content_line in new_content.strip().split('\n'):
                 new_lines.append(f"{block_indent}{content_line}\n")
             in_block = True
@@ -52,7 +52,7 @@ def update_yaml_block(file_path, key, indent, new_content):
             continue
 
         if in_block:
-            if line.strip() != "" and (not line.startswith(indent + " ") or line.startswith(indent + key + ":")): 
+            if line.strip() != "" and (not line.startswith(indent + " ") or line.startswith(indent + key + ":")):
                 in_block = False
                 new_lines.append(line)
         else:
@@ -60,7 +60,7 @@ def update_yaml_block(file_path, key, indent, new_content):
 
     with open(file_path, 'w') as f:
         f.writelines(new_lines)
-    
+
     return True
 
 def update_yaml_value(file_path, key, indent, new_content):
@@ -68,38 +68,38 @@ def update_yaml_value(file_path, key, indent, new_content):
     Updates a single YAML key value on the same line.
     """
     key_marker = f"{indent}{key}:"
-    
+
     with open(file_path, 'r') as f:
         lines = f.readlines()
-        
+
     new_lines = []
     replaced = False
-    
+
     for line in lines:
         if not replaced and line.startswith(key_marker):
             new_lines.append(f"{key_marker} {new_content}\n")
             replaced = True
         else:
             new_lines.append(line)
-            
+
     with open(file_path, 'w') as f:
         f.writelines(new_lines)
-        
+
     return replaced
 
 def process_resource(res, ca_content, script_dir):
     abs_path = os.path.abspath(os.path.join(script_dir, res["path"]))
-    
+
     if not os.path.exists(abs_path):
         print(f"[WARN] Resource not found, skipping: {abs_path}")
         return
 
     mode = res.get("mode", "block")
-    
+
     if mode == "block":
         update_yaml_block(abs_path, res["key"], res["indent"], ca_content)
         print(f"[OK] Updated block in {os.path.basename(abs_path)}")
-        
+
     elif mode == "value_base64":
         # Encode content
         encoded = base64.b64encode(ca_content.encode('utf-8')).decode('utf-8')
@@ -120,7 +120,7 @@ def main():
         sys.exit(1)
 
     print(f"Loaded CA bundle from {args.path}")
-    
+
     script_dir = os.path.dirname(__file__)
 
     # Process resources

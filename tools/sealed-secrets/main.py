@@ -47,7 +47,7 @@ def handle_longhorn():
 
 def main():
     print_header("Sealed Secrets Manager")
-    
+
     if not os.path.exists(CERT_PATH):
         print(f"Error: Public key not found at {CERT_PATH}")
         sys.exit(1)

@@ -5,7 +5,6 @@ set -e
 PKI_DIR="$HOME/.local/share/ansible-home-cluster/pki"
 CERT_FILE="$PKI_DIR/wildcard.pem"
 KEY_FILE="$PKI_DIR/wildcard.key"
-TEMPLATE_FILE="$(dirname "$0")/input/wildcard-tls.yaml"
 OUTPUT_FILE="$(dirname "$0")/input/wildcard-tls-generated.yaml"
 
 # Verify files exist

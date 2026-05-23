@@ -39,7 +39,7 @@ pod:
                     operator: In
                     values:
                       - authelia
-              topologyKey: "kubernetes.io/hostname"  
+              topologyKey: "kubernetes.io/hostname"
 
   env:
     - name: AUTHELIA_IDENTITY_VALIDATION_RESET_PASSWORD_JWT_SECRET_FILE
@@ -50,7 +50,7 @@ pod:
       value: /secrets/authelia-secrets/storage_encryption_key
     - name: AUTHELIA_SESSION_REDIS_PASSWORD_FILE
       value: /secrets/authelia-secrets/session_secret
-  
+
   securityContext:
     pod:
       fsGroup: 1000
@@ -66,7 +66,7 @@ pod:
       allowPrivilegeEscalation: false
       capabilities:
         drop: ["ALL"]
-  
+
   # Custom volumes for user database and OIDC client secrets
   # Note: OIDC client secrets are NOT auto-mounted by the chart, must be added manually
   extraVolumes:
@@ -169,4 +169,3 @@ ingress:
   rulesOverride:
     - host: auth.k3s.gillouche.homelab
       path: /
-

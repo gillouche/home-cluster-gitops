@@ -6,8 +6,14 @@
     flake-utils.url = "github:numtide/flake-utils";
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
-    flake-utils.lib.eachDefaultSystem (system:
+  outputs =
+    {
+      self,
+      nixpkgs,
+      flake-utils,
+    }:
+    flake-utils.lib.eachDefaultSystem (
+      system:
       let
         pkgs = import nixpkgs { inherit system; };
       in
@@ -22,8 +28,17 @@
             kubeseal
             popeye
             k9s
+            kubeconform
+            kube-linter
 
-            
+            # Pre-commit & linters
+            pre-commit
+            yamllint
+            shellcheck
+            gitleaks
+            nixfmt-rfc-style
+            jq
+
             # Python Tools
             python314
             uv
@@ -39,11 +54,17 @@
               source tools/.venv/bin/activate
             fi
 
+            # Install pre-commit hooks if config exists and not already installed
+            if [ -f .pre-commit-config.yaml ] && [ -d .git ]; then
+              pre-commit install --install-hooks >/dev/null 2>&1 || true
+            fi
+
             echo "Environment loaded!"
-            echo "Kubectl:  $(kubectl version --client -o json | jq -r .clientVersion.gitVersion)"
-            echo "ArgoCD:   $(argocd version --client --short)"
-            echo "Kubeseal: $(kubeseal --version | awk '{print $NF}')"
-            echo "Python:   $(python3 --version)"
+            echo "Kubectl:    $(kubectl version --client -o json | jq -r .clientVersion.gitVersion)"
+            echo "ArgoCD:     $(argocd version --client --short)"
+            echo "Kubeseal:   $(kubeseal --version | awk '{print $NF}')"
+            echo "Python:     $(python3 --version)"
+            echo "Pre-commit: $(pre-commit --version)"
           '';
         };
       }

@@ -12,9 +12,9 @@ data:
       requireConfig: false,
 
       prCreation: 'immediate',
-      
+
       allowedPostUpgradeCommands: [],
-      
+
       packageRules: [
         {
           matchPackagePatterns: ['*']

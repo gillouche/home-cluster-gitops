@@ -15,10 +15,6 @@ spec:
   targets:
     staticConfig:
       static:
-        - 192.168.0.76  # rpi4b8g1
-        - 192.168.0.77  # rpi4b8g2
-        - 192.168.0.78  # rpi4b8g3
-        - 192.168.0.79  # rpi4b8g4
         - 192.168.0.80  # rpi5b8g1
         - 192.168.0.81  # rpi5b16g1ssd
         - 192.168.0.82  # rpi5b16g2ssd

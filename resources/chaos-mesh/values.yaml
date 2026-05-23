@@ -31,11 +31,11 @@ dashboard:
     annotations:
       traefik.ingress.kubernetes.io/router.entrypoints: web
       traefik.ingress.kubernetes.io/router.middlewares: security-authelia@kubernetescrd
-  
+
   # Security is handled by Authelia
   security:
     enabled: false
-  
+
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:

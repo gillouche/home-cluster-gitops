@@ -1,0 +1,15 @@
+title = "home-cluster-gitops gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allow sealed secrets, lockfiles, and known committed artifacts"
+paths = [
+    '''resources/secrets/.*''',
+    '''resources/.*/sealed-.*\.yaml''',
+    '''resources/playground/secrets/.*''',
+    '''flake\.lock''',
+    '''tools/uv\.lock''',
+    '''tools/flake\.lock''',
+]

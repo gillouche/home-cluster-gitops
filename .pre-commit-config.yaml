@@ -1,0 +1,63 @@
+default_install_hook_types: [pre-commit]
+default_stages: [pre-commit]
+fail_fast: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '^resources/(secrets|.*sealed-.*)/'
+      - id: end-of-file-fixer
+        exclude: '^resources/(secrets|.*sealed-.*)/'
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: [--maxkb=512]
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-json
+        exclude: '^renovate\.json$'
+      - id: mixed-line-ending
+        args: [--fix=lf]
+      - id: detect-private-key
+        exclude: '^resources/secrets/'
+
+  - repo: local
+    hooks:
+      - id: yamllint
+        name: yamllint
+        entry: yamllint
+        language: system
+        types: [yaml]
+
+      - id: shellcheck
+        name: shellcheck
+        entry: shellcheck
+        language: system
+        types: [shell]
+
+      - id: nixfmt
+        name: nixfmt
+        entry: nixfmt
+        language: system
+        types: [nix]
+
+      - id: gitleaks
+        name: gitleaks
+        entry: gitleaks protect --staged --redact --verbose
+        language: system
+        pass_filenames: false
+
+      - id: kubeconform
+        name: kubeconform
+        entry: kubeconform -strict -ignore-missing-schemas -summary -schema-location default -schema-location 'https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json'
+        language: system
+        files: '^(apps|bootstrap|resources)/.*\.ya?ml$'
+        exclude: '(values\.yaml|Chart\.yaml|^bootstrap/argocd/.*-patch\.yaml)$'
+
+      - id: kube-linter
+        name: kube-linter
+        entry: kube-linter lint --config .kube-linter.yaml apps/ bootstrap/ resources/
+        language: system
+        pass_filenames: false
+        stages: [manual]

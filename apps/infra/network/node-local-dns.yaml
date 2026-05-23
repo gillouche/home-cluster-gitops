@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: longhorn-prereqs
+  name: node-local-dns
   namespace: argocd
   annotations:
     argocd.argoproj.io/sync-wave: "1"
@@ -10,31 +10,24 @@ metadata:
   finalizers:
     - argoproj.io/resources-finalizer
 spec:
-  project: infra-storage
+  project: infra-base
   source:
     repoURL: https://github.com/gillouche/home-cluster-gitops.git
     targetRevision: HEAD
-    path: resources/longhorn/prereqs
+    path: resources/node-local-dns
+    directory:
+      recurse: true
   destination:
     server: https://kubernetes.default.svc
-    namespace: longhorn-system
-  ignoreDifferences:
-    - group: networking.k8s.io
-      kind: Ingress
-      name: longhorn-ui
-      jsonPointers:
-        - /status
+    namespace: kube-system
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
-    managedNamespaceMetadata:
-      labels:
-        goldilocks.fairwinds.com/enabled: "true"
     syncOptions:
-      - CreateNamespace=true
+      - ServerSideApply=true
     retry:
-      limit: -1
+      limit: 3
       backoff:
         duration: 10s
         factor: 2

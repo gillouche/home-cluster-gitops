@@ -21,9 +21,10 @@ echo "Using certificate: $CERT"
 
 seal_file() {
     local FILE="$1"
-    local BASENAME=$(basename "$FILE")
+    local BASENAME
+    BASENAME=$(basename "$FILE")
     local OUT_FILE="$OUTPUT_DIR/sealed-$BASENAME"
-    
+
     echo "Sealing $BASENAME..."
     $KUBESEAL_CMD \
         --cert "$CERT" \
@@ -50,7 +51,7 @@ else
        echo "No secrets found in $INPUT_DIR"
        exit 0
     fi
-    
+
     find "$INPUT_DIR" -maxdepth 1 \( -name "*.yaml" -o -name "*.yml" \) -print0 | while IFS= read -r -d '' FILE; do
         seal_file "$FILE"
     done

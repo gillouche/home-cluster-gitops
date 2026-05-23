@@ -1,0 +1,21 @@
+checks:
+  doNotAutoAddDefaults: false
+  exclude:
+    - "no-extensions-v1beta"
+    - "minimum-three-replicas"
+    - "no-anti-affinity"
+    - "no-readiness-probe"
+    - "no-liveness-probe"
+    - "default-service-account"
+    - "no-rolling-update-strategy"
+    - "unset-cpu-requirements"
+    - "unset-memory-requirements"
+  ignorePaths:
+    - "**/values.yaml"
+    - "**/Chart.yaml"
+    - "resources/secrets/**"
+    - "resources/playground/secrets/**"
+    - "tools/**"
+    - ".direnv/**"
+
+customChecks: []

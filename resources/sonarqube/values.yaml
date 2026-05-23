@@ -23,7 +23,7 @@ persistence:
 
 # Config
 sonarProperties:
-   sonar.forceAuthentication: true
+  sonar.forceAuthentication: true
 
 # Database (External HA)
 postgresql:

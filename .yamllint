@@ -1,0 +1,42 @@
+extends: default
+
+rules:
+  line-length:
+    max: 300
+    level: warning
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
+  document-start: disable
+  truthy:
+    check-keys: false
+    allowed-values: ["true", "false"]
+  indentation:
+    spaces: 2
+    indent-sequences: whatever
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: disable
+  braces:
+    max-spaces-inside: 1
+    level: warning
+  brackets:
+    max-spaces-inside: 1
+    level: warning
+  octal-values:
+    forbid-implicit-octal: false
+    forbid-explicit-octal: false
+  empty-lines:
+    max: 3
+    max-start: 0
+    max-end: 1
+  trailing-spaces: enable
+
+ignore: |
+  resources/secrets/
+  resources/**/sealed-*.yaml
+  resources/playground/secrets/
+  tools/sealed-secrets/input/
+  tools/.venv/
+  **/.venv/
+  .direnv/
+  flake.lock

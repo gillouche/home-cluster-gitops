@@ -18,7 +18,7 @@ spec:
         - |
           # Wait for DB
           until pg_isready -h shared-db-rw.database.svc; do echo waiting for db; sleep 2; done;
-          
+
           # Function to create DB if missing
           create_db() {
             DB=$1
@@ -48,7 +48,7 @@ spec:
               name: shared-db-superuser
               key: password
         - name: PGDATABASE
-          value: postgres 
+          value: postgres
       nodeSelector:
         node-class: homeserver
       restartPolicy: OnFailure

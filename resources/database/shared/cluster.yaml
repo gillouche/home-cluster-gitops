@@ -8,7 +8,7 @@ spec:
   superuserSecret:
     name: shared-db-superuser
   instances: 2
-  
+
   # Placement
   affinity:
     nodeAffinity:
@@ -21,13 +21,13 @@ spec:
             - homeserver
   # Image Configuration
   imageName: nexus.gillouche.homelab/ghcr-proxy/cloudnative-pg/postgresql:16.1
-  
+
   # Storage Configuration
   storage:
     size: 50Gi
     storageClass: longhorn
     resizeInUseVolumes: true
-  
+
   # Monitoring
   monitoring:
     enablePodMonitor: false
@@ -40,7 +40,7 @@ spec:
     initdb:
       database: sonarqube
       owner: sonarqube
-      
+
   # Managed Roles (Users)
   managed:
     roles:

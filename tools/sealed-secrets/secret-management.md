@@ -1,8 +1,8 @@
 # sealed-secrets
 
-Retrieve public certificate: 
+Retrieve public certificate:
 
-```bash 
+```bash
 kubeseal --controller-name=sealed-secrets-controller --controller-namespace=kube-system --fetch-cert > sealed-secrets-public.pem
 ```
 
