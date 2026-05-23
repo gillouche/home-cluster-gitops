@@ -50,7 +50,7 @@ data:
                 force_tcp
         }
         prometheus :9253
-        health 169.254.20.10:8080
+        health 169.254.20.10:9080
         }
     in-addr.arpa:53 {
         errors
@@ -149,7 +149,7 @@ spec:
             httpGet:
               host: 169.254.20.10
               path: /health
-              port: 8080
+              port: 9080
             initialDelaySeconds: 60
             timeoutSeconds: 5
           volumeMounts:
