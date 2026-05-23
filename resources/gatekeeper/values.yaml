@@ -23,9 +23,9 @@ controllerManager:
       requiredDuringSchedulingIgnoredDuringExecution:
         - labelSelector:
             matchExpressions:
-              - key: app
+              - key: gatekeeper.sh/operation
                 operator: In
-                values: ["gatekeeper"]
+                values: ["webhook"]
           topologyKey: kubernetes.io/hostname
 audit:
   resources:
